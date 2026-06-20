@@ -1189,7 +1189,7 @@
             { id: 'комфорт', label: '🌿 Комфорт', color: '#2ed573' }
         ];
 
-        // ЦВЕТА ОЦЕНОК ДЛЯ ХОЛСТА (исправлены)
+        // ЦВЕТА ОЦЕНОК ДЛЯ ХОЛСТА
         const MOOD_COLORS = {
             1: { bg: '#0a0a2a', glow: 'rgba(5,10,50,0.95)' },
             2: { bg: '#1a2a4a', glow: 'rgba(30,60,120,0.8)' },
@@ -1331,12 +1331,14 @@
             const startDay = firstDay.getDay() || 7;
             grid.innerHTML = '';
 
+            // Пустые дни до начала месяца
             for (let i = 1; i < startDay; i++) {
                 const empty = document.createElement('div');
                 empty.className = 'day empty';
                 grid.appendChild(empty);
             }
 
+            // Дни месяца
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
                 const data = getDayData(dateStr);
@@ -1431,7 +1433,7 @@
         }
 
         // ===================================================================
-        // ОТКРЫТЬ ДЕНЬ (БЕЗ МЕЛЬКАНИЯ)
+        // ОТКРЫТЬ ДЕНЬ
         // ===================================================================
 
         function openDay(dateStr) {
@@ -1450,7 +1452,6 @@
             ];
             document.getElementById('waveDate').textContent = `${parts[2]} ${months[parts[1]-1]} ${parts[0]}`;
 
-            // Если есть оценка — сразу показываем дополнения
             if (selectedMood > 0) {
                 applyMoodGlow(selectedMood);
                 document.getElementById('moodSelector').classList.remove('active');
@@ -1460,7 +1461,6 @@
                 buildEmotionPanel();
                 updateStarCounter();
             } else {
-                // Показываем выбор оценки
                 document.getElementById('moodSelector').classList.add('active');
                 document.getElementById('bottomPanel').classList.remove('active');
                 document.getElementById('backBtn').classList.remove('visible');
@@ -1563,7 +1563,7 @@
                     targetAmp: 0,
                     currentAlpha: 0,
                     targetAlpha: 0,
-                    offset: (Math.random() - 0.5) * 120 // рандомный разброс от -60 до +60
+                    offset: (Math.random() - 0.5) * 120
                 };
             }
             return waveStates[emotionId];
@@ -1581,7 +1581,7 @@
         }
 
         // ===================================================================
-        // АНИМАЦИЯ ВОЛН (РАНДОМНЫЙ РАЗБРОС, МАЛЕНЬКАЯ ЧАСТОТА, ЯРКОСТЬ)
+        // АНИМАЦИЯ ВОЛН
         // ===================================================================
 
         function animateWaves() {
@@ -1594,7 +1594,6 @@
             const mood = getDayData(currentDateStr).mood || 0;
             const color = MOOD_COLORS[mood] || MOOD_COLORS[3];
 
-            // Фоновое свечение
             if (mood === 5) {
                 const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.8);
                 grad.addColorStop(0, 'rgba(255,240,250,0.3)');
@@ -1612,7 +1611,6 @@
                 ctx.fillRect(0, 0, w, h);
             }
 
-            // Волны с рандомным разбросом, выше центра
             let hasActiveWaves = false;
             EMOTIONS.forEach((em, index) => {
                 const state = waveStates[em.id];
@@ -1630,14 +1628,12 @@
                 const color = em.color;
                 const offset = state.offset || 0;
                 const centerY = h * 0.4;
-                // Очень низкая частота
                 const freq = 0.012 + index * 0.002;
                 const speed = 0.9 + index * 0.08;
 
-                // Основная волна — яркая, с рассеиванием
                 ctx.save();
 
-                // Слой 1 — основной, яркий
+                // Слой 1
                 ctx.beginPath();
                 ctx.moveTo(0, centerY + offset);
                 for (let x = 0; x <= w; x += 2) {
@@ -1654,7 +1650,7 @@
                 ctx.shadowColor = color;
                 ctx.stroke();
 
-                // Слой 2 — рассеивание света (полупрозрачный)
+                // Слой 2
                 ctx.beginPath();
                 ctx.moveTo(0, centerY + offset + 15 + Math.sin(time * 0.2 + index) * 8);
                 for (let x = 0; x <= w; x += 3) {
@@ -1670,7 +1666,7 @@
                 ctx.shadowColor = color;
                 ctx.stroke();
 
-                // Слой 3 — лёгкое свечение
+                // Слой 3
                 ctx.beginPath();
                 ctx.moveTo(0, centerY + offset - 10 + Math.sin(time * 0.2 + index * 0.6) * 6);
                 for (let x = 0; x <= w; x += 4) {
