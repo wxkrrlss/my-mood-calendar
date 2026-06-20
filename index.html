@@ -27,7 +27,7 @@
             overflow-y: auto;
             position: relative;
         }
-        /* Космический фон (остаётся для календаря) */
+        /* Космический фон для календаря */
         body::before {
             content: '';
             position: fixed;
@@ -280,7 +280,7 @@
             100% { height: 6px; transform: translateY(-2px); opacity: 1; }
         }
 
-        /* ===== ХОЛСТ ===== */
+        /* ===== ХОЛСТЫ ===== */
         #bgCanvas {
             display: block;
             position: fixed;
@@ -329,6 +329,7 @@
             z-index: 10;
         }
 
+        /* Верхняя панель */
         .top-bar {
             position: fixed;
             top: 16px;
@@ -399,7 +400,7 @@
             -webkit-user-select: none;
         }
 
-        /* ОПИСАНИЯ СОСТОЯНИЙ */
+        /* Описания состояний */
         .state-descriptions {
             position: fixed;
             top: 50%;
@@ -408,11 +409,11 @@
             z-index: 1003;
             pointer-events: none;
             text-align: center;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.8);
             font-size: 15px;
             font-weight: 400;
             line-height: 1.8;
-            text-shadow: 0 0 40px rgba(0,0,0,0.8), 0 0 80px rgba(0,0,0,0.5);
+            text-shadow: 0 0 40px rgba(0,0,0,0.9), 0 0 80px rgba(0,0,0,0.5);
             opacity: 0;
             transition: opacity 0.8s ease;
             user-select: none;
@@ -732,6 +733,7 @@
         }
         .note-editor-save:hover { background: rgba(100,150,255,0.15); }
 
+        /* ===== ИНСТРУКЦИЯ ===== */
         .help-modal {
             display: none;
             position: fixed;
@@ -834,7 +836,6 @@
         </div>
     </div>
 
-    <!-- ФОНОВЫЙ ХОЛСТ (для реалистичных эффектов) -->
     <canvas id="bgCanvas"></canvas>
 
     <div id="waveContainer">
@@ -850,7 +851,6 @@
         <div class="wave-date" id="waveDate">12 января</div>
         <canvas id="waveCanvas"></canvas>
 
-        <!-- ОПИСАНИЯ СОСТОЯНИЙ -->
         <div class="state-descriptions" id="stateDescriptions">
             <div><span class="state-item"><span class="state-symbol">🌊</span> Поток — день прошёл на одном дыхании</span></div>
             <div><span class="state-item"><span class="state-symbol">☀️</span> Свет — день был тёплым и радостным</span></div>
@@ -915,7 +915,7 @@
 
     <script>
         // =================================================================
-        // 1. НАСТРОЙКИ
+        // 1. КОНСТАНТЫ И НАСТРОЙКИ
         // =================================================================
         const STATES = [
             { id: 'поток', label: '🌊 Поток', color: '#4dd0e1', desc: 'день прошёл на одном дыхании' },
@@ -1116,11 +1116,19 @@
         }
 
         // =================================================================
-        // 5. РЕАЛИСТИЧНЫЙ ФОНОВЫЙ ХОЛСТ
+        // 5. ФОНОВЫЙ ХОЛСТ (реалистичные эффекты)
         // =================================================================
         let bgCanvas, bgCtx;
         let bgAnimId = null;
         let currentMood = 0;
+        // Массивы частиц
+        let rainDrops = [];
+        let rainDrops2 = [];
+        let glassDrops = [];
+        let clouds = [];
+        let flowers = [];
+        let flareParticles = [];
+        let lightningFlash = 0;
 
         function initBgCanvas() {
             bgCanvas = document.getElementById('bgCanvas');
@@ -1135,15 +1143,6 @@
             bgCanvas.height = window.innerHeight;
         }
 
-        // Эффекты для каждого фона
-        let rainDrops = [];
-        let rainDrops2 = [];
-        let clouds = [];
-        let flowers = [];
-        let lightningFlash = 0;
-        let flareParticles = [];
-
-        // Функция генерации дождя (реалистичные капли)
         function generateRain(dropsArray, count, angle, speed, lengthRange, width) {
             for (let i = 0; i < count; i++) {
                 dropsArray.push({
@@ -1184,9 +1183,6 @@
             }
             bgCtx.restore();
         }
-
-        // Капли на стекле
-        let glassDrops = [];
 
         function generateGlassDrops(count) {
             for (let i = 0; i < count; i++) {
@@ -1229,7 +1225,6 @@
             }
         }
 
-        // Облака
         function generateClouds(count) {
             for (let i = 0; i < count; i++) {
                 clouds.push({
@@ -1266,7 +1261,6 @@
             }
         }
 
-        // Цветы
         function generateFlowers(count) {
             for (let i = 0; i < count; i++) {
                 flowers.push({
@@ -1307,7 +1301,6 @@
             }
         }
 
-        // Блики (линзовые)
         function generateFlareParticles(count) {
             for (let i = 0; i < count; i++) {
                 flareParticles.push({
@@ -1345,13 +1338,11 @@
             }
         }
 
-        // Основная функция отрисовки фона
         function renderBg(time) {
             if (!bgCtx) return;
             bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
 
             if (currentMood === 0) {
-                // Прозрачный фон
                 bgCtx.fillStyle = 'rgba(10,10,18,0)';
                 bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
                 return;
@@ -1362,13 +1353,10 @@
                 case 1:
                     bgCtx.fillStyle = '#0a0a1a';
                     bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                    // Дождь
                     updateRain(rainDrops);
                     drawRain(rainDrops, 'rgba(180,200,255,0.5)');
-                    // Капли на стекле
                     updateGlassDrops();
                     drawGlassDrops();
-                    // Вспышки молний
                     if (Math.random() < 0.0005) lightningFlash = 0.8;
                     if (lightningFlash > 0) {
                         bgCtx.fillStyle = `rgba(200,220,255,${lightningFlash * 0.3})`;
@@ -1398,7 +1386,6 @@
                 case 5:
                     bgCtx.fillStyle = '#8ac4d4';
                     bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                    // Радуга
                     const grad = bgCtx.createConicGradient(0, bgCanvas.width / 2, bgCanvas.height * 0.8);
                     grad.addColorStop(0, 'rgba(255,0,0,0.1)');
                     grad.addColorStop(0.17, 'rgba(255,165,0,0.1)');
@@ -1422,14 +1409,15 @@
             }
         }
 
-        // Функция смены фона
         function setMoodEffect(mood) {
+            if (bgAnimId) {
+                cancelAnimationFrame(bgAnimId);
+                bgAnimId = null;
+            }
             currentMood = mood;
             const bgCanvasEl = document.getElementById('bgCanvas');
             if (mood === 0) {
                 bgCanvasEl.classList.remove('active');
-                if (bgAnimId) { cancelAnimationFrame(bgAnimId);
-                    bgAnimId = null; }
                 return;
             }
             bgCanvasEl.classList.add('active');
@@ -1441,6 +1429,7 @@
             clouds = [];
             flowers = [];
             flareParticles = [];
+            lightningFlash = 0;
 
             switch (mood) {
                 case 1:
@@ -1465,8 +1454,6 @@
                     generateFlareParticles(20);
                     break;
             }
-
-            if (bgAnimId) cancelAnimationFrame(bgAnimId);
 
             function animateBg(time) {
                 renderBg(time);
@@ -1494,7 +1481,6 @@
             ];
             document.getElementById('waveDate').textContent = `${parts[2]} ${months[parts[1]-1]} ${parts[0]}`;
 
-            // Показываем описания состояний
             document.getElementById('stateDescriptions').classList.add('active');
 
             // Сброс состояний волн
