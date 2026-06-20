@@ -2,96 +2,119 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Эмоциональный дневник</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Мой календарь</title>
+    <!-- Запрещаем выделение, зум, прокрутку -->
     <style>
-        /* ===== ГЛОБАЛЬНЫЕ СБРОСЫ ===== */
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0a1a;
-            min-height: 100vh;
-            overflow: hidden;
-            position: fixed;
+        html, body {
             width: 100%;
             height: 100%;
+            overflow: hidden;
             touch-action: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a12;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        /* Запрещаем выделение текста */
+        ::selection { background: transparent; }
+        ::-moz-selection { background: transparent; }
+        
+        /* Основной контейнер */
+        #app {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
         }
         
-        /* ===== ФОН: СЕВЕРНОЕ СИЯНИЕ ===== */
-        #aurora {
+        /* ===== ГЛОБАЛЬНЫЙ ФОН ===== */
+        #globalBg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0a0a1a, #0d1b2a, #1b2a4a);
             z-index: 0;
+            background: radial-gradient(ellipse at 30% 50%, #0d1b2a 0%, #0a0a12 70%);
             overflow: hidden;
         }
-        
-        .aurora-wave {
+        /* Северное сияние */
+        #aurora {
             position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.3;
-            animation: auroraFloat 20s ease-in-out infinite alternate;
-        }
-        
-        .aurora-wave:nth-child(1) {
-            width: 60%;
-            height: 40%;
-            background: rgba(100, 180, 255, 0.2);
-            top: 10%;
+            top: -20%;
             left: -10%;
-            animation-delay: 0s;
+            width: 120%;
+            height: 140%;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(100, 180, 255, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(180, 140, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(120, 200, 255, 0.04) 0%, transparent 70%);
+            filter: blur(40px);
+            animation: auroraMove 20s ease-in-out infinite alternate;
         }
-        .aurora-wave:nth-child(2) {
-            width: 50%;
-            height: 35%;
-            background: rgba(150, 100, 255, 0.15);
-            bottom: 20%;
-            right: -5%;
-            animation-delay: 5s;
-            animation-duration: 25s;
+        @keyframes auroraMove {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            33% { transform: translate(30px, -20px) scale(1.1) rotate(2deg); }
+            66% { transform: translate(-20px, 30px) scale(0.95) rotate(-2deg); }
+            100% { transform: translate(10px, -10px) scale(1.05) rotate(1deg); }
         }
-        .aurora-wave:nth-child(3) {
-            width: 70%;
-            height: 30%;
-            background: rgba(50, 200, 255, 0.1);
-            top: 40%;
-            left: 20%;
-            animation-delay: 10s;
-            animation-duration: 30s;
+        /* Блики/капли */
+        #glints {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(255,255,255,0.03) 0%, transparent 5%),
+                radial-gradient(circle at 85% 65%, rgba(255,255,255,0.02) 0%, transparent 8%),
+                radial-gradient(circle at 45% 80%, rgba(200,230,255,0.02) 0%, transparent 10%),
+                radial-gradient(circle at 70% 15%, rgba(255,255,255,0.015) 0%, transparent 6%);
+            filter: blur(20px);
+            animation: glintMove 25s ease-in-out infinite alternate;
+            pointer-events: none;
         }
-        .aurora-wave:nth-child(4) {
-            width: 40%;
-            height: 50%;
-            background: rgba(200, 150, 255, 0.08);
-            bottom: 10%;
-            left: 30%;
-            animation-delay: 3s;
-            animation-duration: 22s;
+        @keyframes glintMove {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, -30px) scale(1.2); }
+        }
+        #rainDrops {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.3;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 1px, transparent 1px),
+                radial-gradient(circle at 30% 60%, rgba(255,255,255,0.05) 1px, transparent 1px),
+                radial-gradient(circle at 55% 30%, rgba(255,255,255,0.06) 1px, transparent 1px),
+                radial-gradient(circle at 75% 70%, rgba(255,255,255,0.04) 1px, transparent 1px),
+                radial-gradient(circle at 90% 40%, rgba(255,255,255,0.07) 1px, transparent 1px);
+            background-size: 300px 300px;
+            animation: rainDropMove 15s linear infinite;
+        }
+        @keyframes rainDropMove {
+            0% { transform: translate(0, 0); opacity: 0.2; }
+            50% { transform: translate(20px, -10px); opacity: 0.4; }
+            100% { transform: translate(-10px, 20px); opacity: 0.2; }
         }
         
-        @keyframes auroraFloat {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.2; }
-            33% { transform: translate(10%, -10%) scale(1.2) rotate(5deg); opacity: 0.4; }
-            66% { transform: translate(-5%, 15%) scale(0.9) rotate(-3deg); opacity: 0.25; }
-            100% { transform: translate(15%, -5%) scale(1.1) rotate(2deg); opacity: 0.35; }
-        }
-        
-        /* ===== ОСНОВНОЙ КОНТЕЙНЕР ===== */
-        #app {
+        /* ===== КАЛЕНДАРЬ (главный экран) ===== */
+        #calendarScreen {
             position: relative;
             z-index: 1;
             width: 100%;
@@ -99,894 +122,997 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding: 16px;
-            overflow: hidden;
+            justify-content: center;
+            padding: 20px 16px 30px;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+        #calendarScreen.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
         
-        /* ===== КАЛЕНДАРЬ ===== */
-        .calendar-container {
+        /* Заголовок */
+        .calendar-header {
             width: 100%;
             max-width: 420px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 20px 16px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            margin-top: 20px;
-            transition: all 0.5s ease;
-        }
-        
-        .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 4px 16px;
-            position: relative;
-        }
-        
-        .calendar-header .month-year {
-            font-size: 18px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            letter-spacing: 0.5px;
-        }
-        
-        .calendar-header .nav-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: none;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 18px;
-            padding: 6px 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.3s;
-            touch-action: manipulation;
-        }
-        
-        .calendar-header .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.05);
-        }
-        
-        .calendar-header .help-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 16px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: 0.3s;
-            touch-action: manipulation;
-        }
-        
-        .calendar-header .help-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: scale(1.1);
-        }
-        
-        .calendar-header .header-right {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        
-        .weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.4);
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             padding: 0 4px;
         }
-        
-        .days-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+        .calendar-title {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(180, 200, 255, 0.15);
+        }
+        .calendar-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .calendar-actions button {
+            background: rgba(255,255,255,0.06);
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .calendar-actions button:hover {
+            background: rgba(255,255,255,0.12);
+            transform: scale(1.05);
+        }
+        .calendar-actions button:active {
+            transform: scale(0.92);
         }
         
-        .day {
-            aspect-ratio: 1;
+        /* Месяц */
+        .month-nav {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+        .month-nav button {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            color: #aaa;
+            font-size: 18px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease, color 0.3s ease;
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .month-nav button:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .month-nav button:active {
+            transform: scale(0.9);
+        }
+        .month-nav .month-label {
+            font-size: 17px;
+            font-weight: 500;
+            color: #ddd;
+            letter-spacing: 0.3px;
+        }
+        
+        /* Сетка дней */
+        .days-grid {
+            width: 100%;
+            max-width: 420px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            aspect-ratio: 7 / 6;
+        }
+        .day-cell {
+            background: rgba(255,255,255,0.04);
             border-radius: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 500;
+            color: #fff;
+            transition: background 0.5s ease, transform 0.3s ease, box-shadow 0.5s ease, opacity 0.5s ease;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
-            background: rgba(255, 255, 255, 0.06);
-            color: rgba(255, 255, 255, 0.7);
-            touch-action: manipulation;
             min-height: 44px;
+            border: 2px solid transparent;
+            touch-action: none;
         }
-        
-        .day:active {
+        .day-cell:active {
             transform: scale(0.92);
         }
-        
-        /* Оттенки настроения */
-        .day-mood-0 { background: rgba(255, 255, 255, 0.05); color: rgba(255,255,255,0.3); }
-        .day-mood-1 { background: #1a1a1a; color: rgba(255,255,255,0.8); }
-        .day-mood-2 { background: #444; color: rgba(255,255,255,0.8); }
-        .day-mood-3 { background: #777; color: rgba(255,255,255,0.8); }
-        .day-mood-4 { background: #bbb; color: rgba(0,0,0,0.7); }
-        .day-mood-5 { background: #eee; color: rgba(0,0,0,0.7); }
-        
-        /* Будущие дни — тусклые */
-        .day-future {
-            opacity: 0.3;
-            cursor: default;
-            pointer-events: none;
-            background: rgba(255, 255, 255, 0.03) !important;
-            color: rgba(255, 255, 255, 0.2) !important;
+        .day-cell .day-number {
+            position: relative;
+            z-index: 2;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.85);
+            transition: color 0.3s ease;
         }
-        
-        /* Сегодня — выделен */
-        .day-today {
-            box-shadow: 0 0 20px rgba(150, 200, 255, 0.3), inset 0 0 20px rgba(150, 200, 255, 0.05);
-            border: 1.5px solid rgba(150, 200, 255, 0.4);
-            transform: scale(1.04);
-        }
-        
-        /* Мини-волны на днях */
-        .day-waves {
+        /* Мини-волны под числом */
+        .day-cell .mini-waves {
             display: flex;
             gap: 2px;
             margin-top: 2px;
-            height: 10px;
+            height: 6px;
             align-items: flex-end;
-            justify-content: center;
+            position: relative;
+            z-index: 2;
         }
-        
-        .day-wave {
-            width: 6px;
-            border-radius: 3px 3px 0 0;
-            transition: all 0.3s ease;
-            animation: miniWave 1.5s ease-in-out infinite alternate;
+        .day-cell .mini-waves .mw {
+            width: 10px;
+            height: 4px;
+            border-radius: 4px;
+            opacity: 0.7;
+            transition: all 0.5s ease;
         }
-        
-        .day-wave:nth-child(2) { animation-delay: 0.2s; }
-        .day-wave:nth-child(3) { animation-delay: 0.4s; }
-        .day-wave:nth-child(4) { animation-delay: 0.6s; }
-        
-        @keyframes miniWave {
-            0% { height: 3px; }
-            100% { height: 10px; }
+        /* Сегодня */
+        .day-cell.today {
+            border-color: rgba(180, 200, 255, 0.4);
+            box-shadow: 0 0 30px rgba(180, 200, 255, 0.08), inset 0 0 30px rgba(180, 200, 255, 0.03);
         }
+        /* Будущие */
+        .day-cell.future {
+            opacity: 0.3 !important;
+            cursor: default !important;
+            pointer-events: none !important;
+        }
+        .day-cell.future .day-number {
+            color: rgba(255,255,255,0.3);
+        }
+        .day-cell.future:active {
+            transform: none !important;
+        }
+        /* Пустые */
+        .day-cell.empty {
+            background: transparent !important;
+            cursor: default !important;
+            pointer-events: none !important;
+            opacity: 0 !important;
+        }
+        /* Оттенки серого для дней */
+        .mood-0 { background: rgba(255,255,255,0.04); }
+        .mood-1 { background: rgba(20,20,30,0.9); }
+        .mood-2 { background: rgba(60,60,80,0.7); }
+        .mood-3 { background: rgba(120,120,140,0.5); }
+        .mood-4 { background: rgba(190,190,200,0.35); }
+        .mood-5 { background: rgba(240,240,245,0.25); }
+        .mood-1 .day-number { color: rgba(255,255,255,0.6); }
+        .mood-2 .day-number { color: rgba(255,255,255,0.7); }
+        .mood-3 .day-number { color: rgba(255,255,255,0.8); }
+        .mood-4 .day-number { color: rgba(30,30,40,0.8); }
+        .mood-5 .day-number { color: rgba(30,30,40,0.7); }
         
-        /* ===== ИНСТРУКЦИЯ (модалка) ===== */
-        .modal-overlay {
-            display: none;
+        /* ===== ЭКРАН ДНЯ ===== */
+        #dayScreen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.9s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 16px 20px 30px;
+            background: #0a0a12;
+            overflow: hidden;
+        }
+        #dayScreen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* Фон дня */
+        #dayBg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            transition: background 0.8s ease;
+            background: #0a0a12;
+        }
+        /* Элементы поверх фона */
+        #dayBgGlints {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.5;
+            transition: opacity 0.8s ease;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.03) 0%, transparent 15%),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.02) 0%, transparent 20%);
+            filter: blur(30px);
+        }
+        /* Верхняя панель дня */
+        .day-top-bar {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0 8px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+        }
+        #dayScreen.active .day-top-bar {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .day-top-bar button {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            color: #fff;
+            font-size: 22px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: 200;
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            touch-action: none;
+        }
+        .day-top-bar button:active {
+            transform: scale(0.88);
+        }
+        .day-top-bar button:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .day-top-bar .day-date-label {
+            font-size: 16px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.7);
+            letter-spacing: 0.3px;
         }
         
-        .modal-overlay.active {
+        /* Контент дня (оценка, состояния, звёзды) */
+        .day-content {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            max-width: 420px;
+            flex: 1;
             display: flex;
-            opacity: 1;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 4px 0;
         }
         
-        .modal-content {
-            background: rgba(30, 30, 60, 0.95);
+        /* ===== ШАГ 1: ОЦЕНКА ===== */
+        #stepMood {
+            width: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 0;
+        }
+        #stepMood.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #stepMood.hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            position: absolute;
+        }
+        #stepMood .question {
+            font-size: 18px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.85);
+            text-align: center;
+            letter-spacing: 0.2px;
+            text-shadow: 0 0 30px rgba(0,0,0,0.3);
+        }
+        .mood-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .mood-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(6px);
+            touch-action: none;
+        }
+        .mood-btn:active {
+            transform: scale(0.88);
+        }
+        .mood-btn.selected {
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.12);
+            transform: scale(1.08);
+        }
+        .mood-btn.confirm-btn {
+            width: auto;
+            padding: 0 28px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+            font-size: 15px;
+            font-weight: 500;
+            height: 48px;
+            transition: all 0.3s ease;
+        }
+        .mood-btn.confirm-btn:active {
+            transform: scale(0.92);
+        }
+        .mood-btn.confirm-btn.active {
+            background: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.4);
+        }
+        
+        /* ===== ШАГ 2: СОСТОЯНИЯ ===== */
+        #stepEmotions {
+            width: 100%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+            position: absolute;
+            top: 80px;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            max-width: 420px;
+            pointer-events: none;
+        }
+        #stepEmotions.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            position: relative;
+            top: auto;
+        }
+        #stepEmotions .question {
+            font-size: 17px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.8);
+            text-align: center;
+            letter-spacing: 0.2px;
+        }
+        .emotions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            width: 100%;
+        }
+        .emotion-btn {
+            padding: 8px 16px;
+            border-radius: 24px;
+            border: 1.5px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.4);
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(4px);
+            touch-action: none;
+        }
+        .emotion-btn:active {
+            transform: scale(0.92);
+        }
+        .emotion-btn .emoji {
+            margin-right: 4px;
+        }
+        .emotion-btn.selected {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+            transform: scale(1.04);
+            box-shadow: 0 0 30px rgba(255,255,255,0.03);
+        }
+        .emotion-btn.locked {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        /* Всплывающее предупреждение о лимите */
+        #limitToast {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            opacity: 0;
+            transition: all 0.4s ease;
+            pointer-events: none;
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        #limitToast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* ===== ЗВЁЗДЫ ===== */
+        #starsContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .star-el {
+            position: absolute;
+            font-size: 28px;
+            color: #fff;
+            text-shadow: 0 0 30px rgba(255,255,255,0.4);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: transform 0.3s ease, opacity 0.5s ease;
+            touch-action: none;
+            z-index: 4;
+            animation: starTwinkle 2.5s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 12px rgba(255,255,255,0.2));
+        }
+        .star-el:active {
+            transform: scale(0.85);
+        }
+        @keyframes starTwinkle {
+            0% { opacity: 0.6; transform: scale(0.9); filter: drop-shadow(0 0 8px rgba(255,255,255,0.1)); }
+            100% { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 25px rgba(255,255,255,0.4)); }
+        }
+        /* Взрыв звезды */
+        .star-explosion {
+            position: absolute;
+            pointer-events: none;
+            z-index: 20;
+            font-size: 12px;
+            animation: explodeParticles 0.9s ease-out forwards;
+        }
+        @keyframes explodeParticles {
+            0% { opacity: 1; transform: translate(0,0) scale(0.5) rotate(0deg); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(180deg); }
+        }
+        
+        /* ===== КНОПКА ДОБАВЛЕНИЯ ЗВЕЗДЫ ===== */
+        #addStarBtn {
+            position: relative;
+            z-index: 5;
+            padding: 10px 24px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            touch-action: none;
+            margin-top: 6px;
+        }
+        #addStarBtn:active {
+            transform: scale(0.92);
+        }
+        #addStarBtn:hover {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+        }
+        
+        /* ===== МОДАЛКА КОММЕНТАРИЯ ===== */
+        #commentModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        #commentModal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .comment-modal-box {
+            background: rgba(20,20,30,0.9);
+            backdrop-filter: blur(30px);
             border-radius: 28px;
-            padding: 28px 24px;
+            padding: 28px 24px 24px;
             max-width: 380px;
             width: 100%;
+            border: 1px solid rgba(255,255,255,0.06);
+            transform: scale(0.92) translateY(20px);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+        }
+        #commentModal.active .comment-modal-box {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+        .comment-modal-box .label {
+            font-size: 15px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 4px;
+        }
+        .comment-modal-box .sub-label {
+            font-size: 13px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 14px;
+        }
+        .comment-modal-box textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            transition: border-color 0.3s ease;
+            outline: none;
+        }
+        .comment-modal-box textarea:focus {
+            border-color: rgba(255,255,255,0.15);
+        }
+        .comment-modal-box textarea::placeholder {
+            color: rgba(255,255,255,0.2);
+        }
+        .comment-modal-box .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
+        .comment-modal-box .modal-actions button {
+            padding: 10px 24px;
+            border-radius: 24px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            touch-action: none;
+        }
+        .comment-modal-box .modal-actions button:active {
+            transform: scale(0.92);
+        }
+        .comment-modal-box .modal-actions .btn-save {
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+        }
+        .comment-modal-box .modal-actions .btn-save:hover {
+            background: rgba(255,255,255,0.18);
+        }
+        .comment-modal-box .modal-actions .btn-cancel {
+            background: transparent;
+            color: rgba(255,255,255,0.3);
+        }
+        .comment-modal-box .modal-actions .btn-cancel:hover {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* ===== ИНСТРУКЦИЯ ===== */
+        #helpModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 60;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        #helpModal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .help-box {
+            background: rgba(20,20,30,0.9);
+            backdrop-filter: blur(30px);
+            border-radius: 28px;
+            padding: 28px 24px 24px;
+            max-width: 380px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.06);
+            transform: scale(0.92) translateY(20px);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
             max-height: 80vh;
             overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transform: scale(0.9) translateY(20px);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        
-        .modal-overlay.active .modal-content {
+        #helpModal.active .help-box {
             transform: scale(1) translateY(0);
+            opacity: 1;
         }
-        
-        .modal-content h3 {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 20px;
+        .help-box h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
             margin-bottom: 16px;
             text-align: center;
         }
-        
-        .modal-content .help-item {
+        .help-box .help-item {
             display: flex;
-            align-items: flex-start;
             gap: 12px;
+            align-items: flex-start;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
         }
-        
-        .modal-content .help-item:last-child {
+        .help-box .help-item:last-child {
             border-bottom: none;
         }
-        
-        .modal-content .help-icon {
+        .help-box .help-item .icon {
             font-size: 20px;
             width: 32px;
             text-align: center;
             flex-shrink: 0;
         }
-        
-        .modal-content .help-text {
-            color: rgba(255, 255, 255, 0.75);
+        .help-box .help-item .text {
             font-size: 14px;
+            color: rgba(255,255,255,0.65);
             line-height: 1.4;
         }
-        
-        .modal-content .help-text strong {
-            color: rgba(255, 255, 255, 0.9);
+        .help-box .help-item .text strong {
+            color: rgba(255,255,255,0.85);
         }
-        
-        .modal-close-btn {
+        .help-box .close-help {
             width: 100%;
             padding: 12px;
-            margin-top: 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s;
-            touch-action: manipulation;
-        }
-        
-        .modal-close-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-        
-        /* ===== ПОЛНОЭКРАННЫЙ ДЕНЬ ===== */
-        #dayView {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 100;
-            background: #1a1a2a;
-            opacity: 0;
-            transition: opacity 0.6s ease;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 16px;
-            overflow: hidden;
-        }
-        
-        #dayView.active {
-            display: flex;
-            opacity: 1;
-        }
-        
-        /* Стрелка назад */
-        .day-back-btn {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: none;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 22px;
-            padding: 10px 14px;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: 0.3s;
-            touch-action: manipulation;
-        }
-        
-        .day-back-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-        
-        /* Дата сверху */
-        .day-date {
-            position: absolute;
-            top: 18px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-        
-        /* ===== ХОЛСТ ДЛЯ ВОЛН ===== */
-        #waveCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            touch-action: none;
-        }
-        
-        /* ===== ПАНЕЛЬ ОЦЕНКИ ===== */
-        #moodPanel {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-radius: 24px;
-            padding: 20px 24px;
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0;
-            transform: translateX(-50%) translateY(30px) scale(0.95);
-        }
-        
-        #moodPanel.active {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0) scale(1);
-        }
-        
-        #moodPanel .panel-title {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 15px;
-            font-weight: 500;
-            text-align: center;
-            margin-bottom: 14px;
-            letter-spacing: 0.3px;
-        }
-        
-        .mood-options {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .mood-option {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.5);
+            border: none;
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.5);
             font-size: 14px;
-            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            touch-action: manipulation;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .mood-option:hover {
-            transform: scale(1.08);
-        }
-        
-        .mood-option.selected {
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: scale(1.1);
-            color: white;
-        }
-        
-        .mood-option.mood-1.selected { background: #1a1a2a; border-color: #2a4a7a; }
-        .mood-option.mood-2.selected { background: #2a2a4a; border-color: #4a6a9a; }
-        .mood-option.mood-3.selected { background: #4a4a4a; border-color: #8a8a8a; }
-        .mood-option.mood-4.selected { background: #7a4a4a; border-color: #ba7a7a; }
-        .mood-option.mood-5.selected { background: #4a3a6a; border-color: #ba8aba; }
-        
-        .mood-confirm-btn {
-            width: 100%;
-            padding: 12px;
             margin-top: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s;
-            touch-action: manipulation;
+            touch-action: none;
         }
-        
-        .mood-confirm-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-        .mood-confirm-btn:active {
+        .help-box .close-help:active {
             transform: scale(0.96);
         }
         
-        /* ===== ПАНЕЛЬ ЭМОЦИЙ ===== */
-        #emotionPanel {
+        /* ===== ВОЛНЫ (Canvas) ===== */
+        #wavesCanvas {
             position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 16px 20px;
-            width: 92%;
-            max-width: 420px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0;
-            transform: translateX(-50%) translateY(30px) scale(0.95);
-            display: none;
-            max-height: 50vh;
-            overflow-y: auto;
-        }
-        
-        #emotionPanel.active {
-            display: block;
-            opacity: 1;
-            transform: translateX(-50%) translateY(0) scale(1);
-        }
-        
-        #emotionPanel .panel-title {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            font-weight: 500;
-            text-align: center;
-            margin-bottom: 12px;
-            letter-spacing: 0.3px;
-        }
-        
-        .emotion-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-        }
-        
-        .emotion-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.08);
-            background: rgba(255, 255, 255, 0.04);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            touch-action: manipulation;
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .emotion-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        .emotion-btn.selected {
-            transform: scale(1.08);
-            border-color: currentColor;
-            box-shadow: 0 0 20px currentColor;
-            color: white;
-        }
-        
-        .emotion-btn.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        
-        /* ===== ОКНО КОММЕНТАРИЯ ===== */
-        #commentModal {
-            display: none;
-            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 300;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        
-        #commentModal.active {
-            display: flex;
-            opacity: 1;
-        }
-        
-        .comment-content {
-            background: rgba(20, 20, 40, 0.95);
-            border-radius: 28px;
-            padding: 24px 20px;
-            max-width: 360px;
-            width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            transform: scale(0.9) translateY(20px);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        
-        #commentModal.active .comment-content {
-            transform: scale(1) translateY(0);
-        }
-        
-        .comment-content .comment-color-indicator {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            margin: 0 auto 12px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .comment-content .comment-label {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
-            text-align: center;
-            margin-bottom: 4px;
-        }
-        
-        .comment-content .comment-type {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 16px;
-            font-weight: 500;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-        
-        .comment-content textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(255, 255, 255, 0.04);
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            resize: vertical;
-            min-height: 80px;
-            font-family: inherit;
-            transition: 0.3s;
-        }
-        
-        .comment-content textarea:focus {
-            outline: none;
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        .comment-content .comment-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-        }
-        
-        .comment-content .comment-actions button {
-            flex: 1;
-            padding: 10px;
-            border-radius: 14px;
-            border: none;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s;
-            touch-action: manipulation;
-        }
-        
-        .comment-content .comment-actions .save-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-        }
-        
-        .comment-content .comment-actions .save-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-        
-        .comment-content .comment-actions .close-btn {
-            background: rgba(255, 255, 255, 0.04);
-            color: rgba(255, 255, 255, 0.4);
-        }
-        
-        .comment-content .comment-actions .close-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-        
-        /* ===== СКРОЛЛБАР ===== */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+            z-index: 2;
+            pointer-events: auto;
+            touch-action: none;
         }
         
         /* ===== АДАПТИВ ===== */
-        @media (max-width: 400px) {
-            .calendar-container {
-                padding: 12px 10px;
-                border-radius: 20px;
-            }
-            .day {
-                font-size: 12px;
-                min-height: 36px;
-                border-radius: 10px;
-            }
-            .day-waves {
-                height: 8px;
-            }
-            .day-wave {
-                width: 4px;
-            }
-            .mood-option {
-                width: 36px;
-                height: 36px;
-                font-size: 12px;
-            }
-            .emotion-btn {
-                font-size: 11px;
-                padding: 4px 10px;
-            }
-            #moodPanel, #emotionPanel {
-                padding: 14px 16px;
-                bottom: 16px;
-            }
+        @media (max-width: 420px) {
+            .day-cell { min-height: 38px; border-radius: 10px; }
+            .day-cell .day-number { font-size: 12px; }
+            .mood-btn { width: 44px; height: 44px; font-size: 15px; }
+            .emotion-btn { font-size: 12px; padding: 6px 12px; }
+            .calendar-title { font-size: 18px; }
+            .comment-modal-box { padding: 20px 16px; }
+        }
+        @media (max-width: 360px) {
+            .day-cell { min-height: 32px; border-radius: 8px; }
+            .day-cell .day-number { font-size: 10px; }
+            .mood-btn { width: 38px; height: 38px; font-size: 13px; }
+            .emotion-btn { font-size: 10px; padding: 4px 10px; }
         }
         
-        @media (min-width: 600px) {
-            .calendar-container {
-                padding: 28px 24px;
-            }
-            .day {
-                font-size: 16px;
-                min-height: 52px;
-                border-radius: 16px;
-            }
-        }
+        /* Скрываем скролл */
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
-<!-- ===== ФОН С СЕВЕРНЫМ СИЯНИЕМ ===== -->
-<div id="aurora">
-    <div class="aurora-wave"></div>
-    <div class="aurora-wave"></div>
-    <div class="aurora-wave"></div>
-    <div class="aurora-wave"></div>
-</div>
-
-<!-- ===== ОСНОВНОЕ ПРИЛОЖЕНИЕ ===== -->
 <div id="app">
-    <div class="calendar-container" id="calendarContainer">
+    
+    <!-- ===== ГЛОБАЛЬНЫЙ ФОН ===== -->
+    <div id="globalBg">
+        <div id="aurora"></div>
+        <div id="glints"></div>
+        <div id="rainDrops"></div>
+    </div>
+    
+    <!-- ===== КАЛЕНДАРЬ ===== -->
+    <div id="calendarScreen">
         <div class="calendar-header">
-            <button class="nav-btn" id="prevMonth">‹</button>
-            <span class="month-year" id="monthYear">Июнь 2026</span>
-            <div class="header-right">
-                <button class="help-btn" id="helpBtn">?</button>
-                <button class="nav-btn" id="nextMonth">›</button>
+            <div class="calendar-title">🌙 Мой календарь</div>
+            <div class="calendar-actions">
+                <button id="helpBtn" aria-label="Помощь">?</button>
             </div>
         </div>
-        <div class="weekdays">
-            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+        <div class="month-nav">
+            <button id="prevMonth">‹</button>
+            <span class="month-label" id="monthLabel">Январь 2026</span>
+            <button id="nextMonth">›</button>
         </div>
         <div class="days-grid" id="daysGrid"></div>
     </div>
-</div>
-
-<!-- ===== ИНСТРУКЦИЯ ===== -->
-<div class="modal-overlay" id="helpModal">
-    <div class="modal-content">
-        <h3>✨ Как пользоваться</h3>
-        <div class="help-item">
-            <span class="help-icon">📅</span>
-            <span class="help-text"><strong>Нажми на день</strong> — чтобы открыть его</span>
-        </div>
-        <div class="help-item">
-            <span class="help-icon">🔢</span>
-            <span class="help-text"><strong>Оцени день от 1 до 5</strong> — выбери цвет фона</span>
-        </div>
-        <div class="help-item">
-            <span class="help-icon">🌊</span>
-            <span class="help-text"><strong>Выбери до 4 состояний</strong> — появятся волны</span>
-        </div>
-        <div class="help-item">
-            <span class="help-icon">✍️</span>
-            <span class="help-text"><strong>Нажми на волну</strong> — добавь комментарий</span>
-        </div>
-        <div class="help-item">
-            <span class="help-icon">⭐</span>
-            <span class="help-text"><strong>Нажми на пустое место сверху</strong> — добавь звезду</span>
-        </div>
-        <div class="help-item">
-            <span class="help-icon">📝</span>
-            <span class="help-text"><strong>Нажми на звезду</strong> — прочитай/отредактируй</span>
-        </div>
-        <div class="help-item">
-            <span class="help-icon">💥</span>
-            <span class="help-text"><strong>Задержи палец на звезде</strong> — она взорвётся</span>
-        </div>
-        <div class="help-item">
-            <span class="help-icon">🗑️</span>
-            <span class="help-text"><strong>Задержи палец на дне (2 сек)</strong> — очисти день</span>
-        </div>
-        <button class="modal-close-btn" id="helpCloseBtn">Понятно! ✨</button>
-    </div>
-</div>
-
-<!-- ===== ПОЛНОЭКРАННЫЙ ДЕНЬ ===== -->
-<div id="dayView">
-    <button class="day-back-btn" id="dayBackBtn">←</button>
-    <span class="day-date" id="dayDateLabel">20 июня 2026</span>
-    <canvas id="waveCanvas"></canvas>
     
-    <!-- Панель оценки -->
-    <div id="moodPanel">
-        <div class="panel-title">🎯 Как прошёл твой день?</div>
-        <div class="mood-options" id="moodOptions">
-            <button class="mood-option mood-1" data-mood="1">1</button>
-            <button class="mood-option mood-2" data-mood="2">2</button>
-            <button class="mood-option mood-3" data-mood="3">3</button>
-            <button class="mood-option mood-4" data-mood="4">4</button>
-            <button class="mood-option mood-5" data-mood="5">5</button>
+    <!-- ===== ЭКРАН ДНЯ ===== -->
+    <div id="dayScreen">
+        <div id="dayBg"></div>
+        <div id="dayBgGlints"></div>
+        <div id="starsContainer"></div>
+        <canvas id="wavesCanvas"></canvas>
+        
+        <div class="day-top-bar">
+            <button id="backToMoodBtn" style="opacity:0;pointer-events:none;transition:opacity 0.4s ease;">←</button>
+            <span class="day-date-label" id="dayDateLabel">20 июня</span>
+            <button id="closeDayBtn">✕</button>
         </div>
-        <button class="mood-confirm-btn" id="moodConfirmBtn">Подтвердить →</button>
+        
+        <div class="day-content">
+            <!-- Шаг 1: Оценка -->
+            <div id="stepMood" class="visible">
+                <div class="question">Как прошёл твой день? Оцени от 1 до 5</div>
+                <div class="mood-buttons" id="moodSelector">
+                    <button class="mood-btn" data-mood="1">1</button>
+                    <button class="mood-btn" data-mood="2">2</button>
+                    <button class="mood-btn" data-mood="3">3</button>
+                    <button class="mood-btn" data-mood="4">4</button>
+                    <button class="mood-btn" data-mood="5">5</button>
+                </div>
+                <button class="mood-btn confirm-btn" id="confirmMoodBtn">Подтвердить</button>
+            </div>
+            
+            <!-- Шаг 2: Состояния (появляется после подтверждения) -->
+            <div id="stepEmotions">
+                <div id="limitToast">Можно выбрать только 4 состояния</div>
+                <div class="question">Какие состояния были тебе ближе всего в этот день?</div>
+                <div class="emotions-grid" id="emotionsGrid">
+                    <button class="emotion-btn" data-emotion="Нежность" style="border-color:rgba(255,107,157,0.2);"><span class="emoji">💗</span>Нежность</button>
+                    <button class="emotion-btn" data-emotion="Грусть" style="border-color:rgba(74,111,165,0.2);"><span class="emoji">💙</span>Грусть</button>
+                    <button class="emotion-btn" data-emotion="Спокойствие" style="border-color:rgba(127,200,248,0.2);"><span class="emoji">💎</span>Спокойствие</button>
+                    <button class="emotion-btn" data-emotion="Мечта" style="border-color:rgba(179,157,219,0.2);"><span class="emoji">💜</span>Мечта</button>
+                    <button class="emotion-btn" data-emotion="Раздражение" style="border-color:rgba(255,71,87,0.2);"><span class="emoji">❤️‍🔥</span>Раздражение</button>
+                    <button class="emotion-btn" data-emotion="Комфорт" style="border-color:rgba(129,236,236,0.2);"><span class="emoji">🌿</span>Комфорт</button>
+                    <button class="emotion-btn" data-emotion="Удача" style="border-color:rgba(249,202,36,0.2);"><span class="emoji">🌟</span>Удача</button>
+                    <button class="emotion-btn" data-emotion="Радость" style="border-color:rgba(255,159,67,0.2);"><span class="emoji">🧡</span>Радость</button>
+                </div>
+                <button id="addStarBtn">✨ Добавить звезду</button>
+            </div>
+        </div>
     </div>
     
-    <!-- Панель эмоций -->
-    <div id="emotionPanel">
-        <div class="panel-title">🌊 Какие состояния были тебе ближе всего?</div>
-        <div class="emotion-grid" id="emotionGrid">
-            <button class="emotion-btn" data-emotion="милое" style="color:#ff6b9d;">💗 Милое</button>
-            <button class="emotion-btn" data-emotion="грусть" style="color:#4a6fa5;">💙 Грусть</button>
-            <button class="emotion-btn" data-emotion="спокойствие" style="color:#7fc8f8;">💎 Спокойствие</button>
-            <button class="emotion-btn" data-emotion="мечтательное" style="color:#b39ddb;">💜 Мечтательное</button>
-            <button class="emotion-btn" data-emotion="раздражение" style="color:#ff4757;">❤️‍🔥 Раздражение</button>
-            <button class="emotion-btn" data-emotion="комфорт" style="color:#81ecec;">🌿 Комфорт</button>
-            <button class="emotion-btn" data-emotion="удача" style="color:#f9ca24;">🌟 Удача</button>
-            <button class="emotion-btn" data-emotion="радость" style="color:#ff9f43;">🧡 Радость</button>
+    <!-- ===== МОДАЛКА КОММЕНТАРИЯ ===== -->
+    <div id="commentModal">
+        <div class="comment-modal-box">
+            <div class="label" id="commentModalLabel">Комментарий</div>
+            <div class="sub-label" id="commentModalSub">Что бы ты хотела запомнить?</div>
+            <textarea id="commentInput" placeholder="Напиши что-то..."></textarea>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="commentCancel">Отмена</button>
+                <button class="btn-save" id="commentSave">Сохранить</button>
+            </div>
         </div>
     </div>
-</div>
-
-<!-- ===== ОКНО КОММЕНТАРИЯ ===== -->
-<div id="commentModal">
-    <div class="comment-content">
-        <div class="comment-color-indicator" id="commentColorIndicator"></div>
-        <div class="comment-label">Комментарий к</div>
-        <div class="comment-type" id="commentTypeLabel">волне</div>
-        <textarea id="commentInput" placeholder="Напиши что-то..."></textarea>
-        <div class="comment-actions">
-            <button class="save-btn" id="commentSaveBtn">💾 Сохранить</button>
-            <button class="close-btn" id="commentCloseBtn">✕</button>
+    
+    <!-- ===== ИНСТРУКЦИЯ ===== -->
+    <div id="helpModal">
+        <div class="help-box">
+            <h3>📖 Как пользоваться</h3>
+            <div class="help-item"><span class="icon">📅</span><span class="text"><strong>Нажми на день</strong> — чтобы открыть его</span></div>
+            <div class="help-item"><span class="icon">🔢</span><span class="text"><strong>Оцени день от 1 до 5</strong> — выбери цвет фона</span></div>
+            <div class="help-item"><span class="icon">🌊</span><span class="text"><strong>Выбери до 4 состояний</strong> — появятся волны</span></div>
+            <div class="help-item"><span class="icon">✨</span><span class="text"><strong>Нажми «Добавить звезду»</strong> — отметь особенный момент</span></div>
+            <div class="help-item"><span class="icon">📝</span><span class="text"><strong>Нажми на волну или звезду</strong> — напиши комментарий</span></div>
+            <div class="help-item"><span class="icon">⭐</span><span class="text"><strong>Задержи палец на звезде</strong> — чтобы удалить её</span></div>
+            <div class="help-item"><span class="icon">🗑️</span><span class="text"><strong>Задержи палец на дне (2 сек)</strong> — очистить день</span></div>
+            <button class="close-help" id="closeHelpBtn">Закрыть</button>
         </div>
     </div>
+    
 </div>
 
 <script>
 // ============================================================
-// ===== ПОЛНЫЙ JAVASCRIPT =====
+// ПОЛНЫЙ JS
 // ============================================================
 
-// ===== КОНСТАНТЫ =====
-const EMOTION_COLORS = {
-    'милое': '#ff6b9d',
-    'грусть': '#4a6fa5',
-    'спокойствие': '#7fc8f8',
-    'мечтательное': '#b39ddb',
-    'раздражение': '#ff4757',
-    'комфорт': '#81ecec',
-    'удача': '#f9ca24',
-    'радость': '#ff9f43'
-};
-
-const EMOTION_NAMES = {
-    'милое': 'Милое',
-    'грусть': 'Грусть',
-    'спокойствие': 'Спокойствие',
-    'мечтательное': 'Мечтательное',
-    'раздражение': 'Раздражение',
-    'комфорт': 'Комфорт',
-    'удача': 'Удача',
-    'радость': 'Радость'
-};
-
-const MOOD_BG_COLORS = {
-    1: 'linear-gradient(135deg, #0a0a1a, #1a1a3a)',
-    2: 'linear-gradient(135deg, #1a1a2a, #2a3a5a)',
-    3: 'linear-gradient(135deg, #2a2a2a, #5a5a5a)',
-    4: 'linear-gradient(135deg, #3a1a1a, #6a3a3a)',
-    5: 'linear-gradient(135deg, #1a0a2a, #4a2a5a)'
-};
-
 // ===== СОСТОЯНИЕ =====
+const state = {
+    currentDate: new Date(),
+    viewMonth: new Date().getMonth(),
+    viewYear: new Date().getFullYear(),
+    selectedDate: null,        // '2026-06-20'
+    selectedMood: null,        // 1-5
+    selectedEmotions: [],      // ['Нежность', 'Радость']
+    emotionComments: {},       // { 'Нежность': 'коммент', ... }
+    stars: [],                 // [{ id, x, y, note }]
+    isDayOpen: false,
+    isMoodConfirmed: false,
+    starCounter: 0,
+};
+
+// ===== ДАННЫЕ =====
 let moodData = {};
-let currentDate = new Date();
-let currentMonth = currentDate.getMonth();
-let currentYear = currentDate.getFullYear();
-let todayStr = formatDate(currentDate);
 
-// Состояние текущего открытого дня
+// Цвета состояний
+const emotionColors = {
+    'Нежность': '#ff6b9d',
+    'Грусть': '#4a6fa5',
+    'Спокойствие': '#7fc8f8',
+    'Мечта': '#b39ddb',
+    'Раздражение': '#ff4757',
+    'Комфорт': '#81ecec',
+    'Удача': '#f9ca24',
+    'Радость': '#ff9f43'
+};
+
+const moodBgColors = {
+    1: '#0a0e1a',
+    2: '#1a2a3a',
+    3: '#3a3a44',
+    4: '#5a3a3a',
+    5: '#2a1a3a'
+};
+
+const moodBgGlints = {
+    1: 'radial-gradient(circle at 30% 40%, rgba(20,60,120,0.3) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(10,30,80,0.2) 0%, transparent 35%)',
+    2: 'radial-gradient(circle at 20% 30%, rgba(40,100,180,0.2) 0%, transparent 35%), radial-gradient(circle at 80% 70%, rgba(60,140,200,0.15) 0%, transparent 30%)',
+    3: 'radial-gradient(circle at 30% 50%, rgba(160,140,120,0.15) 0%, transparent 35%), radial-gradient(circle at 70% 50%, rgba(180,160,140,0.1) 0%, transparent 30%)',
+    4: 'radial-gradient(circle at 25% 35%, rgba(180,80,100,0.2) 0%, transparent 35%), radial-gradient(circle at 75% 65%, rgba(200,100,120,0.15) 0%, transparent 30%)',
+    5: 'radial-gradient(circle at 20% 30%, rgba(200,150,255,0.2) 0%, transparent 30%), radial-gradient(circle at 80% 70%, rgba(255,200,150,0.15) 0%, transparent 30%), radial-gradient(circle at 50% 50%, rgba(180,220,255,0.1) 0%, transparent 40%)'
+};
+
+// ===== DOM =====
+const $ = id => document.getElementById(id);
+const daysGrid = $('daysGrid');
+const monthLabel = $('monthLabel');
+const dayScreen = $('dayScreen');
+const dayBg = $('dayBg');
+const dayBgGlints = $('dayBgGlints');
+const dayDateLabel = $('dayDateLabel');
+const stepMood = $('stepMood');
+const stepEmotions = $('stepEmotions');
+const moodSelector = $('moodSelector');
+const confirmMoodBtn = $('confirmMoodBtn');
+const backToMoodBtn = $('backToMoodBtn');
+const closeDayBtn = $('closeDayBtn');
+const emotionsGrid = $('emotionsGrid');
+const addStarBtn = $('addStarBtn');
+const starsContainer = $('starsContainer');
+const wavesCanvas = $('wavesCanvas');
+const ctx = wavesCanvas.getContext('2d');
+const commentModal = $('commentModal');
+const commentInput = $('commentInput');
+const commentModalLabel = $('commentModalLabel');
+const commentModalSub = $('commentModalSub');
+const commentSave = $('commentSave');
+const commentCancel = $('commentCancel');
+const limitToast = $('limitToast');
+const helpModal = $('helpModal');
+const helpBtn = $('helpBtn');
+const closeHelpBtn = $('closeHelpBtn');
+
+let toastTimeout = null;
+let waveAnimationId = null;
+let commentTarget = null; // { type: 'emotion', key: 'Нежность' } или { type: 'star', id: 123 }
 let currentDayStr = null;
-let currentMood = null;
-let selectedEmotions = [];
-let stars = [];
-let waveComments = {};
+let isStarLongPress = false;
+let starLongPressTimer = null;
 
-// Canvas
-let canvas, ctx, animationId;
-
-// Таймер для долгого нажатия
-let longPressTimer = null;
-let isLongPress = false;
-
-// ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
-function formatDate(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+// ===== ЗВУКИ =====
+function playSound(type) {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.value = 0.04;
+        if (type === 'star_add') {
+            osc.frequency.value = 1200;
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.1);
+        } else if (type === 'star_explode') {
+            osc.frequency.value = 800;
+            osc.type = 'sawtooth';
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.3);
+        } else if (type === 'emotion_select') {
+            osc.frequency.value = 600;
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.08);
+        } else if (type === 'mood_confirm') {
+            osc.frequency.value = 400;
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.15);
+        }
+    } catch(e) {}
 }
 
-function parseDate(str) {
-    const parts = str.split('-').map(Number);
-    return new Date(parts[0], parts[1] - 1, parts[2]);
-}
-
-function isToday(str) {
-    return str === todayStr;
-}
-
-function isFuture(str) {
-    return str > todayStr;
-}
-
-function getMonthName(month) {
-    const names = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-                   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-    return names[month];
-}
-
-function getWeekDayName(day) {
-    const names = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-    return names[day];
-}
-
-// ===== РАБОТА С ДАННЫМИ =====
+// ===== СОХРАНЕНИЕ =====
 function loadData() {
     try {
-        const data = localStorage.getItem('moodData');
-        if (data) moodData = JSON.parse(data);
+        const raw = localStorage.getItem('moodData');
+        if (raw) moodData = JSON.parse(raw);
     } catch(e) { moodData = {}; }
 }
 
@@ -996,629 +1122,637 @@ function saveData() {
     } catch(e) {}
 }
 
-function getDayData(dateStr) {
-    if (!moodData[dateStr]) {
-        moodData[dateStr] = { mood: null, emotions: [], waveComments: {}, stars: [] };
-    }
-    return moodData[dateStr];
+// ===== КАЛЕНДАРЬ =====
+function getDateStr(year, month, day) {
+    return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 }
 
-// ===== РЕНДЕР КАЛЕНДАРЯ =====
+function getTodayStr() {
+    const d = new Date();
+    return getDateStr(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function isToday(year, month, day) {
+    const d = new Date();
+    return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+}
+
+function isFuture(year, month, day) {
+    const d = new Date();
+    const d1 = new Date(year, month, day);
+    const d2 = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    return d1 > d2;
+}
+
 function renderCalendar() {
-    const grid = document.getElementById('daysGrid');
-    const monthYear = document.getElementById('monthYear');
-    grid.innerHTML = '';
+    const year = state.viewYear;
+    const month = state.viewMonth;
+    const firstDay = new Date(year, month, 1).getDay() || 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const todayStr = getTodayStr();
     
-    monthYear.textContent = getMonthName(currentMonth) + ' ' + currentYear;
+    daysGrid.innerHTML = '';
+    monthLabel.textContent = `${['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'][month]} ${year}`;
     
-    const firstDay = new Date(currentYear, currentMonth, 1);
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const startDay = firstDay.getDay() || 7; // Пн = 1
-    
-    // Пустые дни
-    for (let i = 1; i < startDay; i++) {
-        const empty = document.createElement('div');
-        empty.className = 'day day-mood-0';
-        empty.style.visibility = 'hidden';
-        empty.style.pointerEvents = 'none';
-        grid.appendChild(empty);
+    for (let i = 1; i < firstDay; i++) {
+        const el = document.createElement('div');
+        el.className = 'day-cell empty';
+        daysGrid.appendChild(el);
     }
     
-    // Дни
     for (let day = 1; day <= daysInMonth; day++) {
-        const dateObj = new Date(currentYear, currentMonth, day);
-        const dateStr = formatDate(dateObj);
-        const dayData = moodData[dateStr] || { mood: null, emotions: [] };
-        const isTodayDay = isToday(dateStr);
-        const isFutureDay = isFuture(dateStr);
+        const dateStr = getDateStr(year, month, day);
+        const el = document.createElement('div');
+        el.className = 'day-cell';
+        el.dataset.date = dateStr;
         
-        const dayEl = document.createElement('div');
-        dayEl.className = 'day';
-        dayEl.dataset.date = dateStr;
-        
-        // Класс настроения
-        const mood = dayData.mood || 0;
-        dayEl.classList.add(`day-mood-${mood}`);
-        
-        // Будущие дни
-        if (isFutureDay) {
-            dayEl.classList.add('day-future');
-        }
+        // Цвет
+        const mood = moodData[dateStr]?.mood || 0;
+        el.classList.add(`mood-${mood}`);
         
         // Сегодня
-        if (isTodayDay) {
-            dayEl.classList.add('day-today');
+        if (isToday(year, month, day)) {
+            el.classList.add('today');
+        }
+        
+        // Будущие
+        if (isFuture(year, month, day)) {
+            el.classList.add('future');
         }
         
         // Число
         const numSpan = document.createElement('span');
+        numSpan.className = 'day-number';
         numSpan.textContent = day;
-        dayEl.appendChild(numSpan);
+        el.appendChild(numSpan);
         
         // Мини-волны
-        if (dayData.emotions && dayData.emotions.length > 0 && !isFutureDay) {
+        const emotions = moodData[dateStr]?.emotions || [];
+        if (emotions.length > 0) {
             const wavesContainer = document.createElement('div');
-            wavesContainer.className = 'day-waves';
-            
-            const displayEmotions = dayData.emotions.slice(0, 4);
-            displayEmotions.forEach(emotion => {
-                const wave = document.createElement('div');
-                wave.className = 'day-wave';
-                wave.style.background = EMOTION_COLORS[emotion] || '#888';
-                wavesContainer.appendChild(wave);
+            wavesContainer.className = 'mini-waves';
+            emotions.forEach(em => {
+                const w = document.createElement('span');
+                w.className = 'mw';
+                w.style.background = emotionColors[em] || '#888';
+                if (emotions.length <= 3) {
+                    w.style.width = '12px';
+                } else {
+                    w.style.width = '9px';
+                }
+                wavesContainer.appendChild(w);
             });
-            
-            dayEl.appendChild(wavesContainer);
+            el.appendChild(wavesContainer);
         }
         
-        // Звёздочка, если есть
-        if (dayData.stars && dayData.stars.length > 0 && !isFutureDay) {
-            const starIcon = document.createElement('span');
-            starIcon.textContent = '✦';
-            starIcon.style.cssText = `
-                position: absolute;
-                top: 2px;
-                right: 6px;
-                font-size: 10px;
-                color: rgba(255,255,255,0.6);
-            `;
-            dayEl.appendChild(starIcon);
-        }
-        
-        // События
-        if (!isFutureDay) {
-            dayEl.addEventListener('click', (e) => {
-                if (isLongPress) return;
-                openDayView(dateStr);
-            });
-            
-            // Долгое нажатие — очистка дня
-            dayEl.addEventListener('pointerdown', (e) => {
-                isLongPress = false;
-                longPressTimer = setTimeout(() => {
-                    isLongPress = true;
+        // Обработка нажатия
+        if (!isFuture(year, month, day)) {
+            el.addEventListener('click', () => openDay(dateStr));
+            // Долгое нажатие для очистки
+            let pressTimer = null;
+            el.addEventListener('touchstart', (e) => {
+                pressTimer = setTimeout(() => {
+                    e.preventDefault();
                     clearDay(dateStr);
                 }, 2000);
             });
-            
-            dayEl.addEventListener('pointerup', () => {
-                clearTimeout(longPressTimer);
+            el.addEventListener('touchend', () => clearTimeout(pressTimer));
+            el.addEventListener('touchmove', () => clearTimeout(pressTimer));
+            el.addEventListener('mousedown', () => {
+                pressTimer = setTimeout(() => {
+                    clearDay(dateStr);
+                }, 2000);
             });
-            
-            dayEl.addEventListener('pointerleave', () => {
-                clearTimeout(longPressTimer);
-            });
+            el.addEventListener('mouseup', () => clearTimeout(pressTimer));
+            el.addEventListener('mouseleave', () => clearTimeout(pressTimer));
         }
         
-        grid.appendChild(dayEl);
+        daysGrid.appendChild(el);
     }
 }
 
 // ===== ОЧИСТКА ДНЯ =====
 function clearDay(dateStr) {
-    if (!confirm('🗑️ Очистить день? Все эмоции, звёзды и комментарии будут удалены.')) return;
-    
+    if (!confirm('Очистить день? Все эмоции, звёзды и комментарии будут удалены.')) return;
     if (moodData[dateStr]) {
-        moodData[dateStr] = { mood: null, emotions: [], waveComments: {}, stars: [] };
+        delete moodData[dateStr];
         saveData();
         renderCalendar();
-        
-        // Если открыт этот день — закрыть
         if (currentDayStr === dateStr) {
-            closeDayView();
+            closeDay();
         }
+        playSound('emotion_select');
     }
 }
 
-// ===== ОТКРЫТЬ ДЕНЬ =====
-function openDayView(dateStr) {
+// ===== ОТКРЫТИЕ ДНЯ =====
+function openDay(dateStr) {
     currentDayStr = dateStr;
-    const dayData = getDayData(dateStr);
-    currentMood = dayData.mood || null;
-    selectedEmotions = dayData.emotions || [];
-    waveComments = dayData.waveComments || {};
-    stars = dayData.stars || [];
+    state.selectedDate = dateStr;
+    state.selectedMood = moodData[dateStr]?.mood || null;
+    state.selectedEmotions = moodData[dateStr]?.emotions || [];
+    state.emotionComments = moodData[dateStr]?.emotionComments || {};
+    state.stars = moodData[dateStr]?.stars || [];
+    state.isMoodConfirmed = !!state.selectedMood;
+    state.starCounter = state.stars.length;
     
-    const view = document.getElementById('dayView');
-    const dateLabel = document.getElementById('dayDateLabel');
-    const dateObj = parseDate(dateStr);
-    dateLabel.textContent = `${dateObj.getDate()} ${getMonthName(dateObj.getMonth())} ${dateObj.getFullYear()}`;
+    // Показываем экран
+    dayScreen.classList.add('active');
+    state.isDayOpen = true;
     
-    // Устанавливаем фон
-    applyMoodBackground(currentMood);
+    // Дата
+    const parts = dateStr.split('-');
+    const d = new Date(parts[0], parts[1]-1, parts[2]);
+    dayDateLabel.textContent = `${d.getDate()} ${['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'][d.getMonth()]}`;
     
-    // Показываем view
-    view.classList.add('active');
+    // Настраиваем шаги
+    if (state.selectedMood) {
+        showStepEmotions();
+        updateMoodUI();
+        updateEmotionsUI();
+        renderStars();
+        updateWaves();
+    } else {
+        showStepMood();
+        updateMoodUI();
+    }
     
-    // Инициализируем canvas
-    canvas = document.getElementById('waveCanvas');
-    ctx = canvas.getContext('2d');
+    // Кнопка назад к оценке
+    backToMoodBtn.style.opacity = state.selectedMood ? '1' : '0';
+    backToMoodBtn.style.pointerEvents = state.selectedMood ? 'auto' : 'none';
+    
+    // Адаптируем canvas
     resizeCanvas();
-    
-    // Показываем панель оценки
-    const moodPanel = document.getElementById('moodPanel');
-    moodPanel.classList.add('active');
-    
-    // Выбираем текущую оценку
-    document.querySelectorAll('.mood-option').forEach(btn => {
-        btn.classList.toggle('selected', parseInt(btn.dataset.mood) === currentMood);
-    });
-    
-    // Скрываем панель эмоций
-    document.getElementById('emotionPanel').classList.remove('active');
-    
-    // Запускаем анимацию
-    if (animationId) cancelAnimationFrame(animationId);
+    if (waveAnimationId) cancelAnimationFrame(waveAnimationId);
     animateWaves();
+    
+    // Обновляем календарь в фоне
+    renderCalendar();
 }
 
-// ===== ЗАКРЫТЬ ДЕНЬ =====
-function closeDayView() {
-    const view = document.getElementById('dayView');
-    view.classList.remove('active');
-    document.getElementById('moodPanel').classList.remove('active');
-    document.getElementById('emotionPanel').classList.remove('active');
-    if (animationId) cancelAnimationFrame(animationId);
+// ===== ЗАКРЫТИЕ ДНЯ =====
+function closeDay() {
+    dayScreen.classList.remove('active');
+    state.isDayOpen = false;
+    if (waveAnimationId) {
+        cancelAnimationFrame(waveAnimationId);
+        waveAnimationId = null;
+    }
     currentDayStr = null;
     renderCalendar();
 }
 
-// ===== ПРИМЕНИТЬ ФОН =====
-function applyMoodBackground(mood) {
-    const view = document.getElementById('dayView');
-    if (mood && MOOD_BG_COLORS[mood]) {
-        view.style.background = MOOD_BG_COLORS[mood];
+// ===== ШАГИ =====
+function showStepMood() {
+    stepMood.classList.remove('hidden');
+    stepMood.classList.add('visible');
+    stepEmotions.classList.remove('visible');
+    stepEmotions.classList.add('hidden');
+    // Скрываем звезды и кнопку добавления
+    starsContainer.style.opacity = '0';
+    addStarBtn.style.opacity = '0';
+    addStarBtn.style.pointerEvents = 'none';
+}
+
+function showStepEmotions() {
+    stepMood.classList.add('hidden');
+    stepMood.classList.remove('visible');
+    stepEmotions.classList.remove('hidden');
+    stepEmotions.classList.add('visible');
+    // Показываем звезды
+    starsContainer.style.opacity = '1';
+    addStarBtn.style.opacity = '1';
+    addStarBtn.style.pointerEvents = 'auto';
+    // Обновляем фон
+    updateDayBg();
+}
+
+// ===== ОБНОВЛЕНИЕ UI ОЦЕНКИ =====
+function updateMoodUI() {
+    const btns = moodSelector.querySelectorAll('.mood-btn');
+    btns.forEach(btn => {
+        btn.classList.toggle('selected', parseInt(btn.dataset.mood) === state.selectedMood);
+    });
+    if (state.selectedMood) {
+        confirmMoodBtn.classList.add('active');
+        // Предпросмотр фона
+        previewMoodBg(state.selectedMood);
     } else {
-        view.style.background = 'linear-gradient(135deg, #1a1a2a, #2a2a4a)';
+        confirmMoodBtn.classList.remove('active');
     }
 }
 
-// ===== RESIZE CANVAS =====
-function resizeCanvas() {
-    if (!canvas) return;
-    const rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+function previewMoodBg(mood) {
+    const bg = moodBgColors[mood] || '#0a0a12';
+    dayBg.style.background = bg;
+    dayBgGlints.style.background = moodBgGlints[mood] || 'none';
+    dayBg.style.transition = 'background 0.6s ease';
+    dayBgGlints.style.transition = 'opacity 0.6s ease';
 }
 
-// ===== АНИМАЦИЯ ВОЛН =====
+function updateDayBg() {
+    const mood = state.selectedMood || 3;
+    const bg = moodBgColors[mood] || '#0a0a12';
+    dayBg.style.background = bg;
+    dayBgGlints.style.background = moodBgGlints[mood] || 'none';
+}
+
+// ===== ОБНОВЛЕНИЕ UI ЭМОЦИЙ =====
+function updateEmotionsUI() {
+    const btns = emotionsGrid.querySelectorAll('.emotion-btn');
+    const maxEmotions = 4;
+    btns.forEach(btn => {
+        const em = btn.dataset.emotion;
+        const isSelected = state.selectedEmotions.includes(em);
+        btn.classList.toggle('selected', isSelected);
+        btn.classList.toggle('locked', state.selectedEmotions.length >= maxEmotions && !isSelected);
+        // Цветная рамка
+        const color = emotionColors[em] || '#888';
+        btn.style.borderColor = isSelected ? color : 'rgba(255,255,255,0.08)';
+        btn.style.color = isSelected ? '#fff' : 'rgba(255,255,255,0.4)';
+        btn.style.background = isSelected ? `rgba(255,255,255,0.08)` : 'rgba(255,255,255,0.04)';
+        btn.style.boxShadow = isSelected ? `0 0 30px ${color}20` : 'none';
+    });
+}
+
+// ===== ВОЛНЫ (Canvas) =====
+function resizeCanvas() {
+    const rect = dayScreen.getBoundingClientRect();
+    wavesCanvas.width = rect.width;
+    wavesCanvas.height = rect.height;
+}
+
 function animateWaves() {
-    if (!canvas || !ctx) return;
-    const w = canvas.width;
-    const h = canvas.height;
+    if (!state.isDayOpen) return;
+    const w = wavesCanvas.width;
+    const h = wavesCanvas.height;
     const time = Date.now() / 1000;
     
     ctx.clearRect(0, 0, w, h);
     
-    // Рисуем волны для выбранных эмоций
-    const emotions = selectedEmotions || [];
+    const emotions = state.selectedEmotions;
+    if (emotions.length === 0) {
+        waveAnimationId = requestAnimationFrame(animateWaves);
+        return;
+    }
+    
     emotions.forEach((emotion, index) => {
-        const color = EMOTION_COLORS[emotion] || '#888';
-        const offset = (index - (emotions.length - 1) / 2) * 50;
-        const amplitude = 25 + Math.sin(time * 0.3 + index) * 8;
-        const frequency = 0.015 + index * 0.002;
+        const color = emotionColors[emotion] || '#888';
+        const total = emotions.length;
+        const offset = (index - (total-1)/2) * 25;
+        const amp = 25 + Math.sin(time * 0.4 + index * 1.7) * 8;
+        const freq = 0.012 + index * 0.002;
+        const yBase = h * 0.5 + offset + Math.sin(time * 0.2 + index) * 10;
         
         ctx.beginPath();
-        ctx.moveTo(0, h/2 + offset);
+        ctx.moveTo(0, yBase);
         
         for (let x = 0; x <= w; x += 2) {
-            const y = h/2 + offset + 
-                Math.sin(x * frequency + time * 1.2 + index * 1.5) * amplitude +
-                Math.sin(x * frequency * 0.4 + time * 0.7 + index * 2.1) * amplitude * 0.3;
+            const y = yBase + 
+                Math.sin(x * freq + time * 1.2 + index * 1.3) * amp +
+                Math.sin(x * freq * 0.6 + time * 0.7 + index * 2.1) * amp * 0.4;
             ctx.lineTo(x, y);
         }
         
         ctx.strokeStyle = color;
         ctx.lineWidth = 3;
-        ctx.globalAlpha = 0.5 + Math.sin(time * 0.4 + index) * 0.15;
+        ctx.globalAlpha = 0.5 + Math.sin(time * 0.3 + index) * 0.1;
         ctx.shadowBlur = 25;
         ctx.shadowColor = color;
         ctx.stroke();
-    });
-    
-    // Рисуем звёзды
-    stars.forEach(star => {
-        const twinkle = 0.7 + Math.sin(time * 1.5 + star.x) * 0.3;
-        const size = 6 * twinkle;
+        
+        // Вторая волна (смещение)
         ctx.beginPath();
-        ctx.arc(star.x, star.y, size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${0.7 + Math.sin(time + star.x) * 0.3})`;
-        ctx.shadowBlur = 25;
-        ctx.shadowColor = 'rgba(255,255,255,0.5)';
-        ctx.fill();
+        for (let x = 0; x <= w; x += 2) {
+            const y = yBase + 15 + 
+                Math.sin(x * freq * 0.7 + time * 0.9 + index * 1.8) * amp * 0.5 +
+                Math.sin(x * freq * 0.4 + time * 0.5 + index * 2.5) * amp * 0.25;
+            ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.3 + Math.sin(time * 0.25 + index + 1) * 0.1;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = color;
+        ctx.stroke();
     });
     
     ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
     
-    animationId = requestAnimationFrame(animateWaves);
+    waveAnimationId = requestAnimationFrame(animateWaves);
 }
 
-// ===== ВЫБОР ОЦЕНКИ =====
-document.querySelectorAll('.mood-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const mood = parseInt(btn.dataset.mood);
-        currentMood = mood;
-        document.querySelectorAll('.mood-option').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        applyMoodBackground(mood);
+// ===== ЗВЁЗДЫ =====
+function renderStars() {
+    starsContainer.innerHTML = '';
+    state.stars.forEach(star => {
+        const el = document.createElement('div');
+        el.className = 'star-el';
+        el.textContent = '⭐';
+        el.style.left = (star.x / 100 * 100) + '%';
+        el.style.top = (star.y / 100 * 100) + '%';
+        el.dataset.starId = star.id;
+        el.style.animationDelay = (Math.random() * 2) + 's';
+        
+        // Нажатие -> комментарий
+        el.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openStarComment(star.id);
+        });
+        
+        // Долгое нажатие -> взрыв
+        let timer = null;
+        el.addEventListener('touchstart', (e) => {
+            timer = setTimeout(() => {
+                e.preventDefault();
+                explodeStar(star.id);
+            }, 800);
+        });
+        el.addEventListener('touchend', () => clearTimeout(timer));
+        el.addEventListener('touchmove', () => clearTimeout(timer));
+        el.addEventListener('mousedown', () => {
+            timer = setTimeout(() => {
+                explodeStar(star.id);
+            }, 800);
+        });
+        el.addEventListener('mouseup', () => clearTimeout(timer));
+        el.addEventListener('mouseleave', () => clearTimeout(timer));
+        
+        starsContainer.appendChild(el);
     });
-});
+}
 
-document.getElementById('moodConfirmBtn').addEventListener('click', () => {
-    if (!currentMood) {
-        alert('Выбери оценку от 1 до 5 😊');
+function addStar() {
+    if (state.selectedEmotions.length === 0) {
+        // Можно добавить только если есть эмоции
+        showToast('Сначала выбери состояния 😊');
         return;
     }
     
-    // Сохраняем оценку
-    if (currentDayStr) {
-        const dayData = getDayData(currentDayStr);
-        dayData.mood = currentMood;
-        saveData();
-        renderCalendar();
-    }
+    // Рандомное место (ближе к центру, не у краёв)
+    const x = 10 + Math.random() * 80;
+    const y = 10 + Math.random() * 60;
+    const id = state.starCounter++;
+    const note = '';
     
-    // Прячем панель оценки, показываем эмоции
-    document.getElementById('moodPanel').classList.remove('active');
-    const emotionPanel = document.getElementById('emotionPanel');
-    emotionPanel.classList.add('active');
+    state.stars.push({ id, x, y, note });
+    saveDayData();
+    renderStars();
+    playSound('star_add');
     
-    // Обновляем выбранные эмоции
-    updateEmotionButtons();
-});
-
-// ===== ВЫБОР ЭМОЦИЙ =====
-document.querySelectorAll('.emotion-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const emotion = btn.dataset.emotion;
-        const index = selectedEmotions.indexOf(emotion);
-        
-        if (index > -1) {
-            selectedEmotions.splice(index, 1);
-            btn.classList.remove('selected');
-        } else if (selectedEmotions.length < 4) {
-            selectedEmotions.push(emotion);
-            btn.classList.add('selected');
-        } else {
-            alert('Можно выбрать максимум 4 состояния 😊');
-            return;
-        }
-        
-        // Сохраняем
-        if (currentDayStr) {
-            const dayData = getDayData(currentDayStr);
-            dayData.emotions = [...selectedEmotions];
-            saveData();
-            renderCalendar();
-        }
-        
-        updateEmotionButtons();
-    });
-});
-
-function updateEmotionButtons() {
-    const btns = document.querySelectorAll('.emotion-btn');
-    btns.forEach(btn => {
-        const emotion = btn.dataset.emotion;
-        btn.classList.toggle('selected', selectedEmotions.includes(emotion));
-        btn.classList.toggle('disabled', selectedEmotions.length >= 4 && !selectedEmotions.includes(emotion));
-    });
+    // Открываем комментарий для новой звезды
+    openStarComment(id);
 }
 
-// ===== ВЗАИМОДЕЙСТВИЕ С ХОЛСТОМ (звёзды и волны) =====
-document.addEventListener('DOMContentLoaded', () => {
-    const canvasEl = document.getElementById('waveCanvas');
-    
-    // Добавление звезды (нажатие на пустое место)
-    canvasEl.addEventListener('click', (e) => {
-        if (!currentDayStr) return;
-        const rect = canvasEl.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        // Только в верхней части (не у краёв)
-        if (y > rect.height * 0.65) return;
-        if (x < 30 || x > rect.width - 30) return;
-        if (y < 30) return;
-        
-        // Проверяем, не попали ли на существующую звезду
-        let hitStar = false;
-        stars.forEach(star => {
-            const dx = x - star.x;
-            const dy = y - star.y;
-            if (dx * dx + dy * dy < 400) hitStar = true;
-        });
-        if (hitStar) return;
-        
-        // Добавляем звезду
-        const note = prompt('✨ Что особенного случилось?');
-        if (note && note.trim()) {
-            stars.push({ x, y, note: note.trim() });
-            const dayData = getDayData(currentDayStr);
-            dayData.stars = stars;
-            saveData();
-            renderCalendar();
-        }
-    });
-    
-    // Долгое нажатие на звезду — взрыв
-    let starLongPressTimer = null;
-    let isStarLongPress = false;
-    let targetStar = null;
-    
-    canvasEl.addEventListener('pointerdown', (e) => {
-        const rect = canvasEl.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        // Проверяем попадание в звезду
-        targetStar = null;
-        stars.forEach(star => {
-            const dx = x - star.x;
-            const dy = y - star.y;
-            if (dx * dx + dy * dy < 400) targetStar = star;
-        });
-        
-        if (targetStar) {
-            isStarLongPress = false;
-            starLongPressTimer = setTimeout(() => {
-                isStarLongPress = true;
-                explodeStar(targetStar);
-            }, 800);
-        }
-    });
-    
-    canvasEl.addEventListener('pointerup', () => {
-        clearTimeout(starLongPressTimer);
-        if (targetStar && !isStarLongPress) {
-            // Короткое нажатие — открыть комментарий
-            openStarComment(targetStar);
-        }
-        targetStar = null;
-        isStarLongPress = false;
-    });
-    
-    canvasEl.addEventListener('pointerleave', () => {
-        clearTimeout(starLongPressTimer);
-        targetStar = null;
-        isStarLongPress = false;
-    });
-});
+function openStarComment(starId) {
+    const star = state.stars.find(s => s.id === starId);
+    if (!star) return;
+    commentTarget = { type: 'star', id: starId };
+    commentModalLabel.textContent = '⭐ Особенный момент';
+    commentModalSub.textContent = 'Что случилось?';
+    commentInput.value = star.note || '';
+    commentModal.classList.add('active');
+}
 
-// ===== ВЗРЫВ ЗВЕЗДЫ =====
-function explodeStar(star) {
-    if (!currentDayStr) return;
+function explodeStar(starId) {
+    const star = state.stars.find(s => s.id === starId);
+    if (!star) return;
     
-    // Удаляем звезду
-    stars = stars.filter(s => s !== star);
-    const dayData = getDayData(currentDayStr);
-    dayData.stars = stars;
+    // Взрыв кристалла
+    const el = starsContainer.querySelector(`.star-el[data-star-id="${starId}"]`);
+    if (el) {
+        const rect = el.getBoundingClientRect();
+        const cx = rect.left + rect.width/2;
+        const cy = rect.top + rect.height/2;
+        
+        // Частицы
+        for (let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            p.className = 'star-explosion';
+            p.textContent = ['✦','✧','❄','♦','◇','✶'][Math.floor(Math.random()*6)];
+            p.style.left = cx + 'px';
+            p.style.top = cy + 'px';
+            p.style.fontSize = (8 + Math.random() * 16) + 'px';
+            p.style.color = `hsl(${190 + Math.random() * 60}, 80%, 70%)`;
+            p.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+            p.style.setProperty('--ty', (Math.random() - 0.5) * 200 + 'px');
+            p.style.animationDuration = (0.6 + Math.random() * 0.6) + 's';
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 1200);
+        }
+        el.remove();
+        playSound('star_explode');
+    }
+    
+    // Удаляем из данных
+    state.stars = state.stars.filter(s => s.id !== starId);
+    saveDayData();
+}
+
+// ===== СОХРАНЕНИЕ ДНЯ =====
+function saveDayData() {
+    if (!currentDayStr) return;
+    if (!moodData[currentDayStr]) moodData[currentDayStr] = {};
+    moodData[currentDayStr].mood = state.selectedMood;
+    moodData[currentDayStr].emotions = state.selectedEmotions;
+    moodData[currentDayStr].emotionComments = state.emotionComments;
+    moodData[currentDayStr].stars = state.stars;
     saveData();
     renderCalendar();
-    
-    // Анимация взрыва (визуальный эффект)
-    const canvasEl = document.getElementById('waveCanvas');
-    const ctx2 = canvasEl.getContext('2d');
-    let particles = [];
-    for (let i = 0; i < 20; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 2 + Math.random() * 4;
-        particles.push({
-            x: star.x,
-            y: star.y,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            life: 1,
-            size: 3 + Math.random() * 4
-        });
-    }
-    
-    let frame = 0;
-    function animateExplosion() {
-        ctx2.clearRect(0, 0, canvasEl.width, canvasEl.height);
-        let alive = false;
-        particles.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.05;
-            p.life -= 0.02;
-            if (p.life > 0) {
-                alive = true;
-                ctx2.beginPath();
-                ctx2.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-                ctx2.fillStyle = `rgba(180, 220, 255, ${p.life * 0.8})`;
-                ctx2.shadowBlur = 20;
-                ctx2.shadowColor = 'rgba(180, 220, 255, 0.5)';
-                ctx2.fill();
-            }
-        });
-        ctx2.shadowBlur = 0;
-        frame++;
-        if (alive && frame < 50) {
-            requestAnimationFrame(animateExplosion);
-        }
-    }
-    animateExplosion();
 }
 
-// ===== ОТКРЫТЬ КОММЕНТАРИЙ ЗВЕЗДЫ =====
-function openStarComment(star) {
-    const modal = document.getElementById('commentModal');
-    const colorIndicator = document.getElementById('commentColorIndicator');
-    const typeLabel = document.getElementById('commentTypeLabel');
-    const input = document.getElementById('commentInput');
-    
-    colorIndicator.style.background = 'radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,255,255,0.2))';
-    typeLabel.textContent = '⭐ Особенный момент';
-    input.value = star.note || '';
-    
-    modal.classList.add('active');
-    
-    // Сохраняем привязку
-    modal.dataset.targetType = 'star';
-    modal.dataset.starId = stars.indexOf(star);
+// ===== ВСПЛЫВАЮЩЕЕ СООБЩЕНИЕ =====
+function showToast(text) {
+    limitToast.textContent = text;
+    limitToast.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+        limitToast.classList.remove('show');
+    }, 2500);
 }
 
-// ===== КОММЕНТАРИИ К ВОЛНАМ (нажатие на волну) =====
-// Определяем клик по волне через цвет
-document.getElementById('waveCanvas').addEventListener('click', (e) => {
-    // Проверяем, есть ли выбранные эмоции
-    if (!selectedEmotions || selectedEmotions.length === 0) return;
+// ===== ОБРАБОТЧИКИ =====
+
+// Выбор оценки
+moodSelector.addEventListener('click', (e) => {
+    const btn = e.target.closest('.mood-btn');
+    if (!btn) return;
+    const mood = parseInt(btn.dataset.mood);
+    state.selectedMood = mood;
+    updateMoodUI();
+});
+
+// Подтверждение оценки
+confirmMoodBtn.addEventListener('click', () => {
+    if (!state.selectedMood) return;
+    state.isMoodConfirmed = true;
+    showStepEmotions();
+    updateDayBg();
+    playSound('mood_confirm');
+    backToMoodBtn.style.opacity = '1';
+    backToMoodBtn.style.pointerEvents = 'auto';
+    saveDayData();
+    renderCalendar();
+});
+
+// Назад к оценке
+backToMoodBtn.addEventListener('click', () => {
+    showStepMood();
+    backToMoodBtn.style.opacity = '0';
+    backToMoodBtn.style.pointerEvents = 'none';
+    updateMoodUI();
+});
+
+// Закрыть день
+closeDayBtn.addEventListener('click', closeDay);
+
+// Выбор эмоций
+emotionsGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.emotion-btn');
+    if (!btn) return;
+    const em = btn.dataset.emotion;
+    const idx = state.selectedEmotions.indexOf(em);
+    const maxEmotions = 4;
     
-    // Простой способ: показываем окно для первой волны
-    // В реальности можно определять по цвету пикселя, но для простоты используем индекс
-    const rect = e.target.getBoundingClientRect();
+    if (idx > -1) {
+        state.selectedEmotions.splice(idx, 1);
+        playSound('emotion_select');
+    } else if (state.selectedEmotions.length < maxEmotions) {
+        state.selectedEmotions.push(em);
+        playSound('emotion_select');
+    } else {
+        showToast('Можно выбрать только 4 состояния');
+        return;
+    }
+    
+    updateEmotionsUI();
+    saveDayData();
+    renderCalendar();
+});
+
+// Добавить звезду
+addStarBtn.addEventListener('click', addStar);
+
+// Комментарии
+function openEmotionComment(emotion) {
+    commentTarget = { type: 'emotion', key: emotion };
+    commentModalLabel.textContent = `💬 Комментарий к «${emotion}»`;
+    commentModalSub.textContent = 'Что именно ты чувствовала?';
+    commentInput.value = state.emotionComments[emotion] || '';
+    commentModal.classList.add('active');
+}
+
+// Нажатие на волну (через canvas)
+wavesCanvas.addEventListener('click', (e) => {
+    const rect = wavesCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const h = rect.height;
+    const w = wavesCanvas.width;
+    const h = wavesCanvas.height;
+    const time = Date.now() / 1000;
     
-    // Определяем, какая волна ближе по вертикали
-    let closestIndex = 0;
-    let closestDist = Infinity;
-    selectedEmotions.forEach((emotion, index) => {
-        const offset = (index - (selectedEmotions.length - 1) / 2) * 50;
-        const centerY = h/2 + offset;
-        const dist = Math.abs(y - centerY);
-        if (dist < closestDist) {
-            closestDist = dist;
-            closestIndex = index;
+    // Проверяем, попали ли на волну
+    const emotions = state.selectedEmotions;
+    let found = null;
+    emotions.forEach((emotion, index) => {
+        const total = emotions.length;
+        const offset = (index - (total-1)/2) * 25;
+        const amp = 25 + Math.sin(time * 0.4 + index * 1.7) * 8;
+        const freq = 0.012 + index * 0.002;
+        const yBase = h * 0.5 + offset + Math.sin(time * 0.2 + index) * 10;
+        
+        // Проверяем y в пределах волны
+        const yWave = yBase + 
+            Math.sin(x * freq + time * 1.2 + index * 1.3) * amp +
+            Math.sin(x * freq * 0.6 + time * 0.7 + index * 2.1) * amp * 0.4;
+        if (Math.abs(y - yWave) < 30) {
+            found = emotion;
         }
     });
     
-    if (closestDist < 60) {
-        const emotion = selectedEmotions[closestIndex];
-        openWaveComment(emotion);
+    if (found) {
+        openEmotionComment(found);
     }
 });
 
-function openWaveComment(emotion) {
-    const modal = document.getElementById('commentModal');
-    const colorIndicator = document.getElementById('commentColorIndicator');
-    const typeLabel = document.getElementById('commentTypeLabel');
-    const input = document.getElementById('commentInput');
-    
-    const color = EMOTION_COLORS[emotion] || '#888';
-    colorIndicator.style.background = `radial-gradient(circle, ${color}, ${color}44)`;
-    typeLabel.textContent = `🌊 ${EMOTION_NAMES[emotion] || emotion}`;
-    input.value = waveComments[emotion] || '';
-    
-    modal.classList.add('active');
-    modal.dataset.targetType = 'wave';
-    modal.dataset.emotion = emotion;
-}
-
-// ===== СОХРАНЕНИЕ КОММЕНТАРИЯ =====
-document.getElementById('commentSaveBtn').addEventListener('click', () => {
-    const modal = document.getElementById('commentModal');
-    const input = document.getElementById('commentInput');
-    const type = modal.dataset.targetType;
-    const text = input.value.trim();
-    
-    if (type === 'wave') {
-        const emotion = modal.dataset.emotion;
-        if (currentDayStr) {
-            const dayData = getDayData(currentDayStr);
-            if (text) {
-                dayData.waveComments[emotion] = text;
-            } else {
-                delete dayData.waveComments[emotion];
-            }
-            saveData();
-        }
-    } else if (type === 'star') {
-        const starId = parseInt(modal.dataset.starId);
-        if (currentDayStr && stars[starId]) {
-            if (text) {
-                stars[starId].note = text;
-            } else {
-                stars[starId].note = '';
-            }
-            const dayData = getDayData(currentDayStr);
-            dayData.stars = stars;
-            saveData();
-            renderCalendar();
-        }
+// Сохранение комментария
+commentSave.addEventListener('click', () => {
+    if (!commentTarget) return;
+    const text = commentInput.value.trim();
+    if (commentTarget.type === 'emotion') {
+        state.emotionComments[commentTarget.key] = text;
+    } else if (commentTarget.type === 'star') {
+        const star = state.stars.find(s => s.id === commentTarget.id);
+        if (star) star.note = text;
     }
-    
-    modal.classList.remove('active');
+    saveDayData();
+    commentModal.classList.remove('active');
+    commentTarget = null;
 });
 
-document.getElementById('commentCloseBtn').addEventListener('click', () => {
-    document.getElementById('commentModal').classList.remove('active');
+commentCancel.addEventListener('click', () => {
+    commentModal.classList.remove('active');
+    commentTarget = null;
 });
 
-// ===== КНОПКИ НАВИГАЦИИ =====
-document.getElementById('prevMonth').addEventListener('click', () => {
-    currentMonth--;
-    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+// Закрытие модалки по клику вне
+commentModal.addEventListener('click', (e) => {
+    if (e.target === commentModal) {
+        commentModal.classList.remove('active');
+        commentTarget = null;
+    }
+});
+
+// Инструкция
+helpBtn.addEventListener('click', () => {
+    helpModal.classList.add('active');
+});
+
+closeHelpBtn.addEventListener('click', () => {
+    helpModal.classList.remove('active');
+});
+
+helpModal.addEventListener('click', (e) => {
+    if (e.target === helpModal) {
+        helpModal.classList.remove('active');
+    }
+});
+
+// Навигация месяцев
+$('prevMonth').addEventListener('click', () => {
+    state.viewMonth--;
+    if (state.viewMonth < 0) { state.viewMonth = 11; state.viewYear--; }
     renderCalendar();
 });
 
-document.getElementById('nextMonth').addEventListener('click', () => {
-    currentMonth++;
-    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+$('nextMonth').addEventListener('click', () => {
+    state.viewMonth++;
+    if (state.viewMonth > 11) { state.viewMonth = 0; state.viewYear++; }
     renderCalendar();
 });
-
-document.getElementById('dayBackBtn').addEventListener('click', closeDayView);
-
-// ===== ИНСТРУКЦИЯ =====
-document.getElementById('helpBtn').addEventListener('click', () => {
-    document.getElementById('helpModal').classList.add('active');
-});
-
-document.getElementById('helpCloseBtn').addEventListener('click', () => {
-    document.getElementById('helpModal').classList.remove('active');
-});
-
-document.getElementById('helpModal').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) {
-        document.getElementById('helpModal').classList.remove('active');
-    }
-});
-
-// ===== ЗАПРЕТЫ ДЛЯ МОБИЛЬНЫХ =====
-document.addEventListener('contextmenu', (e) => e.preventDefault());
-document.addEventListener('dblclick', (e) => e.preventDefault());
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 loadData();
 renderCalendar();
 
-// Обработка resize для canvas
+// Resize canvas при открытии
 window.addEventListener('resize', () => {
-    if (document.getElementById('dayView').classList.contains('active')) {
-        resizeCanvas();
-    }
+    if (state.isDayOpen) resizeCanvas();
 });
 
-// Адаптация под Telegram
-if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
+// Предотвращаем zoom, выделение, контекстное меню
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('gesturechange', e => e.preventDefault());
+document.addEventListener('gestureend', e => e.preventDefault());
+
+// Запуск с Telegram WebApp
+if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.expand();
+    window.Telegram.WebApp.ready();
 }
 
-console.log('🌸 Эмоциональный дневник загружен!');
+console.log('🌸 Эмоциональный дневник запущен!');
 </script>
 </body>
 </html>
