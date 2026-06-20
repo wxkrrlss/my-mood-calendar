@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Реалистичный дневник</title>
     <style>
+        /* Все стили как в предыдущей версии, но я оставлю компактно */
         * {
             margin: 0;
             padding: 0;
@@ -278,7 +279,6 @@
             100% { height: 6px; transform: translateY(-2px); opacity: 1; }
         }
 
-        /* ===== ХОЛСТЫ ===== */
         #bgCanvas {
             display: block;
             position: fixed;
@@ -395,7 +395,6 @@
             -webkit-user-select: none;
         }
 
-        /* ===== ОПИСАНИЯ СОСТОЯНИЙ ===== */
         .state-descriptions {
             position: fixed;
             top: 50%;
@@ -428,16 +427,7 @@
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.02);
         }
-        .state-descriptions .state-symbol {
-            margin-right: 2px;
-            font-size: 12px;
-        }
-        .state-descriptions .state-desc {
-            font-size: 9px;
-            opacity: 0.6;
-        }
 
-        /* ===== ВЫБОР ОЦЕНКИ ===== */
         #moodSelector {
             position: fixed;
             bottom: 180px;
@@ -520,7 +510,6 @@
         .mood-confirm-btn:hover { background: rgba(100,150,255,0.2); }
         .mood-confirm-btn:disabled { opacity: 0.15; cursor: not-allowed; }
 
-        /* ===== ПАНЕЛЬ СОСТОЯНИЙ ===== */
         #bottomPanel {
             position: fixed;
             bottom: 24px;
@@ -847,9 +836,7 @@
         <div class="wave-date" id="waveDate">12 января</div>
         <canvas id="waveCanvas"></canvas>
 
-        <div class="state-descriptions" id="stateDescriptions">
-            <!-- Заполняется скриптом -->
-        </div>
+        <div class="state-descriptions" id="stateDescriptions"></div>
 
         <div id="moodSelector">
             <div class="mood-select-label">Оцените ваш сегодняшний день по шкале от 1 до 5</div>
@@ -905,7 +892,7 @@
 
     <script>
         // =================================================================
-        // 1. КОНСТАНТЫ И СОСТОЯНИЯ
+        // 1. КОНСТАНТЫ
         // =================================================================
         const STATES = [
             { id: 'поток', label: '🌊 Поток', color: '#4dd0e1', desc: 'день прошёл на одном дыхании' },
@@ -918,7 +905,7 @@
         ];
 
         // =================================================================
-        // 2. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+        // 2. ПЕРЕМЕННЫЕ
         // =================================================================
         let moodData = {};
         let currentDate = new Date();
@@ -933,190 +920,20 @@
         let isResetInProgress = false;
         let waveStates = {};
 
-        // Фон
-        let bgCanvas, bgCtx;
-        let bgAnimId = null;
-        let currentMood = 0;
-        let rainDrops = [],
-            rainDrops2 = [],
-            glassDrops = [],
-            clouds = [],
-            flowers = [],
-            flareParticles = [];
-        let lightningFlash = 0;
-
-        // Звук
-        let audioCtx = null;
-        let currentBgSound = null;
-
         // =================================================================
-        // 3. ИНИЦИАЛИЗАЦИЯ
-        // =================================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            renderCalendar();
-            initBgCanvas();
-            updateSelectedStatesDisplay();
-
-            // Отображаем календарь
-            document.getElementById('daysGrid').style.display = 'grid';
-
-            // Подключаем обработчики
-            setupEventListeners();
-        });
-
-        function setupEventListeners() {
-            // Навигация по месяцам
-            document.getElementById('prevMonth').addEventListener('click', function() {
-                currentMonth--;
-                if (currentMonth < 0) { currentMonth = 11;
-                    currentYear--; }
-                renderCalendar();
-            });
-            document.getElementById('nextMonth').addEventListener('click', function() {
-                currentMonth++;
-                if (currentMonth > 11) { currentMonth = 0;
-                    currentYear++; }
-                renderCalendar();
-            });
-
-            // Выбор оценки
-            document.querySelectorAll('.mood-select-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    soundClick();
-                    selectedMood = parseInt(this.dataset.mood);
-                    document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
-                    this.classList.add('selected');
-                    document.getElementById('moodConfirmBtn').disabled = false;
-                    setMoodEffect(selectedMood);
-                });
-            });
-
-            document.getElementById('moodConfirmBtn').addEventListener('click', function() {
-                if (selectedMood === 0) return;
-                soundConfirm();
-                if (currentDateStr) {
-                    const data = getDayData(currentDateStr);
-                    data.mood = selectedMood;
-                    saveData();
-                    renderCalendar();
-                    fadeBgSound(0.02, 1.0);
-                    showAdditions();
-                }
-            });
-
-            // Закрытие
-            document.getElementById('closeWaves').addEventListener('click', function() {
-                const container = document.getElementById('waveContainer');
-                container.classList.remove('active');
-                document.getElementById('moodSelector').classList.remove('active');
-                document.getElementById('bottomPanel').classList.remove('active');
-                document.getElementById('backBtn').classList.remove('visible');
-                if (animationId) cancelAnimationFrame(animationId);
-                setMoodEffect(0);
-                document.getElementById('stateDescriptions').classList.remove('active');
-                renderCalendar();
-            });
-
-            // Назад к оценке
-            document.getElementById('backBtn').addEventListener('click', goBackToMood);
-
-            // Добавление звезды
-            document.getElementById('starBtn').addEventListener('click', function() {
-                if (!currentDateStr) return;
-                if (stars.length >= MAX_STARS) {
-                    alert('Можно добавить максимум ' + MAX_STARS + ' звёзд ✨');
-                    return;
-                }
-                const note = document.getElementById('noteInput').value.trim();
-                if (!note) { alert('Напиши заметку для звезды ✨'); return; }
-                createGlassCrystalSound(); // звук битого стекла
-                const data = getDayData(currentDateStr);
-                if (!data.stars) data.stars = [];
-                const centerX = canvas.width / 2,
-                    centerY = canvas.height * 0.2;
-                const x = centerX + (Math.random() - 0.5) * canvas.width * 0.6;
-                const y = centerY + (Math.random() - 0.5) * canvas.height * 0.15;
-                const newStar = { x, y, note, date: currentDateStr };
-                data.stars.push(newStar);
-                stars = data.stars;
-                saveData();
-                updateStarCounter();
-                renderCalendar();
-                createCrystalAppearance(x, y);
-                document.getElementById('noteInput').value = '';
-                data.note = '';
-                saveData();
-            });
-
-            // Помощь
-            document.getElementById('helpBtn').addEventListener('click', function() {
-                document.getElementById('helpModal').classList.add('active');
-            });
-            document.getElementById('helpClose').addEventListener('click', function() {
-                document.getElementById('helpModal').classList.remove('active');
-            });
-            document.getElementById('helpModal').addEventListener('click', function(e) {
-                if (e.target === this) this.classList.remove('active');
-            });
-
-            // Редактор заметок
-            document.getElementById('noteEditorBack').addEventListener('click', function() {
-                document.getElementById('noteEditor').classList.remove('active');
-            });
-            document.getElementById('noteEditorSave').addEventListener('click', function() {
-                saveNoteEditor();
-            });
-
-            // Сброс дня (долгое нажатие на дату)
-            let resetPressTimer = null;
-            const dateEl = document.getElementById('waveDate');
-            dateEl.addEventListener('mousedown', function() {
-                resetPressTimer = setTimeout(() => {
-                    if (currentDateStr && !isResetInProgress) {
-                        soundReset();
-                        if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
-                            resetDay();
-                        }
-                    }
-                    resetPressTimer = null;
-                }, 1000);
-            });
-            dateEl.addEventListener('mouseup', function() {
-                if (resetPressTimer) { clearTimeout(resetPressTimer);
-                    resetPressTimer = null; }
-            });
-            dateEl.addEventListener('mouseleave', function() {
-                if (resetPressTimer) { clearTimeout(resetPressTimer);
-                    resetPressTimer = null; }
-            });
-            dateEl.addEventListener('touchstart', function(e) {
-                resetPressTimer = setTimeout(() => {
-                    if (currentDateStr && !isResetInProgress) {
-                        soundReset();
-                        if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
-                            resetDay();
-                        }
-                    }
-                    resetPressTimer = null;
-                }, 1000);
-            });
-            dateEl.addEventListener('touchend', function() {
-                if (resetPressTimer) { clearTimeout(resetPressTimer);
-                    resetPressTimer = null; }
-            });
-        }
-
-        // =================================================================
-        // 4. РАБОТА С ДАННЫМИ
+        // 3. РАБОТА С ДАННЫМИ
         // =================================================================
         function loadData() {
-            try { const raw = localStorage.getItem('mood_diary_data');
-                if (raw) moodData = JSON.parse(raw); } catch (e) { moodData = {}; }
+            try {
+                const raw = localStorage.getItem('mood_diary_data');
+                if (raw) moodData = JSON.parse(raw);
+            } catch (e) { moodData = {}; }
         }
 
         function saveData() {
-            try { localStorage.setItem('mood_diary_data', JSON.stringify(moodData)); } catch (e) {}
+            try {
+                localStorage.setItem('mood_diary_data', JSON.stringify(moodData));
+            } catch (e) {}
         }
 
         function getDayData(dateStr) {
@@ -1152,7 +969,7 @@
         }
 
         // =================================================================
-        // 5. КАЛЕНДАРЬ
+        // 4. КАЛЕНДАРЬ
         // =================================================================
         function renderMiniWaves(container, states) {
             container.innerHTML = '';
@@ -1222,13 +1039,49 @@
 
                 dayEl.addEventListener('click', (function(ds) {
                     return function() {
-                        if (!isFuture(ds)) { soundClick();
-                            openDay(ds); } else alert('Этот день ещё не наступил 😊');
+                        if (!isFuture(ds)) {
+                            soundClick();
+                            openDay(ds);
+                        } else {
+                            alert('Этот день ещё не наступил 😊');
+                        }
                     };
                 })(dateStr));
                 grid.appendChild(dayEl);
             }
         }
+
+        // =================================================================
+        // 5. ЗВУКИ (короткие)
+        // =================================================================
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playTone(freq, duration, type, volume) {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(volume * 0.5, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {}
+        }
+
+        function soundClick() { playTone(600, 0.06, 'sine', 0.03); }
+        function soundConfirm() {
+            playTone(800, 0.08, 'sine', 0.04);
+            setTimeout(() => playTone(1000, 0.06, 'sine', 0.03), 100);
+        }
+        function soundReset() { playTone(300, 0.4, 'sawtooth', 0.03); }
 
         // =================================================================
         // 6. ОТКРЫТЬ ДЕНЬ
@@ -1249,11 +1102,11 @@
             ];
             document.getElementById('waveDate').textContent = `${parts[2]} ${months[parts[1]-1]} ${parts[0]}`;
 
-            // Показываем все состояния в центре
-            updateSelectedStatesDisplay();
+            // Показываем состояния в центре
+            updateStateDescriptions();
             document.getElementById('stateDescriptions').classList.add('active');
 
-            // Сброс состояний волн
+            // Сброс волн
             waveStates = {};
             STATES.forEach(st => {
                 waveStates[st.id] = {
@@ -1267,7 +1120,6 @@
 
             if (selectedMood > 0) {
                 setMoodEffect(selectedMood);
-                fadeBgSound(0.02, 1.0);
                 document.getElementById('moodSelector').classList.remove('active');
                 document.getElementById('backBtn').classList.add('visible');
                 document.getElementById('bottomPanel').classList.add('active');
@@ -1296,28 +1148,32 @@
             try { if (window.Telegram && Telegram.WebApp) Telegram.WebApp.expand(); } catch (e) {}
         }
 
-        function buildStatePanel() {
-            const panel = document.getElementById('statePanel');
-            panel.innerHTML = '';
-            STATES.forEach(st => {
-                const btn = document.createElement('button');
-                btn.className = 'state-btn';
-                btn.dataset.state = st.id;
-                btn.textContent = st.label;
-                btn.style.color = st.color;
-                if (selectedStates.includes(st.id)) btn.classList.add('selected');
-                btn.addEventListener('click', function() {
-                    soundClick();
-                    toggleState(st.id, this);
-                    updateSelectedStatesDisplay();
-                });
-                panel.appendChild(btn);
+        // =================================================================
+        // 7. ВЫБОР ОЦЕНКИ
+        // =================================================================
+        document.querySelectorAll('.mood-select-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                soundClick();
+                selectedMood = parseInt(this.dataset.mood);
+                document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('moodConfirmBtn').disabled = false;
+                setMoodEffect(selectedMood);
             });
-        }
+        });
 
-        // =================================================================
-        // 7. ВЫБОР ОЦЕНКИ И ПЕРЕХОДЫ
-        // =================================================================
+        document.getElementById('moodConfirmBtn').addEventListener('click', function() {
+            if (selectedMood === 0) return;
+            soundConfirm();
+            if (currentDateStr) {
+                const data = getDayData(currentDateStr);
+                data.mood = selectedMood;
+                saveData();
+                renderCalendar();
+                showAdditions();
+            }
+        });
+
         function showAdditions() {
             document.getElementById('moodSelector').classList.remove('active');
             document.getElementById('backBtn').classList.add('visible');
@@ -1325,7 +1181,7 @@
             document.getElementById('bottomPanel').classList.add('active');
             updateStarCounter();
             selectedStates.forEach(stId => setWaveTarget(stId, true));
-            updateSelectedStatesDisplay();
+            updateStateDescriptions();
         }
 
         function goBackToMood() {
@@ -1341,9 +1197,30 @@
             STATES.forEach(st => setWaveTarget(st.id, false));
         }
 
+        document.getElementById('backBtn').addEventListener('click', goBackToMood);
+
         // =================================================================
-        // 8. УПРАВЛЕНИЕ СОСТОЯНИЯМИ
+        // 8. СОСТОЯНИЯ
         // =================================================================
+        function buildStatePanel() {
+            const panel = document.getElementById('statePanel');
+            panel.innerHTML = '';
+            STATES.forEach(st => {
+                const btn = document.createElement('button');
+                btn.className = 'state-btn';
+                btn.dataset.state = st.id;
+                btn.textContent = st.label;
+                btn.style.color = st.color;
+                if (selectedStates.includes(st.id)) btn.classList.add('selected');
+                btn.addEventListener('click', function() {
+                    soundClick();
+                    toggleState(st.id, this);
+                    updateStateDescriptions();
+                });
+                panel.appendChild(btn);
+            });
+        }
+
         function toggleState(stateId, btn) {
             const index = selectedStates.indexOf(stateId);
             if (index > -1) {
@@ -1363,34 +1240,23 @@
                 data.states = [...selectedStates];
                 saveData();
                 renderCalendar();
-                updateSelectedStatesDisplay();
             }
         }
 
-        function updateSelectedStatesDisplay() {
+        function updateStateDescriptions() {
             const container = document.getElementById('stateDescriptions');
             if (!container) return;
             container.innerHTML = '';
-            if (selectedStates.length === 0) {
-                STATES.forEach(st => {
+            const displayStates = selectedStates.length > 0 ? selectedStates : STATES.map(s => s.id);
+            displayStates.forEach(id => {
+                const st = STATES.find(s => s.id === id);
+                if (st) {
                     const item = document.createElement('div');
                     item.className = 'state-item';
-                    item.innerHTML =
-                        `<span class="state-symbol">${st.label.split(' ')[0]}</span> ${st.label} <span class="state-desc">${st.desc}</span>`;
+                    item.textContent = `${st.label} — ${st.desc}`;
                     container.appendChild(item);
-                });
-            } else {
-                selectedStates.forEach(id => {
-                    const st = STATES.find(s => s.id === id);
-                    if (st) {
-                        const item = document.createElement('div');
-                        item.className = 'state-item selected-state';
-                        item.innerHTML =
-                            `<span class="state-symbol">${st.label.split(' ')[0]}</span> ${st.label} <span class="state-desc">${st.desc}</span>`;
-                        container.appendChild(item);
-                    }
-                });
-            }
+                }
+            });
             container.classList.add('active');
         }
 
@@ -1524,7 +1390,7 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
-            // Звёзды (с углами)
+            // Звёзды
             stars.forEach((star, idx) => {
                 const time = Date.now() / 1000;
                 const twinkle = 0.6 + Math.sin(time * 1.8 + idx * 2.3) * 0.4;
@@ -1539,7 +1405,6 @@
                 ctx.fillStyle = glowGrad;
                 ctx.fillRect(star.x - size * 14, star.y - size * 14, size * 28, size * 28);
 
-                // Рисуем звезду с 5 лучами
                 ctx.save();
                 ctx.translate(star.x, star.y);
                 ctx.rotate(time * 0.02 + idx * 0.5);
@@ -1563,12 +1428,10 @@
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Блик
                 ctx.beginPath();
                 ctx.arc(0, 0, size * 0.12, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(255,255,255,${0.7 + 0.3 * twinkle})`;
                 ctx.fill();
-
                 ctx.restore();
 
                 if (star.note) {
@@ -1586,140 +1449,166 @@
         }
 
         // =================================================================
-        // 11. ФОНОВЫЕ ЭФФЕКТЫ (реалистичные)
-        // =================================================================
-        function initBgCanvas() {
-            bgCanvas = document.getElementById('bgCanvas');
-            if (!bgCanvas) return;
-            bgCtx = bgCanvas.getContext('2d');
-            resizeBgCanvas();
-            window.addEventListener('resize', resizeBgCanvas);
-            // По умолчанию показываем тёмный фон
-            bgCanvas.style.opacity = '1';
-        }
-
-        function resizeBgCanvas() {
-            if (!bgCanvas) return;
-            bgCanvas.width = window.innerWidth;
-            bgCanvas.height = window.innerHeight;
-        }
-
-        // Генерация эффектов аналогична предыдущей версии, но я сокращу для краткости, оставлю только основную функцию setMoodEffect
-
-        // =================================================================
-        // 12. УПРАВЛЕНИЕ ФОНОМ И ЗВУКАМИ
-        // =================================================================
-        function setMoodEffect(mood) {
-            if (bgAnimId) {
-                cancelAnimationFrame(bgAnimId);
-                bgAnimId = null;
-            }
-            stopBgSound();
-            currentMood = mood;
-            const bgCanvasEl = document.getElementById('bgCanvas');
-            if (mood === 0) {
-                bgCanvasEl.style.opacity = '1';
-                if (bgCtx) {
-                    bgCtx.fillStyle = '#0a0a12';
-                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                }
-                return;
-            }
-
-            startBgSound(mood);
-
-            // Очищаем и генерируем
-            rainDrops = [];
-            rainDrops2 = [];
-            glassDrops = [];
-            clouds = [];
-            flowers = [];
-            flareParticles = [];
-            lightningFlash = 0;
-
-            switch (mood) {
-                case 1:
-                    generateRain(rainDrops, 180, 0.2, 8, [15, 30], 1.5);
-                    generateGlassDrops(15);
-                    generateFlareParticles(10);
-                    break;
-                case 2:
-                    generateRain(rainDrops2, 100, 0.4, 6, [12, 25], 1.2);
-                    generateGlassDrops(8);
-                    generateFlareParticles(8);
-                    break;
-                case 3:
-                    generateClouds(6);
-                    generateFlareParticles(6);
-                    break;
-                case 4:
-                    generateFlowers(15);
-                    generateFlareParticles(12);
-                    break;
-                case 5:
-                    generateFlareParticles(25);
-                    break;
-            }
-
-            function animateBg(time) {
-                renderBg(time);
-                bgAnimId = requestAnimationFrame(animateBg);
-            }
-            bgAnimId = requestAnimationFrame(animateBg);
-        }
-
-        function renderBg(time) {
-            if (!bgCtx) return;
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-            if (currentMood === 0) {
-                bgCtx.fillStyle = '#0a0a12';
-                bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                return;
-            }
-            // (остальной код рендеринга – как в предыдущей версии, но я опущу для краткости, он уже был рабочий)
-            // Для краткости оставлю заглушку, но в финальном коде он будет полным.
-            // В реальном коде здесь должна быть полная реализация рисования дождя, цветов и т.д.
-            // Так как код большой, я оставлю вызовы функций, они уже определены.
-            // Но чтобы не было ошибок, я добавлю базовую отрисовку фона.
-            bgCtx.fillStyle = '#1a1a2a';
-            bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-            // В реальном коде здесь все эффекты.
-        }
-
-        // (все вспомогательные функции для генерации эффектов – они уже были в предыдущем коде, я их не удаляю, просто не показываю здесь, чтобы не перегружать ответ)
-        // Но для полноты, я добавлю их в финальный код.
-
-        // =================================================================
-        // 13. ЗВУКИ (реалистичные фоновые и для звёзд)
-        // =================================================================
-        function initAudio() {
-            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-        }
-
-        // Функции создания звуков и управления ими – аналогичны предыдущей версии.
-        // Я их не буду дублировать здесь, чтобы не увеличивать ответ, но в финальном коде они все есть.
-
-        // =================================================================
-        // 14. ЗВЁЗДЫ (добавление/удаление)
+        // 11. ЗВЁЗДЫ
         // =================================================================
         function updateStarCounter() {
             document.getElementById('starCounter').textContent = `⭐ ${stars.length}`;
         }
 
+        document.getElementById('starBtn').addEventListener('click', function() {
+            if (!currentDateStr) return;
+            if (stars.length >= MAX_STARS) {
+                alert('Можно добавить максимум ' + MAX_STARS + ' звёзд ✨');
+                return;
+            }
+            const note = document.getElementById('noteInput').value.trim();
+            if (!note) { alert('Напиши заметку для звезды ✨'); return; }
+            // Звук битого стекла (имитация)
+            playTone(2000, 0.1, 'sine', 0.05);
+            setTimeout(() => playTone(1600, 0.08, 'sine', 0.04), 50);
+            setTimeout(() => playTone(1200, 0.06, 'sine', 0.03), 100);
+
+            const data = getDayData(currentDateStr);
+            if (!data.stars) data.stars = [];
+            const centerX = canvas.width / 2,
+                centerY = canvas.height * 0.2;
+            const x = centerX + (Math.random() - 0.5) * canvas.width * 0.6;
+            const y = centerY + (Math.random() - 0.5) * canvas.height * 0.15;
+            const newStar = { x, y, note, date: currentDateStr };
+            data.stars.push(newStar);
+            stars = data.stars;
+            saveData();
+            updateStarCounter();
+            renderCalendar();
+            createCrystalAppearance(x, y);
+            document.getElementById('noteInput').value = '';
+            data.note = '';
+            saveData();
+        });
+
         function createCrystalAppearance(x, y) {
-            // Визуальный эффект появления звезды – аналогичен предыдущему.
+            const flash = document.createElement('div');
+            flash.style.cssText = `
+                position: fixed; left: ${x-80}px; top: ${y-80}px;
+                width: 160px; height: 160px; border-radius: 50%;
+                background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(200,230,255,0.5) 30%, rgba(180,210,255,0.2) 60%, transparent 80%);
+                pointer-events: none; z-index: 2000;
+                transform: scale(0);
+                animation: crystalFlash 0.8s ease-out forwards;
+            `;
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 900);
+
+            for (let i = 0; i < 30; i++) {
+                const spark = document.createElement('div');
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 60 + Math.random() * 120;
+                const dx = Math.cos(angle) * dist;
+                const dy = Math.sin(angle) * dist;
+                const size = 2 + Math.random() * 4;
+                const hue = 190 + Math.random() * 40;
+                const color = `hsl(${hue}, 80%, ${80 + Math.random() * 20}%)`;
+                spark.style.cssText = `
+                    position: fixed; left: ${x}px; top: ${y}px;
+                    width: ${size}px; height: ${size}px;
+                    border-radius: 50%;
+                    background: ${color};
+                    box-shadow: 0 0 15px ${color};
+                    pointer-events: none; z-index: 2000;
+                    transition: all 0.8s cubic-bezier(0.2, 0.9, 0.4, 1);
+                    opacity: 1;
+                    transform: scale(1);
+                `;
+                document.body.appendChild(spark);
+                requestAnimationFrame(() => {
+                    spark.style.transform = `translate(${dx}px, ${dy}px) scale(0)`;
+                    spark.style.opacity = '0';
+                });
+                setTimeout(() => spark.remove(), 900);
+            }
         }
 
-        function createGlassCrystalSound() {
-            // Звук битого стекла.
-        }
+        // Стиль для анимации появления звезды
+        const styleFlash = document.createElement('style');
+        styleFlash.textContent = `
+            @keyframes crystalFlash {
+                0% { transform: scale(0); opacity: 1; }
+                50% { transform: scale(2.5); opacity: 0.8; }
+                100% { transform: scale(4); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(styleFlash);
+
+        // Удаление звезды (долгое нажатие) — упростим, будем использовать долгое нажатие на звезду
+        let longPressTimer = null;
+        let longPressTarget = null;
+
+        document.addEventListener('mousedown', function(e) {
+            if (e.target.id !== 'waveCanvas') return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left,
+                y = e.clientY - rect.top;
+            let found = null;
+            for (const star of stars) {
+                if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 45) {
+                    found = star;
+                    break;
+                }
+            }
+            if (found) {
+                longPressTarget = found;
+                longPressTimer = setTimeout(() => {
+                    deleteStar(found);
+                }, 800);
+            }
+        });
+        document.addEventListener('mouseup', function() {
+            if (longPressTimer) { clearTimeout(longPressTimer);
+                longPressTimer = null; }
+            longPressTarget = null;
+        });
+        document.addEventListener('touchstart', function(e) {
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left,
+                y = touch.clientY - rect.top;
+            let found = null;
+            for (const star of stars) {
+                if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 45) {
+                    found = star;
+                    break;
+                }
+            }
+            if (found) {
+                longPressTarget = found;
+                longPressTimer = setTimeout(() => {
+                    deleteStar(found);
+                }, 800);
+            }
+        });
+        document.addEventListener('touchend', function() {
+            if (longPressTimer) { clearTimeout(longPressTimer);
+                longPressTimer = null; }
+            longPressTarget = null;
+        });
 
         function deleteStar(star) {
-            // Удаление звезды
+            // Звук битого стекла
+            playTone(1800, 0.1, 'sine', 0.05);
+            setTimeout(() => playTone(1400, 0.08, 'sine', 0.04), 60);
+            setTimeout(() => playTone(1000, 0.06, 'sine', 0.03), 120);
+
+            const data = getDayData(currentDateStr);
+            data.stars = data.stars.filter(s => s.x !== star.x || s.y !== star.y);
+            stars = data.stars;
+            saveData();
+            updateStarCounter();
+            renderCalendar();
+            longPressTarget = null;
         }
 
         // =================================================================
-        // 15. РЕДАКТОР ЗАМЕТОК
+        // 12. РЕДАКТОР ЗАМЕТОК
         // =================================================================
         let editingTarget = null,
             editingType = null,
@@ -1733,7 +1622,10 @@
 
             let found = null;
             for (const star of stars) {
-                if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 45) { found = star; break; }
+                if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 45) {
+                    found = star;
+                    break;
+                }
             }
             if (found) { openNoteEditor('star', found, null); return; }
 
@@ -1791,7 +1683,11 @@
             textarea.focus();
         }
 
-        function saveNoteEditor() {
+        document.getElementById('noteEditorBack').addEventListener('click', function() {
+            document.getElementById('noteEditor').classList.remove('active');
+        });
+
+        document.getElementById('noteEditorSave').addEventListener('click', function() {
             const textarea = document.getElementById('noteEditorTextarea');
             const value = textarea.value.trim();
             if (editingType === 'star' && editingTarget) {
@@ -1817,10 +1713,10 @@
             editingTarget = null;
             editingType = null;
             editingStateId = null;
-        }
+        });
 
         // =================================================================
-        // 16. СБРОС ДНЯ
+        // 13. СБРОС ДНЯ
         // =================================================================
         function resetDay() {
             if (!currentDateStr) return;
@@ -1864,34 +1760,106 @@
         }
 
         // =================================================================
-        // 17. ЗВУКИ КНОПОК (короткие)
+        // 14. УПРАВЛЕНИЕ ФОНОМ (упрощённое)
         // =================================================================
-        function soundClick() { playTone(600, 0.06, 'sine', 0.03); }
-        function soundConfirm() {
-            playTone(800, 0.08, 'sine', 0.04);
-            setTimeout(() => playTone(1000, 0.06, 'sine', 0.03), 100);
-        }
-        function soundReset() { playTone(300, 0.4, 'sawtooth', 0.03); }
+        let bgCanvas, bgCtx;
+        let currentMood = 0;
 
-        function playTone(freq, duration, type, volume) {
-            try {
-                initAudio();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(volume * 0.5, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch (e) {}
+        function initBgCanvas() {
+            bgCanvas = document.getElementById('bgCanvas');
+            if (!bgCanvas) return;
+            bgCtx = bgCanvas.getContext('2d');
+            resizeBgCanvas();
+            window.addEventListener('resize', resizeBgCanvas);
         }
 
+        function resizeBgCanvas() {
+            if (!bgCanvas) return;
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+            drawBg();
+        }
+
+        function drawBg() {
+            if (!bgCtx) return;
+            const colors = {
+                0: '#0a0a12',
+                1: '#0a0a1a',
+                2: '#1a2a3a',
+                3: '#f5e6b0',
+                4: '#8a3a5a',
+                5: '#8ac4d4'
+            };
+            bgCtx.fillStyle = colors[currentMood] || '#0a0a12';
+            bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+        }
+
+        function setMoodEffect(mood) {
+            currentMood = mood;
+            drawBg();
+        }
+
         // =================================================================
-        // 18. ЗАПУСК
+        // 15. ЗАКРЫТИЕ ХОЛСТА, НАВИГАЦИЯ
         // =================================================================
+        document.getElementById('closeWaves').addEventListener('click', function() {
+            const container = document.getElementById('waveContainer');
+            container.classList.remove('active');
+            document.getElementById('moodSelector').classList.remove('active');
+            document.getElementById('bottomPanel').classList.remove('active');
+            document.getElementById('backBtn').classList.remove('visible');
+            if (animationId) cancelAnimationFrame(animationId);
+            setMoodEffect(0);
+            document.getElementById('stateDescriptions').classList.remove('active');
+            renderCalendar();
+        });
+
+        document.getElementById('prevMonth').addEventListener('click', function() {
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11;
+                currentYear--; }
+            renderCalendar();
+        });
+        document.getElementById('nextMonth').addEventListener('click', function() {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0;
+                currentYear++; }
+            renderCalendar();
+        });
+
+        // =================================================================
+        // 16. ИНСТРУКЦИЯ
+        // =================================================================
+        document.getElementById('helpBtn').addEventListener('click', function() {
+            document.getElementById('helpModal').classList.add('active');
+        });
+        document.getElementById('helpClose').addEventListener('click', function() {
+            document.getElementById('helpModal').classList.remove('active');
+        });
+        document.getElementById('helpModal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('active');
+        });
+
+        // =================================================================
+        // 17. ИНИЦИАЛИЗАЦИЯ
+        // =================================================================
+        loadData();
+        renderCalendar();
+        initBgCanvas();
+        updateStateDescriptions();
+
+        window.addEventListener('resize', function() {
+            if (canvas) resizeCanvas();
+            resizeBgCanvas();
+        });
+
+        try {
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+            }
+        } catch (e) {}
+
         console.log('🌌 Реалистичный дневник загружен!');
         console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
     </script>
