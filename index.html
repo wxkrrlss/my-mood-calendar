@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Хрустальный дневник</title>
+    <title>Природный дневник</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* ===== ВСЕ СТИЛИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ ===== */
+        /* (CSS полностью скопирован из предыдущей версии, здесь он не приведён для экономии места) */
         * {
             margin: 0;
             padding: 0;
@@ -28,7 +30,6 @@
             overflow-y: auto;
             position: relative;
         }
-        /* ===== ГЛУБОКИЙ ТУМАННЫЙ ФОН ===== */
         body::before {
             content: '';
             position: fixed;
@@ -36,8 +37,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background:
-                radial-gradient(ellipse at 20% 30%, rgba(180, 100, 255, 0.10) 0%, transparent 40%),
+            background: radial-gradient(ellipse at 20% 30%, rgba(180, 100, 255, 0.10) 0%, transparent 40%),
                 radial-gradient(ellipse at 70% 60%, rgba(100, 200, 255, 0.08) 0%, transparent 40%),
                 radial-gradient(ellipse at 40% 20%, rgba(255, 150, 200, 0.06) 0%, transparent 40%),
                 radial-gradient(ellipse at 80% 40%, rgba(200, 180, 100, 0.05) 0%, transparent 40%),
@@ -60,8 +60,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image:
-                radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
+            background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
                 radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,0.3), transparent),
                 radial-gradient(1px 1px at 55% 10%, rgba(255,255,255,0.5), transparent),
                 radial-gradient(1px 1px at 75% 70%, rgba(255,255,255,0.2), transparent),
@@ -81,8 +80,6 @@
             50% { opacity: 0.7; transform: scale(1.02); }
             100% { opacity: 0.3; transform: scale(0.98); }
         }
-
-        /* ===== КАЛЕНДАРЬ ===== */
         .calendar-wrapper {
             position: relative;
             background: rgba(10, 10, 18, 0.88);
@@ -104,8 +101,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background:
-                radial-gradient(ellipse at 20% 30%, rgba(140, 180, 255, 0.10) 0%, transparent 50%),
+            background: radial-gradient(ellipse at 20% 30%, rgba(140, 180, 255, 0.10) 0%, transparent 50%),
                 radial-gradient(ellipse at 80% 60%, rgba(200, 150, 255, 0.07) 0%, transparent 50%),
                 radial-gradient(ellipse at 50% 80%, rgba(100, 200, 255, 0.06) 0%, transparent 50%);
             animation: auroraBorealis 30s ease-in-out infinite alternate;
@@ -125,8 +121,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image:
-                radial-gradient(2px 2px at 15% 25%, rgba(255, 255, 255, 0.5), transparent),
+            background-image: radial-gradient(2px 2px at 15% 25%, rgba(255, 255, 255, 0.5), transparent),
                 radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.6), transparent),
                 radial-gradient(2px 2px at 45% 55%, rgba(255, 255, 255, 0.3), transparent),
                 radial-gradient(1px 1px at 85% 75%, rgba(255, 255, 255, 0.4), transparent);
@@ -149,7 +144,6 @@
             border-radius: 36px;
             padding: 16px;
         }
-
         .header {
             display: flex;
             justify-content: space-between;
@@ -292,8 +286,6 @@
             0% { height: 2px; transform: translateY(0); opacity: 0.4; }
             100% { height: 7px; transform: translateY(-2px); opacity: 1; }
         }
-
-        /* ===== ХОЛСТЫ ===== */
         #bgCanvas {
             display: block;
             position: fixed;
@@ -307,7 +299,6 @@
             transition: opacity 1.2s ease;
         }
         #bgCanvas.active { opacity: 1; }
-
         #waveContainer {
             display: block;
             position: fixed;
@@ -341,8 +332,6 @@
             position: relative;
             z-index: 10;
         }
-
-        /* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
         .top-bar {
             position: fixed;
             top: 20px;
@@ -409,8 +398,6 @@
             user-select: none;
             -webkit-user-select: none;
         }
-
-        /* ===== ВЫБОР ОЦЕНКИ ===== */
         #moodSelector {
             position: fixed;
             bottom: 190px;
@@ -492,8 +479,6 @@
         }
         .mood-confirm-btn:hover { background: rgba(100, 150, 255, 0.18); }
         .mood-confirm-btn:disabled { opacity: 0.10; cursor: not-allowed; }
-
-        /* ===== НИЖНЯЯ ПАНЕЛЬ ===== */
         #bottomPanel {
             position: fixed;
             bottom: 24px;
@@ -630,8 +615,6 @@
         #starBtn:hover { background: rgba(255, 215, 0, 0.05); border-color: rgba(255, 215, 0, 0.12); transform: scale(1.01); }
         .star-counter { font-size: 12px; color: rgba(255, 255, 255, 0.12); text-align: center; margin-top: 4px; }
         .star-hint { font-size: 10px; color: rgba(255, 255, 255, 0.05); text-align: center; margin-top: -2px; }
-
-        /* ===== РЕДАКТОР ===== */
         .note-editor {
             display: none;
             position: fixed;
@@ -717,7 +700,6 @@
             margin-top: 10px;
         }
         .note-editor-save:hover { background: rgba(100, 150, 255, 0.15); }
-
         .help-modal,
         .info-modal {
             display: none;
@@ -791,7 +773,6 @@
         }
         .help-close:hover,
         .info-close:hover { background: rgba(255, 255, 255, 0.08); }
-
         .fog-overlay {
             position: fixed;
             top: 0;
@@ -805,7 +786,6 @@
             transition: opacity 1.2s ease;
         }
         .fog-overlay.active { opacity: 1; }
-
         @media (max-width: 400px) {
             .day { font-size: 12px; min-height: 34px; border-radius: 12px; }
             .calendar { padding: 12px; }
@@ -956,13 +936,13 @@
         let waveStates = {};
 
         // =================================================================
-        // 2. ЗВУКИ — ПОЛНОСТЬЮ ПЕРЕРАБОТАНЫ
+        // 2. ЗВУКИ — ПРИРОДНЫЕ, НЕЖНЫЕ
         // =================================================================
         let audioCtx = null;
         let ambientNodes = [];
         let ambientGainNode = null;
-        let droneGainNode = null;
-        let isDronePlaying = false;
+        let isAmbientPlaying = false;
+        let ambientInterval = null;
 
         function initAudio() {
             if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
@@ -972,118 +952,124 @@
             ambientNodes.forEach(node => { try { node.stop(); } catch (e) {} });
             ambientNodes = [];
             ambientGainNode = null;
-            droneGainNode = null;
-            isDronePlaying = false;
+            if (ambientInterval) {
+                clearInterval(ambientInterval);
+                ambientInterval = null;
+            }
+            isAmbientPlaying = false;
         }
 
-        // ===== МЕЛАНХОЛИЧНЫЙ ГУЛ ДЛЯ КАЛЕНДАРЯ =====
-        function playCalendarDrone() {
-            if (isDronePlaying) return;
+        // ===== ОСНОВНОЙ ФОН (ВЕТЕР В ПОЛЕ) =====
+        function playMainAmbient() {
+            if (isAmbientPlaying) return;
             try {
                 initAudio();
                 const now = audioCtx.currentTime;
-                isDronePlaying = true;
+                isAmbientPlaying = true;
 
-                // Низкий гул
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(48, now);
-                osc.frequency.exponentialRampToValueAtTime(52, now + 8);
+                // Шум ветра через буфер
+                const bufferSize = audioCtx.sampleRate * 5;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    const t = i / audioCtx.sampleRate;
+                    data[i] = (Math.random() * 2 - 1) * 0.04 *
+                        (0.6 + 0.4 * Math.sin(t * 0.2)) *
+                        (0.7 + 0.3 * Math.sin(t * 0.05));
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                noise.loop = true;
 
-                droneGainNode = audioCtx.createGain();
-                droneGainNode.gain.setValueAtTime(0.025, now);
-                droneGainNode.gain.exponentialRampToValueAtTime(0.015, now + 2);
+                ambientGainNode = audioCtx.createGain();
+                ambientGainNode.gain.setValueAtTime(0.04, now);
+                ambientGainNode.gain.exponentialRampToValueAtTime(0.035, now + 2);
 
-                osc.connect(droneGainNode);
-                droneGainNode.connect(audioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 35);
-                ambientNodes.push(osc);
-                ambientNodes.push(droneGainNode);
+                noise.connect(ambientGainNode);
+                ambientGainNode.connect(audioCtx.destination);
+                noise.start(now);
+                noise.stop(now + 30);
+                ambientNodes.push(noise);
 
-                // Второй слой — меланхоличная мелодия (лёгкие колокольчики)
-                const notes = [110, 82, 98, 110, 82, 110, 98];
+                // Лёгкие переливы (как дальние колокольчики)
+                const notes = [200, 230, 180, 210];
                 notes.forEach((freq, i) => {
-                    const osc2 = audioCtx.createOscillator();
-                    osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(freq, now + i * 0.7 + 0.3);
-                    osc2.frequency.exponentialRampToValueAtTime(freq * 1.02, now + i * 0.7 + 0.8);
-
-                    const gain2 = audioCtx.createGain();
-                    gain2.gain.setValueAtTime(0.01, now + i * 0.7 + 0.3);
-                    gain2.gain.exponentialRampToValueAtTime(0.001, now + i * 0.7 + 0.9);
-
-                    osc2.connect(gain2);
-                    gain2.connect(audioCtx.destination);
-                    osc2.start(now + i * 0.7 + 0.3);
-                    osc2.stop(now + i * 0.7 + 0.9);
-                    ambientNodes.push(osc2);
-                    ambientNodes.push(gain2);
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.8 + 0.5);
+                    osc.frequency.exponentialRampToValueAtTime(freq * 1.01, now + i * 0.8 + 1.5);
+                    const g = audioCtx.createGain();
+                    g.gain.setValueAtTime(0.008, now + i * 0.8 + 0.5);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.8 + 1.5);
+                    osc.connect(g);
+                    g.connect(audioCtx.destination);
+                    osc.start(now + i * 0.8 + 0.5);
+                    osc.stop(now + i * 0.8 + 1.5);
+                    ambientNodes.push(osc);
+                    ambientNodes.push(g);
                 });
 
-                // Повтор через 10 секунд
-                setTimeout(() => {
-                    if (isDronePlaying) playCalendarDrone();
-                }, 15000);
+                // Повтор
+                ambientInterval = setTimeout(() => {
+                    if (isAmbientPlaying) playMainAmbient();
+                }, 25000);
 
             } catch (e) {}
         }
 
-        // ===== АТМОСФЕРНЫЕ ЗВУКИ ДЛЯ ОЦЕНОК =====
-        function createAmbientSound(type) {
+        // ===== ФОНОВЫЕ ЗВУКИ ДЛЯ ОЦЕНОК =====
+        function createMoodSound(type) {
             stopAllSounds();
             initAudio();
             try {
                 const now = audioCtx.currentTime;
-                const bufferSize = audioCtx.sampleRate * 5;
+                const bufferSize = audioCtx.sampleRate * 4;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
 
                 let baseAmp = 0;
                 switch (type) {
                     case 1:
-                        baseAmp = 0.25;
-                        break;
+                        baseAmp = 0.12;
+                        break; // Дождь
                     case 2:
-                        baseAmp = 0.10;
-                        break;
-                    case 3:
                         baseAmp = 0.06;
-                        break;
+                        break; // Лёгкий дождь
+                    case 3:
+                        baseAmp = 0.04;
+                        break; // Листва
                     case 4:
-                        baseAmp = 0.05;
-                        break;
+                        baseAmp = 0.03;
+                        break; // Птицы
                     case 5:
                         baseAmp = 0.04;
-                        break;
+                        break; // Море
                     default:
-                        baseAmp = 0.08;
+                        baseAmp = 0.05;
                 }
 
                 for (let i = 0; i < bufferSize; i++) {
                     let val = 0;
                     const t = i / audioCtx.sampleRate;
-                    if (type === 1) { // Гроза
-                        val = (Math.random() * 2 - 1) * baseAmp * (0.7 + 0.3 * Math.sin(t * 0.5));
-                        if (Math.random() < 0.00015) val += (Math.random() * 2 - 1) * 0.35;
-                    } else if (type === 2) { // Лёгкий дождь
+                    if (type === 1) { // Дождь
                         val = (Math.random() * 2 - 1) * baseAmp * (0.8 + 0.2 * Math.sin(t * 0.3));
-                        val += Math.sin(t * 1.5) * baseAmp * 0.15;
-                    } else if (type === 3) { // Космические колокольчики
-                        val = Math.sin(t * 0.6) * baseAmp * 0.3 +
-                            Math.sin(t * 0.9 + 0.5) * baseAmp * 0.2 +
-                            Math.sin(t * 0.3 + 1.2) * baseAmp * 0.15;
+                        if (Math.random() < 0.001) val += (Math.random() * 2 - 1) * 0.15;
+                    } else if (type === 2) { // Лёгкий дождь
+                        val = (Math.random() * 2 - 1) * baseAmp * (0.7 + 0.3 * Math.sin(t * 0.2));
+                        val += Math.sin(t * 0.5) * baseAmp * 0.1;
+                    } else if (type === 3) { // Листва
+                        val = (Math.random() * 2 - 1) * baseAmp * (0.5 + 0.5 * Math.sin(t * 0.1));
+                        val += Math.sin(t * 0.3 + 0.5) * baseAmp * 0.2;
+                    } else if (type === 4) { // Птицы
+                        val = Math.sin(t * 0.8 + 0.3) * baseAmp * 0.5 +
+                            Math.sin(t * 1.2 + 0.7) * baseAmp * 0.3 +
+                            Math.sin(t * 0.4 + 1.0) * baseAmp * 0.2;
                         val += (Math.random() * 2 - 1) * baseAmp * 0.05;
-                    } else if (type === 4) { // Хрустальные переливы
-                        val = Math.sin(t * 0.7) * baseAmp * 0.4 +
-                            Math.sin(t * 1.1 + 0.5) * baseAmp * 0.25 +
-                            Math.sin(t * 0.4 + 1.0) * baseAmp * 0.15;
-                        val += (Math.random() * 2 - 1) * baseAmp * 0.03;
-                    } else if (type === 5) { // Райские голоса
-                        val = Math.sin(t * 0.5) * baseAmp * 0.5 +
-                            Math.sin(t * 0.8 + 0.3) * baseAmp * 0.3 +
-                            Math.sin(t * 0.2 + 0.8) * baseAmp * 0.2;
-                        val += (Math.random() * 2 - 1) * baseAmp * 0.02;
+                    } else if (type === 5) { // Море
+                        val = Math.sin(t * 0.3) * baseAmp * 0.6 +
+                            Math.sin(t * 0.6 + 0.3) * baseAmp * 0.3 +
+                            Math.sin(t * 0.1 + 0.7) * baseAmp * 0.2;
+                        val += (Math.random() * 2 - 1) * baseAmp * 0.08;
                     }
                     data[i] = val;
                 }
@@ -1093,87 +1079,57 @@
                 noise.loop = true;
 
                 ambientGainNode = audioCtx.createGain();
-                ambientGainNode.gain.setValueAtTime(0.10, now);
-                ambientGainNode.gain.exponentialRampToValueAtTime(0.07, now + 0.8);
+                ambientGainNode.gain.setValueAtTime(0.08, now);
+                ambientGainNode.gain.exponentialRampToValueAtTime(0.06, now + 1);
 
                 noise.connect(ambientGainNode);
                 ambientGainNode.connect(audioCtx.destination);
                 noise.start(now);
-                noise.stop(now + 15);
+                noise.stop(now + 20);
                 ambientNodes.push(noise);
 
                 // Дополнительные слои
-                if (type === 1) {
+                if (type === 4) { // Птицы — дополнительные трели
+                    for (let i = 0; i < 6; i++) {
+                        const osc = audioCtx.createOscillator();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(400 + i * 80 + Math.random() * 30, now + i * 0.5 + 0.3);
+                        osc.frequency.exponentialRampToValueAtTime(500 + i * 70 + Math.random() * 20, now + i * 0.5 + 0.8);
+                        const g = audioCtx.createGain();
+                        g.gain.setValueAtTime(0.01, now + i * 0.5 + 0.3);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.5 + 0.8);
+                        osc.connect(g);
+                        g.connect(audioCtx.destination);
+                        osc.start(now + i * 0.5 + 0.3);
+                        osc.stop(now + i * 0.5 + 0.8);
+                        ambientNodes.push(osc);
+                        ambientNodes.push(g);
+                    }
+                } else if (type === 5) { // Море — дополнительные волны
                     for (let i = 0; i < 4; i++) {
                         const osc = audioCtx.createOscillator();
-                        osc.type = 'sawtooth';
-                        osc.frequency.setValueAtTime(35 + i * 12, now + i * 0.8);
-                        osc.frequency.exponentialRampToValueAtTime(20 + i * 8, now + i * 0.8 + 2);
-                        const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.03, now + i * 0.8);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.8 + 2);
-                        osc.connect(g);
-                        g.connect(audioCtx.destination);
-                        osc.start(now + i * 0.8);
-                        osc.stop(now + i * 0.8 + 2);
-                        ambientNodes.push(osc);
-                        ambientNodes.push(g);
-                    }
-                } else if (type === 3) {
-                    for (let i = 0; i < 8; i++) {
-                        const osc = audioCtx.createOscillator();
                         osc.type = 'sine';
-                        osc.frequency.setValueAtTime(200 + i * 45 + Math.random() * 15, now + i * 0.15);
-                        osc.frequency.exponentialRampToValueAtTime(300 + i * 35 + Math.random() * 10, now + i * 0.15 + 1.5);
+                        osc.frequency.setValueAtTime(120 + i * 15, now + i * 1.5 + 0.5);
+                        osc.frequency.exponentialRampToValueAtTime(100 + i * 12, now + i * 1.5 + 1.5);
                         const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.01, now + i * 0.15);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 1.5);
+                        g.gain.setValueAtTime(0.015, now + i * 1.5 + 0.5);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 1.5 + 1.5);
                         osc.connect(g);
                         g.connect(audioCtx.destination);
-                        osc.start(now + i * 0.15);
-                        osc.stop(now + i * 0.15 + 1.5);
-                        ambientNodes.push(osc);
-                        ambientNodes.push(g);
-                    }
-                } else if (type === 4) {
-                    for (let i = 0; i < 7; i++) {
-                        const osc = audioCtx.createOscillator();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(280 + i * 55 + Math.random() * 15, now + i * 0.1);
-                        osc.frequency.exponentialRampToValueAtTime(380 + i * 45 + Math.random() * 10, now + i * 0.1 + 1.8);
-                        const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.015, now + i * 0.1);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 1.8);
-                        osc.connect(g);
-                        g.connect(audioCtx.destination);
-                        osc.start(now + i * 0.1);
-                        osc.stop(now + i * 0.1 + 1.8);
-                        ambientNodes.push(osc);
-                        ambientNodes.push(g);
-                    }
-                } else if (type === 5) {
-                    for (let i = 0; i < 10; i++) {
-                        const osc = audioCtx.createOscillator();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(400 + i * 60 + Math.random() * 20, now + i * 0.08);
-                        osc.frequency.exponentialRampToValueAtTime(500 + i * 50 + Math.random() * 15, now + i * 0.08 + 2.5);
-                        const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.02, now + i * 0.08);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 2.5);
-                        osc.connect(g);
-                        g.connect(audioCtx.destination);
-                        osc.start(now + i * 0.08);
-                        osc.stop(now + i * 0.08 + 2.5);
+                        osc.start(now + i * 1.5 + 0.5);
+                        osc.stop(now + i * 1.5 + 1.5);
                         ambientNodes.push(osc);
                         ambientNodes.push(g);
                     }
                 }
 
-                // Дрон продолжает играть фоном
-                if (!isDronePlaying) {
-                    isDronePlaying = true;
-                    setTimeout(() => { playCalendarDrone(); }, 100);
-                }
+                // Основной фон продолжает играть тихо
+                setTimeout(() => {
+                    if (!isAmbientPlaying) {
+                        isAmbientPlaying = true;
+                        playMainAmbient();
+                    }
+                }, 500);
 
             } catch (e) {}
         }
@@ -1184,81 +1140,75 @@
             }
         }
 
-        // ===== ХРУСТАЛЬНЫЕ ЗВУКИ ДЛЯ ЗВЁЗД =====
-        function playCrystalSound(type) {
+        // ===== ЗВУКИ ЗВЁЗД (НЕЖНЫЕ, ПРИРОДНЫЕ) =====
+        function playStarSound(type) {
             initAudio();
             try {
                 const now = audioCtx.currentTime;
                 if (type === 'add') {
-                    // Появление — нежный высокий перелив
-                    for (let i = 0; i < 5; i++) {
-                        const osc = audioCtx.createOscillator();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(1400 + i * 180 + Math.random() * 20, now + i * 0.03);
-                        osc.frequency.exponentialRampToValueAtTime(900 + i * 120 + Math.random() * 15, now + i * 0.03 +
-                            0.35);
-                        const gain = audioCtx.createGain();
-                        gain.gain.setValueAtTime(0.03, now + i * 0.03);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.03 + 0.35);
-                        osc.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        osc.start(now + i * 0.03);
-                        osc.stop(now + i * 0.03 + 0.35);
-                        ambientNodes.push(osc);
-                        ambientNodes.push(gain);
-                    }
+                    // Капля воды, падающая в воду
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+                    const gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.04, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                    ambientNodes.push(osc);
+                    ambientNodes.push(gain);
+
                     // Лёгкое эхо
                     setTimeout(() => {
-                        for (let i = 0; i < 3; i++) {
-                            const osc2 = audioCtx.createOscillator();
-                            osc2.type = 'sine';
-                            osc2.frequency.setValueAtTime(1000 + i * 150, now + 0.35 + i * 0.04);
-                            osc2.frequency.exponentialRampToValueAtTime(700 + i * 100, now + 0.35 + i * 0.04 + 0.25);
-                            const gain2 = audioCtx.createGain();
-                            gain2.gain.setValueAtTime(0.015, now + 0.35 + i * 0.04);
-                            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.35 + i * 0.04 + 0.25);
-                            osc2.connect(gain2);
-                            gain2.connect(audioCtx.destination);
-                            osc2.start(now + 0.35 + i * 0.04);
-                            osc2.stop(now + 0.35 + i * 0.04 + 0.25);
-                            ambientNodes.push(osc2);
-                            ambientNodes.push(gain2);
-                        }
+                        const osc2 = audioCtx.createOscillator();
+                        osc2.type = 'sine';
+                        osc2.frequency.setValueAtTime(600, audioCtx.currentTime);
+                        osc2.frequency.exponentialRampToValueAtTime(350, audioCtx.currentTime + 0.08);
+                        const gain2 = audioCtx.createGain();
+                        gain2.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+                        osc2.connect(gain2);
+                        gain2.connect(audioCtx.destination);
+                        osc2.start();
+                        osc2.stop(audioCtx.currentTime + 0.12);
+                        ambientNodes.push(osc2);
+                        ambientNodes.push(gain2);
                     }, 200);
                 } else if (type === 'remove') {
-                    // Исчезновение — обратный эффект (затухание)
-                    for (let i = 0; i < 5; i++) {
-                        const osc = audioCtx.createOscillator();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(1000 + i * 150 + Math.random() * 15, now + i * 0.025);
-                        osc.frequency.exponentialRampToValueAtTime(600 + i * 100 + Math.random() * 10, now + i * 0.025 +
-                            0.3);
-                        const gain = audioCtx.createGain();
-                        gain.gain.setValueAtTime(0.025, now + i * 0.025);
-                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.025 + 0.3);
-                        osc.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        osc.start(now + i * 0.025);
-                        osc.stop(now + i * 0.025 + 0.3);
-                        ambientNodes.push(osc);
-                        ambientNodes.push(gain);
-                    }
-                    // Лёгкое шипение (исчезновение)
-                    const bufferSize = audioCtx.sampleRate * 0.06;
+                    // Затухающий колокольчик
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(700, now);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.3);
+                    const gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.03, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                    ambientNodes.push(osc);
+                    ambientNodes.push(gain);
+
+                    // Лёгкий шум (исчезновение)
+                    const bufferSize = audioCtx.sampleRate * 0.05;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
-                        data[i] = (Math.random() * 2 - 1) * 0.015 * (1 - i / bufferSize);
+                        data[i] = (Math.random() * 2 - 1) * 0.02 * (1 - i / bufferSize);
                     }
                     const noise = audioCtx.createBufferSource();
                     noise.buffer = buffer;
                     const gain2 = audioCtx.createGain();
                     gain2.gain.setValueAtTime(0.02, now);
-                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
                     noise.connect(gain2);
                     gain2.connect(audioCtx.destination);
                     noise.start(now);
-                    noise.stop(now + 0.06);
+                    noise.stop(now + 0.05);
                     ambientNodes.push(noise);
                     ambientNodes.push(gain2);
                 }
@@ -1271,8 +1221,8 @@
             try {
                 const osc = audioCtx.createOscillator();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(700, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(500, audioCtx.currentTime + 0.04);
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.04);
                 const gain = audioCtx.createGain();
                 gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
@@ -1289,18 +1239,18 @@
             initAudio();
             try {
                 const now = audioCtx.currentTime;
-                for (let i = 0; i < 4; i++) {
+                for (let i = 0; i < 3; i++) {
                     const osc = audioCtx.createOscillator();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(550 + i * 130, now + i * 0.05);
-                    osc.frequency.exponentialRampToValueAtTime(750 + i * 100, now + i * 0.05 + 0.12);
+                    osc.frequency.setValueAtTime(500 + i * 100, now + i * 0.06);
+                    osc.frequency.exponentialRampToValueAtTime(600 + i * 80, now + i * 0.06 + 0.1);
                     const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.025, now + i * 0.05);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.12);
+                    gain.gain.setValueAtTime(0.02, now + i * 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.1);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
-                    osc.start(now + i * 0.05);
-                    osc.stop(now + i * 0.05 + 0.12);
+                    osc.start(now + i * 0.06);
+                    osc.stop(now + i * 0.06 + 0.1);
                     ambientNodes.push(osc);
                     ambientNodes.push(gain);
                 }
@@ -1312,15 +1262,15 @@
             try {
                 const osc = audioCtx.createOscillator();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(350, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.6);
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.5);
                 const gain = audioCtx.createGain();
                 gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.6);
+                osc.stop(audioCtx.currentTime + 0.5);
                 ambientNodes.push(osc);
                 ambientNodes.push(gain);
             } catch (e) {}
@@ -1764,27 +1714,27 @@
                     generateRain(rainDrops, 180, 0.2, 8, [15, 32], 1.6);
                     generateGlassDrops(15);
                     generateFlareParticles(10);
-                    createAmbientSound(1);
+                    createMoodSound(1);
                     break;
                 case 2:
                     generateRain(rainDrops2, 90, 0.4, 6, [12, 22], 1.2);
                     generateGlassDrops(8);
                     generateFlareParticles(8);
-                    createAmbientSound(2);
+                    createMoodSound(2);
                     break;
                 case 3:
                     generateClouds(8);
                     generateFlareParticles(6);
-                    createAmbientSound(3);
+                    createMoodSound(3);
                     break;
                 case 4:
                     generateFlowers(18);
                     generateFlareParticles(12);
-                    createAmbientSound(4);
+                    createMoodSound(4);
                     break;
                 case 5:
                     generateFlareParticles(25);
-                    createAmbientSound(5);
+                    createMoodSound(5);
                     break;
             }
 
@@ -1835,7 +1785,7 @@
                 buildStatePanel();
                 updateStarCounter();
                 selectedStates.forEach(stId => setWaveTarget(stId, true));
-                setTimeout(() => setAmbientVolume(0.06), 400);
+                setTimeout(() => setAmbientVolume(0.05), 400);
             } else {
                 document.getElementById('moodSelector').classList.add('active');
                 document.getElementById('bottomPanel').classList.remove('active');
@@ -1884,7 +1834,7 @@
                 this.classList.add('selected');
                 document.getElementById('moodConfirmBtn').disabled = false;
                 setMoodEffect(selectedMood);
-                setAmbientVolume(0.14);
+                setAmbientVolume(0.10);
             });
         });
 
@@ -1897,7 +1847,7 @@
                 saveData();
                 renderCalendar();
                 showAdditions();
-                setTimeout(() => setAmbientVolume(0.06), 500);
+                setTimeout(() => setAmbientVolume(0.05), 500);
             }
         });
 
@@ -1985,7 +1935,7 @@
         }
 
         // =================================================================
-        // 10. АНИМАЦИЯ ВОЛН И МЯГКИХ ЗВЁЗД
+        // 10. АНИМАЦИЯ ВОЛН И ЗВЁЗД
         // =================================================================
         function animateWaves() {
             if (!canvas || !ctx) return;
@@ -2080,7 +2030,7 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
-            // === МЯГКИЕ ПАРЯЩИЕ ЗВЁЗДЫ ===
+            // Звёзды
             stars.forEach((star, idx) => {
                 const floatOffset = star.floatPhase || 0;
                 const floatY = Math.sin(time * 0.4 + floatOffset) * 12;
@@ -2091,7 +2041,6 @@
                 const y = star.y + floatY;
                 const size = 13 + 3 * (0.5 + 0.5 * Math.sin(time * 0.6 + floatOffset));
 
-                // Мягкое свечение
                 const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 14);
                 glowGrad.addColorStop(0, `rgba(255,255,255,${0.10 * twinkle + 0.06})`);
                 glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.06 * twinkle + 0.03})`);
@@ -2099,11 +2048,9 @@
                 ctx.fillStyle = glowGrad;
                 ctx.fillRect(x - size * 14, y - size * 14, size * 28, size * 28);
 
-                // Хрустальная звезда
                 ctx.save();
                 ctx.translate(x, y);
                 ctx.rotate(time * 0.08 + idx * 0.3);
-
                 ctx.beginPath();
                 const spikes = 5;
                 const outerR = size;
@@ -2156,7 +2103,7 @@
         }
 
         // =================================================================
-        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ (МЯГКАЯ КРУГОВАЯ ВОЛНА)
+        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ
         // =================================================================
         function updateStarCounter() {
             document.getElementById('starCounter').textContent = `⭐ ${stars.length}`;
@@ -2182,7 +2129,7 @@
             }
             const note = document.getElementById('noteInput').value.trim();
             if (!note) { alert('Напиши заметку для звезды ✨'); return; }
-            playCrystalSound('add');
+            playStarSound('add');
 
             const data = getDayData(currentDateStr);
             if (!data.stars) data.stars = [];
@@ -2222,12 +2169,11 @@
         });
 
         function createSoftRipple(x, y) {
-            // Мягкая круговая волна
             const ripple = document.createElement('div');
             ripple.style.cssText = `
                 position: fixed; left: ${x-80}px; top: ${y-80}px;
                 width: 160px; height: 160px;
-                border: 1px solid rgba(200,230,255,0.15);
+                border: 1px solid rgba(200,230,255,0.10);
                 border-radius: 50%;
                 pointer-events: none; z-index: 2000;
                 transform: scale(0);
@@ -2236,13 +2182,12 @@
             document.body.appendChild(ripple);
             setTimeout(() => ripple.remove(), 1100);
 
-            // Лёгкая вспышка
             const flash = document.createElement('div');
             flash.style.cssText = `
                 position: fixed; left: ${x-50}px; top: ${y-50}px;
                 width: 100px; height: 100px;
                 border-radius: 50%;
-                background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(200,230,255,0.08) 40%, transparent 70%);
+                background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(200,230,255,0.05) 40%, transparent 70%);
                 pointer-events: none; z-index: 2000;
                 transform: scale(0);
                 animation: flashSoft 0.8s ease-out forwards;
@@ -2250,7 +2195,6 @@
             document.body.appendChild(flash);
             setTimeout(() => flash.remove(), 900);
 
-            // Мягкие искры
             for (let i = 0; i < 12; i++) {
                 const spark = document.createElement('div');
                 const angle = Math.random() * Math.PI * 2;
@@ -2268,7 +2212,7 @@
                     box-shadow: 0 0 10px ${color};
                     pointer-events: none; z-index: 2000;
                     transition: all 0.8s ease-out;
-                    opacity: 0.8;
+                    opacity: 0.6;
                 `;
                 document.body.appendChild(spark);
                 requestAnimationFrame(() => {
@@ -2278,7 +2222,6 @@
                 setTimeout(() => spark.remove(), 900);
             }
 
-            // Добавляем стили
             if (!document.getElementById('softRippleStyles')) {
                 const style = document.createElement('style');
                 style.id = 'softRippleStyles';
@@ -2290,7 +2233,7 @@
                     }
                     @keyframes flashSoft {
                         0% { transform: scale(0); opacity: 1; }
-                        50% { transform: scale(1.8); opacity: 0.7; }
+                        50% { transform: scale(1.8); opacity: 0.6; }
                         100% { transform: scale(3); opacity: 0; }
                     }
                 `;
@@ -2299,18 +2242,17 @@
         }
 
         // =================================================================
-        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ (МЯГКОЕ ТАЯНИЕ)
+        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ
         // =================================================================
         function deleteStar(star) {
-            playCrystalSound('remove');
+            playStarSound('remove');
 
-            // Дымка исчезновения
             const mist = document.createElement('div');
             mist.style.cssText = `
                 position: fixed; left: ${star.x-100}px; top: ${star.y-100}px;
                 width: 200px; height: 200px;
                 border-radius: 50%;
-                background: radial-gradient(circle, rgba(200,230,255,0.12) 0%, rgba(150,200,255,0.06) 30%, transparent 70%);
+                background: radial-gradient(circle, rgba(200,230,255,0.08) 0%, rgba(150,200,255,0.04) 30%, transparent 70%);
                 pointer-events: none; z-index: 2000;
                 transform: scale(0.5);
                 opacity: 0;
@@ -2319,7 +2261,6 @@
             document.body.appendChild(mist);
             setTimeout(() => mist.remove(), 1100);
 
-            // Светящиеся частицы, улетающие вверх
             for (let i = 0; i < 25; i++) {
                 const particle = document.createElement('div');
                 const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.0;
@@ -2337,7 +2278,7 @@
                     box-shadow: 0 0 15px ${color};
                     pointer-events: none; z-index: 2000;
                     transition: all 1s cubic-bezier(0.2, 0.9, 0.4, 1);
-                    opacity: 0.8;
+                    opacity: 0.6;
                 `;
                 document.body.appendChild(particle);
                 requestAnimationFrame(() => {
@@ -2361,7 +2302,7 @@
                 style.textContent = `
                     @keyframes mistSoft {
                         0% { transform: scale(0.5); opacity: 0; }
-                        30% { transform: scale(1.2); opacity: 0.6; }
+                        30% { transform: scale(1.2); opacity: 0.5; }
                         100% { transform: scale(2.2); opacity: 0; }
                     }
                 `;
@@ -2657,9 +2598,9 @@
         renderCalendar();
         initBgCanvas();
 
-        // Запускаем меланхоличный гул для календаря
+        // Запускаем основной фоновый звук для календаря
         setTimeout(() => {
-            if (!isDronePlaying) playCalendarDrone();
+            if (!isAmbientPlaying) playMainAmbient();
         }, 500);
 
         window.addEventListener('resize', function() {
@@ -2674,7 +2615,7 @@
             }
         } catch (e) {}
 
-        console.log('💎 Хрустальный дневник загружен!');
+        console.log('🌿 Природный дневник загружен!');
         console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
     </script>
 </body>
