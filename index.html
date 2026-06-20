@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Атмосферный дневник</title>
+    <title>Календарь настроения</title>
+    <!-- Подключаем p5.js для сложной анимации -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -27,7 +29,6 @@
             overflow-y: auto;
             position: relative;
         }
-        /* Космический фон (оставляем) */
         body::before {
             content: '';
             position: fixed;
@@ -35,8 +36,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background:
-                radial-gradient(ellipse at 20% 30%, rgba(180, 100, 255, 0.06) 0%, transparent 40%),
+            background: radial-gradient(ellipse at 20% 30%, rgba(180, 100, 255, 0.06) 0%, transparent 40%),
                 radial-gradient(ellipse at 70% 60%, rgba(100, 200, 255, 0.05) 0%, transparent 40%),
                 radial-gradient(ellipse at 40% 80%, rgba(255, 150, 200, 0.04) 0%, transparent 40%);
             animation: nebula 40s ease-in-out infinite alternate;
@@ -296,8 +296,8 @@
             right: 0;
             bottom: 0;
             z-index: 1000;
-            background: #0a0a12;
-            transition: opacity 0.6s ease, background 1.8s ease, box-shadow 1.8s ease;
+            background: transparent;
+            transition: opacity 0.6s ease;
             overflow: hidden;
             opacity: 0;
             pointer-events: none;
@@ -316,189 +316,88 @@
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
-        }
-
-        /* ===== ЭФЕКТЫ ДЛЯ ОЦЕНОК (CSS) ===== */
-        .mood-effects {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            z-index: 2;
+        }
+
+        /* ===== ФОНЫ (p5.js) ===== */
+        .mood-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
             opacity: 0;
             transition: opacity 1.5s ease;
+            pointer-events: none;
         }
-        .mood-effects.active {
+        .mood-bg.active {
             opacity: 1;
         }
-
-        /* 1 — Дождь и грозовые вспышки */
-        .mood-1-bg {
-            background: #0a0a1a;
-        }
-        .rain-drop {
-            position: absolute;
-            width: 2px;
-            background: rgba(180, 200, 255, 0.6);
-            animation: rainFall linear infinite;
-        }
-        @keyframes rainFall {
-            0% { transform: translateY(-10px) translateX(0); opacity: 1; }
-            100% { transform: translateY(calc(100vh + 20px)) translateX(15px); opacity: 0.2; }
-        }
-        .lightning-flash {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(200, 220, 255, 0.15);
-            opacity: 0;
-            animation: lightning 6s infinite;
-        }
-        @keyframes lightning {
-            0%, 90%, 95%, 100% { opacity: 0; }
-            92% { opacity: 0.9; }
-            94% { opacity: 0.3; }
+        .mood-bg canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
         }
 
-        /* 2 — Лёгкий дождь с ветром */
-        .mood-2-bg {
-            background: #1a2a3a;
-        }
-        .rain-drop-2 {
-            position: absolute;
-            width: 1.5px;
-            background: rgba(200, 220, 255, 0.4);
-            animation: rainWind linear infinite;
-        }
-        @keyframes rainWind {
-            0% { transform: translateY(-10px) translateX(0); opacity: 0.8; }
-            100% { transform: translateY(calc(100vh + 20px)) translateX(-30px); opacity: 0.1; }
-        }
-
-        /* 3 — Облака на нежно-жёлтом фоне */
-        .mood-3-bg {
-            background: #f5e6b0;
-        }
-        .cloud {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.6);
-            filter: blur(20px);
-            animation: cloudFloat 20s ease-in-out infinite alternate;
-        }
-        @keyframes cloudFloat {
-            0% { transform: translateX(0) scale(1); }
-            100% { transform: translateX(100px) scale(1.1); }
-        }
-
-        /* 4 — Бордово-розовый с распускающимися цветами и бликами */
-        .mood-4-bg {
-            background: #8a3a5a;
-        }
-        .bloom-flower {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #ff8a9a, #d84a6a);
-            opacity: 0;
-            animation: bloom 8s ease-out infinite;
-        }
-        @keyframes bloom {
-            0% { transform: scale(0); opacity: 0; }
-            20% { opacity: 0.8; transform: scale(1); }
-            80% { opacity: 0.6; transform: scale(1.2); }
-            100% { opacity: 0; transform: scale(1.5); }
-        }
-        .lens-flare-4 {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 200, 220, 0.4), transparent 70%);
-            filter: blur(30px);
-            animation: flareMove 12s ease-in-out infinite alternate;
-        }
-
-        /* 5 — Небесно-голубой с радугой и бликами */
-        .mood-5-bg {
-            background: #8ac4d4;
-        }
-        .rainbow {
-            position: absolute;
-            width: 300%;
-            height: 200%;
-            top: -50%;
-            left: -50%;
-            background: conic-gradient(from 0deg, red, orange, yellow, green, blue, indigo, violet, red);
-            opacity: 0.15;
-            filter: blur(50px);
-            animation: rainbowRotate 20s linear infinite;
-        }
-        @keyframes rainbowRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .lens-flare-5 {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.5), transparent 70%);
-            filter: blur(20px);
-            animation: flareMove 10s ease-in-out infinite alternate;
-        }
-        @keyframes flareMove {
-            0% { transform: translate(0,0) scale(1); }
-            100% { transform: translate(60px, -40px) scale(1.5); }
-        }
-
-        /* ===== ОПИСАНИЯ СОСТОЯНИЙ (на холсте) ===== */
+        /* ===== ОПИСАНИЯ СОСТОЯНИЙ (центр, компактно) ===== */
         .state-descriptions {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 998;
+            z-index: 1;
             pointer-events: none;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            opacity: 0.15;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 13px;
-            font-weight: 300;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transition: opacity 0.8s ease;
             user-select: none;
             -webkit-user-select: none;
-            transition: opacity 0.8s ease;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 0 0 40px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.6);
+            font-weight: 400;
+            padding: 20px;
         }
         .state-descriptions.active {
-            opacity: 0.35;
+            opacity: 1;
         }
-        .state-descriptions div {
-            margin: 6px 0;
-            text-align: center;
-            line-height: 1.4;
+        .state-descriptions .state-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 4px 0;
+            font-size: 15px;
+            line-height: 1.3;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(4px);
+            padding: 4px 16px 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            white-space: nowrap;
         }
         .state-descriptions .state-symbol {
             font-size: 18px;
-            margin-right: 6px;
         }
         .state-descriptions .state-desc {
-            font-size: 11px;
-            opacity: 0.7;
+            font-size: 13px;
+            opacity: 0.85;
+            font-weight: 300;
         }
 
-        /* ===== ОСТАЛЬНЫЕ ЭЛЕМЕНТЫ (кнопки и т.д.) ===== */
+        /* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
         .top-bar {
-            position: fixed;
+            position: absolute;
             top: 16px;
             left: 16px;
             right: 16px;
-            z-index: 1001;
+            z-index: 10;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -520,7 +419,7 @@
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 1002;
+            z-index: 10;
         }
         .back-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
         .back-btn.visible { display: flex; }
@@ -539,16 +438,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1002;
+            z-index: 10;
         }
         .close-btn:hover { background: rgba(255,255,255,0.08); transform: rotate(90deg); color: #fff; }
 
         .wave-date {
-            position: fixed;
+            position: absolute;
             top: 68px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1001;
+            z-index: 10;
             color: rgba(255,255,255,0.3);
             font-size: 16px;
             font-weight: 500;
@@ -565,11 +464,11 @@
 
         /* ===== ВЫБОР ОЦЕНКИ ===== */
         #moodSelector {
-            position: fixed;
+            position: absolute;
             bottom: 180px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1001;
+            z-index: 10;
             background: rgba(0,0,0,0.4);
             backdrop-filter: blur(24px);
             border-radius: 24px;
@@ -648,11 +547,11 @@
 
         /* ===== ПАНЕЛЬ СОСТОЯНИЙ ===== */
         #bottomPanel {
-            position: fixed;
+            position: absolute;
             bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1001;
+            z-index: 10;
             display: none;
             flex-direction: column;
             align-items: center;
@@ -904,12 +803,12 @@
         .help-close:hover { background: rgba(255,255,255,0.06); }
 
         .fog-overlay {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 1500;
+            z-index: 5;
             pointer-events: none;
             background: radial-gradient(ellipse at center, rgba(150,200,255,0.3) 0%, rgba(100,150,200,0.15) 30%, rgba(50,80,120,0.05) 60%, transparent 80%);
             opacity: 0;
@@ -929,8 +828,8 @@
             .close-btn, .back-btn { width: 36px; height: 36px; font-size: 16px; }
             .wave-date { font-size: 14px; padding: 4px 12px; top: 60px; }
             .top-bar { top: 12px; left: 12px; right: 12px; }
-            .state-descriptions { font-size: 11px; }
-            .state-descriptions .state-desc { font-size: 10px; }
+            .state-descriptions .state-item { font-size: 13px; padding: 3px 12px; }
+            .state-descriptions .state-desc { font-size: 11px; }
         }
     </style>
 </head>
@@ -961,44 +860,22 @@
     <div id="waveContainer">
         <div class="fog-overlay" id="fogOverlay"></div>
 
-        <!-- Эффекты фона для оценок -->
-        <div class="mood-effects" id="moodEffects">
-            <div class="mood-1-bg" id="mood1Bg" style="display:none;">
-                <div id="rainContainer1"></div>
-                <div class="lightning-flash"></div>
-            </div>
-            <div class="mood-2-bg" id="mood2Bg" style="display:none;">
-                <div id="rainContainer2"></div>
-            </div>
-            <div class="mood-3-bg" id="mood3Bg" style="display:none;">
-                <div class="cloud" style="width:200px;height:100px;top:10%;left:5%;"></div>
-                <div class="cloud" style="width:300px;height:120px;top:30%;right:10%;animation-delay:5s;"></div>
-                <div class="cloud" style="width:250px;height:90px;bottom:20%;left:20%;animation-delay:10s;"></div>
-            </div>
-            <div class="mood-4-bg" id="mood4Bg" style="display:none;">
-                <div id="flowerContainer"></div>
-                <div class="lens-flare-4" style="width:300px;height:300px;top:10%;left:5%;"></div>
-                <div class="lens-flare-4" style="width:200px;height:200px;bottom:20%;right:10%;animation-delay:4s;"></div>
-                <div class="lens-flare-4" style="width:250px;height:250px;top:50%;left:60%;animation-delay:8s;"></div>
-            </div>
-            <div class="mood-5-bg" id="mood5Bg" style="display:none;">
-                <div class="rainbow"></div>
-                <div class="lens-flare-5" style="width:350px;height:350px;top:5%;left:10%;"></div>
-                <div class="lens-flare-5" style="width:250px;height:250px;bottom:15%;right:15%;animation-delay:3s;"></div>
-                <div class="lens-flare-5" style="width:200px;height:200px;top:40%;left:70%;animation-delay:6s;"></div>
-                <div class="lens-flare-5" style="width:280px;height:280px;bottom:30%;left:5%;animation-delay:9s;"></div>
-            </div>
-        </div>
+        <!-- Фоны (p5.js) -->
+        <div class="mood-bg" id="bg1" style="background:#0a0a1a;"></div>
+        <div class="mood-bg" id="bg2" style="background:#1a2a3a;"></div>
+        <div class="mood-bg" id="bg3" style="background:#f5e6b0;"></div>
+        <div class="mood-bg" id="bg4" style="background:#8a3a5a;"></div>
+        <div class="mood-bg" id="bg5" style="background:#8ac4d4;"></div>
 
         <!-- Описания состояний -->
         <div class="state-descriptions" id="stateDescriptions">
-            <div><span class="state-symbol">🌊</span> Поток — день прошёл на одном дыхании</div>
-            <div><span class="state-symbol">☀️</span> Свет — день был тёплым и радостным</div>
-            <div><span class="state-symbol">🏠</span> Уют — чувствовала себя в безопасности</div>
-            <div><span class="state-symbol">🌙</span> Тень — день был тяжёлым или грустным</div>
-            <div><span class="state-symbol">⚡</span> Искра — случилось что-то яркое и неожиданное</div>
-            <div><span class="state-symbol">🌿</span> Тишина — спокойный, но не пустой день</div>
-            <div><span class="state-symbol">🌫️</span> Туман — день прошёл как в дымке</div>
+            <div class="state-item"><span class="state-symbol">🌊</span> Поток — день прошёл на одном дыхании</div>
+            <div class="state-item"><span class="state-symbol">☀️</span> Свет — день был тёплым и радостным</div>
+            <div class="state-item"><span class="state-symbol">🏠</span> Уют — чувствовала себя в безопасности</div>
+            <div class="state-item"><span class="state-symbol">🌙</span> Тень — день был тяжёлым или грустным</div>
+            <div class="state-item"><span class="state-symbol">⚡</span> Искра — случилось что-то яркое</div>
+            <div class="state-item"><span class="state-symbol">🌿</span> Тишина — спокойный, но не пустой день</div>
+            <div class="state-item"><span class="state-symbol">🌫️</span> Туман — день прошёл как в дымке</div>
         </div>
 
         <div class="top-bar">
@@ -1065,14 +942,14 @@
 
     <script>
         // =================================================================
-        // 1. НАСТРОЙКИ
+        // 1. НАСТРОЙКИ И СОСТОЯНИЯ
         // =================================================================
         const STATES = [
             { id: 'поток', label: '🌊 Поток', color: '#4dd0e1', desc: 'день прошёл на одном дыхании' },
             { id: 'свет', label: '☀️ Свет', color: '#ffca28', desc: 'день был тёплым и радостным' },
             { id: 'уют', label: '🏠 Уют', color: '#ffab91', desc: 'чувствовала себя в безопасности' },
             { id: 'тень', label: '🌙 Тень', color: '#90caf9', desc: 'день был тяжёлым или грустным' },
-            { id: 'искра', label: '⚡ Искра', color: '#ce93d8', desc: 'случилось что-то яркое и неожиданное' },
+            { id: 'искра', label: '⚡ Искра', color: '#ce93d8', desc: 'случилось что-то яркое' },
             { id: 'тишина', label: '🌿 Тишина', color: '#81c784', desc: 'спокойный, но не пустой день' },
             { id: 'туман', label: '🌫️ Туман', color: '#b0bec5', desc: 'день прошёл как в дымке' }
         ];
@@ -1091,7 +968,7 @@
         let waveStates = {};
 
         // =================================================================
-        // 2. ЗВУКИ (оставляем те же)
+        // 2. ЗВУКИ (те же)
         // =================================================================
         let audioCtx = null;
 
@@ -1277,78 +1154,247 @@
         }
 
         // =================================================================
-        // 5. ЭФФЕКТЫ ФОНА ДЛЯ ОЦЕНОК
+        // 5. УПРАВЛЕНИЕ ФОНАМИ (p5.js)
         // =================================================================
-        function showMoodEffect(mood) {
-            const effects = document.getElementById('moodEffects');
-            const bg1 = document.getElementById('mood1Bg');
-            const bg2 = document.getElementById('mood2Bg');
-            const bg3 = document.getElementById('mood3Bg');
-            const bg4 = document.getElementById('mood4Bg');
-            const bg5 = document.getElementById('mood5Bg');
+        let bgSketches = {};
+        let currentBg = 0;
 
-            // Скрываем все
-            [bg1, bg2, bg3, bg4, bg5].forEach(el => el.style.display = 'none');
-
-            if (mood === 0) {
-                effects.classList.remove('active');
-                return;
-            }
-
-            effects.classList.add('active');
-
-            switch (mood) {
-                case 1:
-                    bg1.style.display = 'block';
-                    generateRain('rainContainer1', 120, 'rain-drop');
-                    break;
-                case 2:
-                    bg2.style.display = 'block';
-                    generateRain('rainContainer2', 80, 'rain-drop-2');
-                    break;
-                case 3:
-                    bg3.style.display = 'block';
-                    break;
-                case 4:
-                    bg4.style.display = 'block';
-                    generateFlowers(10);
-                    break;
-                case 5:
-                    bg5.style.display = 'block';
-                    break;
+        // Функция для остановки предыдущего sketch
+        function stopBgSketch() {
+            if (bgSketches[currentBg]) {
+                bgSketches[currentBg].remove();
+                delete bgSketches[currentBg];
             }
         }
 
-        function generateRain(containerId, count, className) {
+        function startBgSketch(mood) {
+            stopBgSketch();
+            const containerId = `bg${mood}`;
             const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            for (let i = 0; i < count; i++) {
-                const drop = document.createElement('div');
-                drop.className = className;
-                drop.style.left = Math.random() * 100 + '%';
-                drop.style.height = (10 + Math.random() * 20) + 'px';
-                drop.style.animationDuration = (0.8 + Math.random() * 1.2) + 's';
-                drop.style.animationDelay = (Math.random() * 2) + 's';
-                drop.style.opacity = 0.3 + Math.random() * 0.5;
-                container.appendChild(drop);
-            }
-        }
+            if (!container) return;
+            // Показываем только нужный контейнер
+            document.querySelectorAll('.mood-bg').forEach(el => el.classList.remove('active'));
+            container.classList.add('active');
 
-        function generateFlowers(count) {
-            const container = document.getElementById('flowerContainer');
-            container.innerHTML = '';
-            for (let i = 0; i < count; i++) {
-                const flower = document.createElement('div');
-                flower.className = 'bloom-flower';
-                const size = 40 + Math.random() * 80;
-                flower.style.width = size + 'px';
-                flower.style.height = size + 'px';
-                flower.style.left = Math.random() * 90 + '%';
-                flower.style.top = Math.random() * 90 + '%';
-                flower.style.animationDuration = (6 + Math.random() * 4) + 's';
-                flower.style.animationDelay = (Math.random() * 8) + 's';
-                container.appendChild(flower);
-            }
+            // Создаём p5 sketch
+            const sketch = function(p) {
+                let drops = [];
+                let clouds = [];
+                let flowers = [];
+                let lightning = 0;
+                let rainbowAngle = 0;
+
+                p.setup = function() {
+                    const rect = container.getBoundingClientRect();
+                    const canvas = p.createCanvas(rect.width, rect.height);
+                    canvas.parent(container);
+                    p.frameRate(30);
+
+                    // Инициализация эффектов в зависимости от mood
+                    switch (mood) {
+                        case 1: // Дождь и молнии
+                            for (let i = 0; i < 200; i++) {
+                                drops.push({
+                                    x: p.random(p.width),
+                                    y: p.random(-p.height, 0),
+                                    speed: p.random(4, 10),
+                                    length: p.random(10, 30),
+                                    opacity: p.random(100, 200)
+                                });
+                            }
+                            break;
+                        case 2: // Лёгкий дождь с ветром
+                            for (let i = 0; i < 150; i++) {
+                                drops.push({
+                                    x: p.random(p.width),
+                                    y: p.random(-p.height, 0),
+                                    speed: p.random(3, 7),
+                                    length: p.random(8, 20),
+                                    opacity: p.random(80, 180),
+                                    wind: p.random(1, 3)
+                                });
+                            }
+                            break;
+                        case 3: // Облака
+                            for (let i = 0; i < 6; i++) {
+                                clouds.push({
+                                    x: p.random(p.width),
+                                    y: p.random(p.height * 0.1, p.height * 0.8),
+                                    w: p.random(150, 350),
+                                    h: p.random(60, 120),
+                                    speed: p.random(0.2, 0.8),
+                                    opacity: p.random(150, 220)
+                                });
+                            }
+                            break;
+                        case 4: // Цветы
+                            for (let i = 0; i < 25; i++) {
+                                flowers.push({
+                                    x: p.random(p.width),
+                                    y: p.random(p.height),
+                                    size: p.random(20, 50),
+                                    phase: p.random(p.TAU),
+                                    speed: p.random(0.005, 0.02),
+                                    color: p.color(
+                                        p.random(200, 255),
+                                        p.random(100, 200),
+                                        p.random(150, 220)
+                                    )
+                                });
+                            }
+                            break;
+                        case 5: // Радуга и блики
+                            // Ничего не инициализируем, всё рисуем в draw
+                            break;
+                    }
+                };
+
+                p.draw = function() {
+                    p.clear();
+                    // Фон уже установлен через CSS, рисуем только эффекты
+                    switch (mood) {
+                        case 1:
+                            drawRain(p, drops, true);
+                            break;
+                        case 2:
+                            drawRain(p, drops, false);
+                            break;
+                        case 3:
+                            drawClouds(p, clouds);
+                            break;
+                        case 4:
+                            drawFlowers(p, flowers);
+                            break;
+                        case 5:
+                            drawRainbow(p);
+                            break;
+                    }
+                };
+
+                // Функции рисования
+                function drawRain(p, drops, lightningOn) {
+                    p.noStroke();
+                    for (let d of drops) {
+                        let alpha = d.opacity / 255;
+                        p.stroke(180, 210, 255, alpha * 150);
+                        p.strokeWeight(1);
+                        p.line(d.x, d.y, d.x + (d.wind || 0) * 2, d.y + d.length);
+                        d.y += d.speed;
+                        d.x += (d.wind || 0) * 0.5;
+                        if (d.y > p.height) {
+                            d.y = p.random(-p.height, 0);
+                            d.x = p.random(p.width);
+                        }
+                    }
+                    if (lightningOn) {
+                        // Молнии (вспышки)
+                        if (p.frameCount % 180 === 0 && p.random() < 0.2) {
+                            lightning = 255;
+                        }
+                        if (lightning > 0) {
+                            p.fill(200, 220, 255, lightning * 0.15);
+                            p.rect(0, 0, p.width, p.height);
+                            lightning *= 0.92;
+                            if (lightning < 1) lightning = 0;
+                        }
+                        // Рисуем саму молнию (просто линию)
+                        if (p.frameCount % 200 === 0 && p.random() < 0.3) {
+                            p.stroke(255, 255, 255, 200);
+                            p.strokeWeight(2);
+                            let x1 = p.random(p.width * 0.2, p.width * 0.8);
+                            let y1 = 0;
+                            let x2 = x1 + p.random(-30, 30);
+                            let y2 = p.random(50, 150);
+                            p.line(x1, y1, x2, y2);
+                            p.strokeWeight(1);
+                            p.stroke(255, 255, 255, 100);
+                            p.line(x1 + p.random(-10, 10), y1 + 20, x2 + p.random(-20, 20), y2 + p.random(20, 40));
+                        }
+                    }
+                }
+
+                function drawClouds(p, clouds) {
+                    p.noStroke();
+                    for (let c of clouds) {
+                        p.fill(255, 255, 255, c.opacity);
+                        p.ellipse(c.x, c.y, c.w, c.h);
+                        p.ellipse(c.x - c.w * 0.4, c.y + c.h * 0.2, c.w * 0.6, c.h * 0.7);
+                        p.ellipse(c.x + c.w * 0.4, c.y + c.h * 0.1, c.w * 0.5, c.h * 0.6);
+                        c.x += c.speed;
+                        if (c.x > p.width + c.w) c.x = -c.w;
+                        // Лёгкое покачивание
+                        c.y += p.sin(p.frameCount * 0.005 + c.x * 0.01) * 0.1;
+                    }
+                }
+
+                function drawFlowers(p, flowers) {
+                    p.noStroke();
+                    for (let f of flowers) {
+                        let t = p.sin(p.frameCount * f.speed + f.phase) * 0.5 + 0.5;
+                        let size = f.size * (0.7 + 0.3 * t);
+                        let petals = 5 + Math.floor(t * 3);
+                        let angleStep = p.TAU / petals;
+                        p.fill(f.color);
+                        p.push();
+                        p.translate(f.x, f.y);
+                        p.rotate(p.frameCount * 0.01 + f.phase);
+                        for (let i = 0; i < petals; i++) {
+                            let angle = i * angleStep;
+                            let r = size * (0.8 + 0.2 * t);
+                            p.ellipse(r * p.cos(angle), r * p.sin(angle), size * 0.5, size * 0.3);
+                        }
+                        // Центр
+                        p.fill(255, 220, 100);
+                        p.ellipse(0, 0, size * 0.3, size * 0.3);
+                        p.pop();
+                        // Лёгкое движение
+                        f.x += p.sin(p.frameCount * 0.01 + f.phase) * 0.2;
+                        f.y += p.cos(p.frameCount * 0.015 + f.phase) * 0.2;
+                    }
+                }
+
+                function drawRainbow(p) {
+                    // Радуга
+                    p.noFill();
+                    p.strokeWeight(3);
+                    let rainbowColors = [
+                        [255, 0, 0],
+                        [255, 165, 0],
+                        [255, 255, 0],
+                        [0, 255, 0],
+                        [0, 0, 255],
+                        [75, 0, 130],
+                        [148, 0, 211]
+                    ];
+                    let centerX = p.width * 0.5;
+                    let centerY = p.height * 0.8;
+                    let radius = Math.min(p.width, p.height) * 0.45;
+                    for (let i = 0; i < rainbowColors.length; i++) {
+                        let r = radius - i * 12;
+                        p.stroke(rainbowColors[i][0], rainbowColors[i][1], rainbowColors[i][2], 180);
+                        p.arc(centerX, centerY, r * 2, r * 2, p.PI, 0);
+                    }
+                    // Блики
+                    for (let i = 0; i < 6; i++) {
+                        let x = p.width * (0.1 + i * 0.15) + p.sin(p.frameCount * 0.005 + i) * 30;
+                        let y = p.height * (0.1 + i * 0.12) + p.cos(p.frameCount * 0.007 + i * 1.2) * 30;
+                        let size = 80 + p.sin(p.frameCount * 0.01 + i) * 30;
+                        p.fill(255, 255, 255, 40);
+                        p.noStroke();
+                        p.ellipse(x, y, size, size);
+                        p.fill(255, 255, 255, 80);
+                        p.ellipse(x - 20, y - 20, size * 0.3, size * 0.3);
+                    }
+                }
+
+                p.windowResized = function() {
+                    const rect = container.getBoundingClientRect();
+                    p.resizeCanvas(rect.width, rect.height);
+                };
+            };
+
+            bgSketches[mood] = new p5(sketch);
+            currentBg = mood;
         }
 
         // =================================================================
@@ -1373,7 +1419,7 @@
             // Показываем описания состояний
             document.getElementById('stateDescriptions').classList.add('active');
 
-            // Сброс состояний волн
+            // Сброс волн
             waveStates = {};
             STATES.forEach(st => {
                 waveStates[st.id] = {
@@ -1402,10 +1448,10 @@
                 document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
                 document.getElementById('moodConfirmBtn').disabled = true;
                 // Убираем эффекты
-                showMoodEffect(0);
-                container.style.background = '#0a0a12';
-                container.style.boxShadow = 'none';
+                stopBgSketch();
+                document.querySelectorAll('.mood-bg').forEach(el => el.classList.remove('active'));
                 document.getElementById('stateDescriptions').classList.remove('active');
+                container.style.background = 'transparent';
             }
 
             canvas = document.getElementById('waveCanvas');
@@ -1418,11 +1464,10 @@
         }
 
         function applyMood(mood) {
-            const container = document.getElementById('waveContainer');
-            // Убираем старые цвета — теперь фон задаётся через эффекты
-            container.style.background = 'transparent';
-            container.style.boxShadow = 'none';
-            showMoodEffect(mood);
+            // Запускаем p5 sketch для фона
+            startBgSketch(mood);
+            // Делаем фон прозрачным, чтобы p5 был виден
+            document.getElementById('waveContainer').style.background = 'transparent';
         }
 
         function buildStatePanel() {
@@ -1483,9 +1528,11 @@
             document.getElementById('bottomPanel').classList.remove('active');
             document.getElementById('backBtn').classList.remove('visible');
             document.getElementById('moodSelector').classList.add('active');
-            // Сбрасываем эффекты
-            showMoodEffect(0);
+            // Убираем эффекты
+            stopBgSketch();
+            document.querySelectorAll('.mood-bg').forEach(el => el.classList.remove('active'));
             document.getElementById('stateDescriptions').classList.remove('active');
+            document.getElementById('waveContainer').style.background = 'transparent';
             document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.toggle('selected', parseInt(b
                 .dataset.mood) === selectedMood));
             document.getElementById('moodConfirmBtn').disabled = selectedMood === 0;
@@ -1562,7 +1609,6 @@
                 time = Date.now() / 1000;
             ctx.clearRect(0, 0, w, h);
 
-            // Рисуем только волны, фон теперь из CSS
             let hasActive = false;
             STATES.forEach((st, index) => {
                 const state = waveStates[st.id];
@@ -1584,7 +1630,7 @@
                 const speed = 0.9 + index * 0.1;
 
                 ctx.save();
-                // Дополнительное свечение от волн
+                // Свечение
                 const glowSize = 80 + Math.sin(time * 0.5 + index) * 20;
                 const grad = ctx.createRadialGradient(w / 2, centerY + offset, 0, w / 2, centerY + offset, glowSize);
                 grad.addColorStop(0, st.color + '20');
@@ -2048,12 +2094,11 @@
                 selector.classList.add('active');
                 document.getElementById('moodConfirmBtn').disabled = true;
                 document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
-                // Сбрасываем эффекты
-                showMoodEffect(0);
+                // Убираем эффекты
+                stopBgSketch();
+                document.querySelectorAll('.mood-bg').forEach(el => el.classList.remove('active'));
                 document.getElementById('stateDescriptions').classList.remove('active');
-                const container = document.getElementById('waveContainer');
-                container.style.background = '#0a0a12';
-                container.style.boxShadow = 'none';
+                document.getElementById('waveContainer').style.background = 'transparent';
                 isResetInProgress = false;
             }, 1200);
         }
@@ -2068,8 +2113,10 @@
             document.getElementById('bottomPanel').classList.remove('active');
             document.getElementById('backBtn').classList.remove('visible');
             if (animationId) cancelAnimationFrame(animationId);
-            showMoodEffect(0);
+            stopBgSketch();
+            document.querySelectorAll('.mood-bg').forEach(el => el.classList.remove('active'));
             document.getElementById('stateDescriptions').classList.remove('active');
+            document.getElementById('waveContainer').style.background = 'transparent';
             renderCalendar();
         });
 
@@ -2107,6 +2154,13 @@
 
         window.addEventListener('resize', function() {
             if (canvas) resizeCanvas();
+            // Перезапускаем p5 sketch при изменении размера, если активен
+            if (currentBg) {
+                const container = document.getElementById(`bg${currentBg}`);
+                if (container && bgSketches[currentBg]) {
+                    bgSketches[currentBg].windowResized();
+                }
+            }
         });
 
         try {
@@ -2116,7 +2170,7 @@
             }
         } catch (e) {}
 
-        console.log('🌌 Атмосферный дневник загружен!');
+        console.log('🌸 Дневник загружен!');
         console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
     </script>
 </body>
