@@ -792,6 +792,40 @@
             .top-bar { top: 14px; left: 14px; right: 14px; }
             .info-btn-small { width: 26px; height: 26px; font-size: 14px; }
         }
+        /* Аудио плеер */
+        #audioPlayer {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            z-index: 9999;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+        }
+        #audioPlayer:hover { opacity: 0.8; }
+        #audioPlayer audio {
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #audioPlayer .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255,255,255,0.2);
+            font-size: 12px;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -859,6 +893,14 @@
         </div>
     </div>
 
+    <!-- Аудио плеер с песней -->
+    <div id="audioPlayer" title="watching the sky - foreveralone">
+        <div class="play-icon">♪</div>
+        <audio id="bgMusic" loop preload="auto">
+            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_8f8e6c8f8e.mp3?filename=watching-the-sky-foreveralone-114589.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
     <div class="note-editor" id="noteEditor">
         <div class="note-editor-content" id="noteEditorContent">
             <div class="note-editor-header">
@@ -881,6 +923,7 @@
             <p><b>🗑️ Чтобы удалить звезду</b> — зажми её на 2 секунды.</p>
             <p><b>🔄 Чтобы вернуться к оценке</b> — нажми стрелку ←.</p>
             <p><b>🗑️ Чтобы сбросить день</b> — зажми дату в центре вверху на 2 секунды.</p>
+            <p><b>🎵 Фоновая музыка</b> — нажми на значок ♪ в правом нижнем углу.</p>
             <button class="help-close" id="helpClose">Понятно!</button>
         </div>
     </div>
@@ -927,330 +970,42 @@
         let waveStates = {};
 
         // =================================================================
-        // 2. ЗВУКИ — ВНЕШНИЕ + ЗАПАСНЫЕ СИНТЕТИЧЕСКИЕ
+        // 2. МУЗЫКА — ТОЛЬКО ОДНА ПЕСНЯ
         // =================================================================
+        let isMusicPlaying = false;
+        let audioElement = null;
 
-        let audioCtx = null;
-        let ambientNodes = [];
-        let ambientGainNode = null;
-        let isAmbientPlaying = false;
-        let ambientInterval = null;
-
-        // Внешние звуки (если доступны)
-        const SOUND_URLS = {
-            main: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8f8e6c8.mp3?filename=melancholy-piano-14370.mp3',
-            rain: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_dd5f6f5d6f.mp3?filename=rain-01-26910.mp3',
-            wind: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_8c8f8e6c8f.mp3?filename=wind-15353.mp3',
-            space: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_8f8e6c8f8e.mp3?filename=deep-space-ambient-16995.mp3',
-            water: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_dd5f6f5d6f.mp3?filename=water-stream-27563.mp3',
-            bells: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_8c8f8e6c8f.mp3?filename=music-box-10573.mp3',
-            star_add: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_8f8e6c8f8e.mp3?filename=bell-12524.mp3',
-            star_remove: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_8f8e6c8f8e.mp3?filename=glass-break-02-14309.mp3'
-        };
-
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-
-        function stopAllSounds() {
-            ambientNodes.forEach(node => {
-                try { node.stop(); } catch (e) {}
-            });
-            ambientNodes = [];
-            ambientGainNode = null;
-            if (ambientInterval) {
-                clearTimeout(ambientInterval);
-                ambientInterval = null;
-            }
-            isAmbientPlaying = false;
-        }
-
-        // Загрузка внешнего звука
-        function loadAndPlay(url, loop = false, volume = 0.3, fadeIn = 0) {
-            return new Promise((resolve, reject) => {
-                fetch(url)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network error');
-                        return response.arrayBuffer();
-                    })
-                    .then(data => audioCtx.decodeAudioData(data))
-                    .then(buffer => {
-                        const source = audioCtx.createBufferSource();
-                        source.buffer = buffer;
-                        source.loop = loop;
-
-                        const gain = audioCtx.createGain();
-                        if (fadeIn > 0) {
-                            gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-                            gain.gain.exponentialRampToValueAtTime(volume, audioCtx.currentTime + fadeIn);
-                        } else {
-                            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-                        }
-
-                        source.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        source.start(0);
-                        ambientNodes.push(source);
-                        ambientNodes.push(gain);
-
-                        resolve({ source, gain });
-                    })
-                    .catch(err => reject(err));
-            });
-        }
-
-        // === ЗАПАСНЫЕ СИНТЕТИЧЕСКИЕ ЗВУКИ ===
-        function playFallbackMood(type) {
-            try {
-                const now = audioCtx.currentTime;
-                const bufferSize = audioCtx.sampleRate * 3;
-                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const data = buffer.getChannelData(0);
-                
-                for (let i = 0; i < bufferSize; i++) {
-                    const t = i / audioCtx.sampleRate;
-                    let val = 0;
-                    if (type === 1) {
-                        val = (Math.random() * 2 - 1) * 0.08 * (0.7 + 0.3 * Math.sin(t * 0.5));
-                        if (Math.random() < 0.001) val += (Math.random() * 2 - 1) * 0.10;
-                    } else if (type === 2) {
-                        val = (Math.random() * 2 - 1) * 0.04 * (0.5 + 0.5 * Math.sin(t * 0.08));
-                        val += Math.sin(t * 3.0) * 0.008;
-                    } else if (type === 3) {
-                        val = Math.sin(t * 0.35) * 0.025 + Math.sin(t * 0.65 + 0.3) * 0.015;
-                        val += (Math.random() * 2 - 1) * 0.005;
-                    } else if (type === 4) {
-                        val = (Math.random() * 2 - 1) * 0.04 * (0.6 + 0.4 * Math.sin(t * 0.2));
-                        val += Math.sin(t * 0.8 + 0.5) * 0.01;
-                    } else if (type === 5) {
-                        val = Math.sin(t * 2.5) * 0.02 + Math.sin(t * 3.2 + 0.4) * 0.015;
-                        val += (Math.random() * 2 - 1) * 0.003;
-                    }
-                    data[i] = val;
+        function initMusic() {
+            audioElement = document.getElementById('bgMusic');
+            if (!audioElement) return;
+            
+            // Автозапуск при первом клике
+            document.addEventListener('click', function playOnClick() {
+                if (!isMusicPlaying && audioElement) {
+                    audioElement.play().then(() => {
+                        isMusicPlaying = true;
+                        document.querySelector('.play-icon').textContent = '♫';
+                    }).catch(() => {});
+                    document.removeEventListener('click', playOnClick);
                 }
-                
-                const noise = audioCtx.createBufferSource();
-                noise.buffer = buffer;
-                noise.loop = true;
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.03, now);
-                gain.gain.exponentialRampToValueAtTime(0.02, now + 1);
-                noise.connect(gain);
-                gain.connect(audioCtx.destination);
-                noise.start(now);
-                noise.stop(now + 20);
-                ambientNodes.push(noise);
-                ambientNodes.push(gain);
-                ambientGainNode = gain;
-            } catch (e) {}
-        }
+            });
 
-        function playFallbackStar(type) {
-            const now = audioCtx.currentTime;
-            try {
-                if (type === 'add') {
-                    const osc = audioCtx.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(1200, now);
-                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.2);
-                    const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.03, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.25);
-                    ambientNodes.push(osc);
-                    ambientNodes.push(gain);
+            // Клик по плееру для включения/выключения
+            const player = document.getElementById('audioPlayer');
+            player.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (!audioElement) return;
+                if (isMusicPlaying) {
+                    audioElement.pause();
+                    isMusicPlaying = false;
+                    document.querySelector('.play-icon').textContent = '♪';
                 } else {
-                    const osc = audioCtx.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(900, now);
-                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.35);
-                    const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.025, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.4);
-                    ambientNodes.push(osc);
-                    ambientNodes.push(gain);
+                    audioElement.play().then(() => {
+                        isMusicPlaying = true;
+                        document.querySelector('.play-icon').textContent = '♫';
+                    }).catch(() => {});
                 }
-            } catch (e) {}
-        }
-
-        function playFallbackClick() {
-            try {
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.04);
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.04);
-                ambientNodes.push(osc);
-                ambientNodes.push(gain);
-            } catch (e) {}
-        }
-
-        function playFallbackConfirm() {
-            try {
-                const now = audioCtx.currentTime;
-                for (let i = 0; i < 3; i++) {
-                    const osc = audioCtx.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(500 + i * 100, now + i * 0.06);
-                    osc.frequency.exponentialRampToValueAtTime(600 + i * 80, now + i * 0.06 + 0.1);
-                    const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.02, now + i * 0.06);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.1);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(now + i * 0.06);
-                    osc.stop(now + i * 0.06 + 0.1);
-                    ambientNodes.push(osc);
-                    ambientNodes.push(gain);
-                }
-            } catch (e) {}
-        }
-
-        function playFallbackReset() {
-            try {
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.5);
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.5);
-                ambientNodes.push(osc);
-                ambientNodes.push(gain);
-            } catch (e) {}
-        }
-
-        // === ОСНОВНЫЕ ФУНКЦИИ С ПРИОРИТЕТОМ ВНЕШНИХ ЗВУКОВ ===
-        function playMainAmbient() {
-            if (isAmbientPlaying) return;
-            try {
-                initAudio();
-                isAmbientPlaying = true;
-                
-                loadAndPlay(SOUND_URLS.main, true, 0.25, 1.5)
-                    .then(({ gain }) => {
-                        ambientGainNode = gain;
-                    })
-                    .catch(() => {
-                        // Если внешний не загрузился - запасной
-                        playFallbackMood(3);
-                    });
-
-                ambientInterval = setTimeout(() => {
-                    if (isAmbientPlaying) playMainAmbient();
-                }, 30000);
-
-            } catch (e) {
-                isAmbientPlaying = false;
-            }
-        }
-
-        function createMoodSound(type) {
-            stopAllSounds();
-            initAudio();
-            
-            let url = '';
-            let volume = 0.2;
-            let fade = 1.0;
-
-            switch (type) {
-                case 1: url = SOUND_URLS.rain; volume = 0.25; break;
-                case 2: url = SOUND_URLS.wind; volume = 0.2; break;
-                case 3: url = SOUND_URLS.space; volume = 0.18; break;
-                case 4: url = SOUND_URLS.water; volume = 0.2; break;
-                case 5: url = SOUND_URLS.bells; volume = 0.15; break;
-                default: return;
-            }
-
-            loadAndPlay(url, true, volume, fade)
-                .then(({ gain }) => {
-                    ambientGainNode = gain;
-                })
-                .catch(() => {
-                    // Если внешний не загрузился - запасной
-                    playFallbackMood(type);
-                });
-
-            setTimeout(() => {
-                if (!isAmbientPlaying) {
-                    isAmbientPlaying = true;
-                    playMainAmbient();
-                }
-            }, 3000);
-        }
-
-        function setAmbientVolume(vol) {
-            if (ambientGainNode) {
-                try {
-                    ambientGainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
-                } catch (e) {}
-            }
-        }
-
-        function playStarSound(type) {
-            initAudio();
-            
-            let url = '';
-            let volume = 0.2;
-            if (type === 'add') {
-                url = SOUND_URLS.star_add;
-                volume = 0.25;
-            } else {
-                url = SOUND_URLS.star_remove;
-                volume = 0.2;
-            }
-
-            loadAndPlay(url, false, volume, 0.05)
-                .catch(() => {
-                    playFallbackStar(type);
-                });
-        }
-
-        function playClickSound() {
-            initAudio();
-            loadAndPlay(SOUND_URLS.star_add, false, 0.05, 0.01)
-                .catch(() => {
-                    playFallbackClick();
-                });
-        }
-
-        function playConfirmSound() {
-            initAudio();
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    loadAndPlay(SOUND_URLS.star_add, false, 0.03, 0.01)
-                        .catch(() => {
-                            if (i === 0) playFallbackConfirm();
-                        });
-                }, i * 80);
-            }
-        }
-
-        function playResetSound() {
-            initAudio();
-            loadAndPlay(SOUND_URLS.star_remove, false, 0.15, 0.05)
-                .catch(() => {
-                    playFallbackReset();
-                });
+            });
         }
 
         // =================================================================
@@ -1367,8 +1122,8 @@
 
                 dayEl.addEventListener('click', (function(ds) {
                     return function() {
-                        if (!isFuture(ds)) { playClickSound();
-                            openDay(ds); } else alert('Этот день ещё не наступил 😊');
+                        if (!isFuture(ds)) openDay(ds);
+                        else alert('Этот день ещё не наступил 😊');
                     };
                 })(dateStr));
                 grid.appendChild(dayEl);
@@ -1674,7 +1429,6 @@
             const bgCanvasEl = document.getElementById('bgCanvas');
             if (mood === 0) {
                 bgCanvasEl.classList.remove('active');
-                stopAllSounds();
                 return;
             }
             bgCanvasEl.classList.add('active');
@@ -1691,27 +1445,22 @@
                     generateRain(rainDrops, 180, 0.2, 8, [15, 32], 1.6);
                     generateGlassDrops(15);
                     generateFlareParticles(10);
-                    createMoodSound(1);
                     break;
                 case 2:
                     generateRain(rainDrops2, 90, 0.4, 6, [12, 22], 1.2);
                     generateGlassDrops(8);
                     generateFlareParticles(8);
-                    createMoodSound(2);
                     break;
                 case 3:
                     generateClouds(8);
                     generateFlareParticles(6);
-                    createMoodSound(3);
                     break;
                 case 4:
                     generateFlowers(18);
                     generateFlareParticles(12);
-                    createMoodSound(4);
                     break;
                 case 5:
                     generateFlareParticles(25);
-                    createMoodSound(5);
                     break;
             }
 
@@ -1763,7 +1512,6 @@
                 buildStatePanel();
                 updateStarCounter();
                 selectedStates.forEach(stId => setWaveTarget(stId, true));
-                setTimeout(() => setAmbientVolume(0.05), 400);
             } else {
                 document.getElementById('moodSelector').classList.add('active');
                 document.getElementById('bottomPanel').classList.remove('active');
@@ -1794,7 +1542,6 @@
                 btn.style.color = st.color;
                 if (selectedStates.includes(st.id)) btn.classList.add('selected');
                 btn.addEventListener('click', function() {
-                    playClickSound();
                     toggleState(st.id, this);
                 });
                 panel.appendChild(btn);
@@ -1806,26 +1553,22 @@
         // =================================================================
         document.querySelectorAll('.mood-select-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                playClickSound();
                 selectedMood = parseInt(this.dataset.mood);
                 document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
                 document.getElementById('moodConfirmBtn').disabled = false;
                 setMoodEffect(selectedMood);
-                setAmbientVolume(0.10);
             });
         });
 
         document.getElementById('moodConfirmBtn').addEventListener('click', function() {
             if (selectedMood === 0) return;
-            playConfirmSound();
             if (currentDateStr) {
                 const data = getDayData(currentDateStr);
                 data.mood = selectedMood;
                 saveData();
                 renderCalendar();
                 showAdditions();
-                setTimeout(() => setAmbientVolume(0.05), 500);
             }
         });
 
@@ -1839,7 +1582,6 @@
         }
 
         function goBackToMood() {
-            playClickSound();
             document.getElementById('bottomPanel').classList.remove('active');
             document.getElementById('backBtn').classList.remove('visible');
             document.getElementById('moodSelector').classList.add('active');
@@ -1848,7 +1590,6 @@
                 .dataset.mood) === selectedMood));
             document.getElementById('moodConfirmBtn').disabled = selectedMood === 0;
             STATES.forEach(st => setWaveTarget(st.id, false));
-            stopAllSounds();
         }
         document.getElementById('backBtn').addEventListener('click', goBackToMood);
 
@@ -1914,7 +1655,7 @@
         }
 
         // =================================================================
-        // 10. АНИМАЦИЯ ВОЛН И ПЯТИКОНЕЧНЫХ ЗВЁЗД
+        // 10. АНИМАЦИЯ ВОЛН И ПЯТИКОНЕЧНЫХ ЗВЁЗД (ПЕРЕРИСОВАННЫХ)
         // =================================================================
         function animateWaves() {
             if (!canvas || !ctx) return;
@@ -2009,32 +1750,30 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
-            // ===== ПЯТИКОНЕЧНЫЕ БЕЛО-ГОЛУБЫЕ ЗВЁЗДЫ =====
+            // ===== ПЕРЕРИСОВАННАЯ ПЯТИКОНЕЧНАЯ ЗВЕЗДА =====
             stars.forEach((star, idx) => {
                 const floatOffset = star.floatPhase || 0;
-                const crystalOffset = star.crystalPhase || 0;
                 const floatY = Math.sin(time * 0.4 + floatOffset) * 10;
                 const floatX = Math.sin(time * 0.3 + floatOffset * 0.5) * 6;
-                const pulse = 0.5 + 0.5 * Math.sin(time * 0.8 + crystalOffset);
-                const twinkle = 0.5 + 0.5 * Math.sin(time * 1.2 + floatOffset);
+                const twinkle = 0.6 + 0.4 * Math.sin(time * 1.2 + floatOffset);
 
                 const x = star.x + floatX;
                 const y = star.y + floatY;
-                const size = 14 + 4 * pulse;
+                const size = 16;
 
                 // Серебристо-голубое свечение
-                const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 18);
-                glowGrad.addColorStop(0, `rgba(200,230,255,${0.15 * twinkle + 0.05})`);
-                glowGrad.addColorStop(0.2, `rgba(180,210,255,${0.10 * twinkle + 0.03})`);
-                glowGrad.addColorStop(0.5, `rgba(150,190,255,${0.05 * twinkle + 0.01})`);
+                const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 12);
+                glowGrad.addColorStop(0, `rgba(200,230,255,${0.2 * twinkle})`);
+                glowGrad.addColorStop(0.3, `rgba(180,210,255,${0.1 * twinkle})`);
+                glowGrad.addColorStop(0.7, `rgba(150,190,255,${0.04 * twinkle})`);
                 glowGrad.addColorStop(1, 'rgba(255,255,255,0)');
                 ctx.fillStyle = glowGrad;
-                ctx.fillRect(x - size * 18, y - size * 18, size * 36, size * 36);
+                ctx.fillRect(x - size * 12, y - size * 12, size * 24, size * 24);
 
-                // Пятиконечная звезда
+                // ЧЁТКАЯ ПЯТИКОНЕЧНАЯ ЗВЕЗДА
                 ctx.save();
                 ctx.translate(x, y);
-                ctx.rotate(time * 0.03 + idx * 0.4 + Math.sin(time * 0.12 + idx) * 0.06);
+                ctx.rotate(time * 0.02 + idx * 0.3);
 
                 ctx.beginPath();
                 const spikes = 5;
@@ -2048,23 +1787,30 @@
                 }
                 ctx.closePath();
 
-                // Бело-голубой градиент
+                // Четкий контур
+                ctx.strokeStyle = `rgba(200,230,255,${0.5 * twinkle})`;
+                ctx.lineWidth = 1.5;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = `rgba(180,210,255,0.3)`;
+                ctx.stroke();
+
+                // Бело-голубая заливка
                 const starGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
-                starGrad.addColorStop(0, `rgba(255,255,255,${0.9 + 0.1 * twinkle})`);
-                starGrad.addColorStop(0.3, `rgba(230,245,255,${0.7 + 0.2 * twinkle})`);
-                starGrad.addColorStop(0.6, `rgba(200,225,255,${0.5 + 0.2 * twinkle})`);
-                starGrad.addColorStop(0.85, `rgba(170,200,240,${0.3 + 0.1 * twinkle})`);
-                starGrad.addColorStop(1, `rgba(140,180,220,${0.1 + 0.05 * twinkle})`);
+                starGrad.addColorStop(0, `rgba(255,255,255,${0.95 * twinkle})`);
+                starGrad.addColorStop(0.3, `rgba(235,245,255,${0.8 * twinkle})`);
+                starGrad.addColorStop(0.6, `rgba(210,230,255,${0.6 * twinkle})`);
+                starGrad.addColorStop(0.85, `rgba(180,210,240,${0.4 * twinkle})`);
+                starGrad.addColorStop(1, `rgba(150,190,220,${0.2 * twinkle})`);
                 ctx.fillStyle = starGrad;
-                ctx.shadowBlur = 50;
-                ctx.shadowColor = `rgba(180,210,255,${0.3 + 0.2 * twinkle})`;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = `rgba(180,210,255,0.2)`;
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Внутреннее свечение
-                const innerGlow = ctx.createRadialGradient(-size * 0.1, -size * 0.15, 0, 0, 0, size * 0.5);
-                innerGlow.addColorStop(0, `rgba(255,255,255,${0.5 + 0.3 * twinkle})`);
-                innerGlow.addColorStop(0.4, `rgba(220,240,255,${0.2 + 0.1 * twinkle})`);
+                // Внутренний блеск
+                const innerGlow = ctx.createRadialGradient(-size * 0.15, -size * 0.2, 0, 0, 0, size * 0.5);
+                innerGlow.addColorStop(0, `rgba(255,255,255,${0.6 * twinkle})`);
+                innerGlow.addColorStop(0.5, `rgba(230,245,255,${0.2 * twinkle})`);
                 innerGlow.addColorStop(1, 'rgba(255,255,255,0)');
                 ctx.fillStyle = innerGlow;
                 ctx.beginPath();
@@ -2073,37 +1819,37 @@
 
                 // Блик
                 ctx.beginPath();
-                ctx.ellipse(-size * 0.25, -size * 0.35, size * 0.2, size * 0.1, -0.5, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255,255,255,${0.5 + 0.2 * twinkle})`;
+                ctx.ellipse(-size * 0.3, -size * 0.4, size * 0.2, size * 0.08, -0.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,255,255,${0.4 * twinkle})`;
                 ctx.fill();
 
                 ctx.restore();
 
+                // Маленькие искорки
+                for (let i = 0; i < 2; i++) {
+                    const sparkAngle = time * 0.2 + i * 2.5 + idx * 0.5;
+                    const sparkDist = size * (0.8 + 0.3 * Math.sin(time * 0.15 + i * 1.5 + idx));
+                    const sx = x + Math.cos(sparkAngle) * sparkDist;
+                    const sy = y + Math.sin(sparkAngle) * sparkDist;
+                    const sparkSize = 1.5 + 2 * Math.sin(time * 0.4 + i * 2.0 + idx);
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, sparkSize * 0.5, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(200,230,255,${0.2 * twinkle})`;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = 'rgba(180,210,255,0.15)';
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+
                 // Текст заметки
                 if (star.note) {
                     ctx.save();
-                    ctx.fillStyle = `rgba(200,220,255,${0.08 + 0.04 * twinkle})`;
+                    ctx.fillStyle = `rgba(200,220,255,${0.08 * twinkle})`;
                     ctx.font = '10px system-ui';
                     ctx.textAlign = 'center';
                     const displayNote = star.note.length > 18 ? star.note.slice(0, 18) + '…' : star.note;
                     ctx.fillText(displayNote, x, y + size + 20);
                     ctx.restore();
-                }
-
-                // Маленькие искорки
-                for (let i = 0; i < 3; i++) {
-                    const sparkAngle = time * 0.3 + i * 2.1 + idx;
-                    const sparkDist = size * (0.8 + 0.4 * Math.sin(time * 0.2 + i * 1.3 + idx));
-                    const sx = x + Math.cos(sparkAngle) * sparkDist;
-                    const sy = y + Math.sin(sparkAngle) * sparkDist;
-                    const sparkSize = 1.5 + 2 * Math.sin(time * 0.5 + i * 1.7 + idx);
-                    ctx.beginPath();
-                    ctx.arc(sx, sy, sparkSize * 0.5, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(200,230,255,${0.15 + 0.1 * Math.sin(time + i)})`;
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = 'rgba(180,210,255,0.2)';
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
                 }
             });
 
@@ -2139,7 +1885,6 @@
             }
             const note = document.getElementById('noteInput').value.trim();
             if (!note) { alert('Напиши заметку для звезды ✦'); return; }
-            playStarSound('add');
 
             const data = getDayData(currentDateStr);
             if (!data.stars) data.stars = [];
@@ -2179,9 +1924,8 @@
             saveData();
         });
 
-        // Эффект "капли упавшей в воду" — расходящиеся круги
+        // Эффект "капли упавшей в воду"
         function createWaterDropEffect(x, y) {
-            // Создаём несколько расходящихся колец
             for (let ring = 0; ring < 3; ring++) {
                 setTimeout(() => {
                     const ripple = document.createElement('div');
@@ -2201,7 +1945,6 @@
                 }, ring * 80);
             }
 
-            // Световая вспышка в центре
             const flash = document.createElement('div');
             flash.style.cssText = `
                 position: fixed; left: ${x-30}px; top: ${y-30}px;
@@ -2215,7 +1958,6 @@
             document.body.appendChild(flash);
             setTimeout(() => flash.remove(), 800);
 
-            // Небольшие брызги-искорки
             for (let i = 0; i < 12; i++) {
                 const spark = document.createElement('div');
                 const angle = Math.random() * Math.PI * 2;
@@ -2243,7 +1985,6 @@
                 setTimeout(() => spark.remove(), 800);
             }
 
-            // Стили для анимации
             if (!document.getElementById('waterDropStyles')) {
                 const style = document.createElement('style');
                 style.id = 'waterDropStyles';
@@ -2265,9 +2006,6 @@
         // 12. ЗВЁЗДЫ — УДАЛЕНИЕ (МЕДЛЕННОЕ РАСТВОРЕНИЕ)
         // =================================================================
         function deleteStar(star) {
-            playStarSound('remove');
-
-            // Медленное растворение звезды с увеличением и рассеиванием
             const dissolve = document.createElement('div');
             dissolve.style.cssText = `
                 position: fixed; left: ${star.x-80}px; top: ${star.y-80}px;
@@ -2276,7 +2014,6 @@
                 animation: starDissolve 1.8s ease-out forwards;
             `;
             
-            // Создаём несколько размытых кругов
             for (let i = 0; i < 5; i++) {
                 const ring = document.createElement('div');
                 const size = 30 + i * 25;
@@ -2296,7 +2033,6 @@
             document.body.appendChild(dissolve);
             setTimeout(() => dissolve.remove(), 2000);
 
-            // Частицы, медленно разлетающиеся
             for (let i = 0; i < 20; i++) {
                 const particle = document.createElement('div');
                 const angle = Math.random() * Math.PI * 2;
@@ -2507,7 +2243,6 @@
         document.getElementById('waveDate').addEventListener('mousedown', function() {
             resetPressTimer = setTimeout(() => {
                 if (currentDateStr && !isResetInProgress) {
-                    playResetSound();
                     if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
                         resetDay();
                     }
@@ -2526,7 +2261,6 @@
         document.getElementById('waveDate').addEventListener('touchstart', function(e) {
             resetPressTimer = setTimeout(() => {
                 if (currentDateStr && !isResetInProgress) {
-                    playResetSound();
                     if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
                         resetDay();
                     }
@@ -2575,7 +2309,6 @@
                 const container = document.getElementById('waveContainer');
                 container.style.background = 'rgba(0,0,0,0.10)';
                 container.style.boxShadow = 'none';
-                stopAllSounds();
                 isResetInProgress = false;
             }, 1200);
         }
@@ -2591,7 +2324,6 @@
             document.getElementById('backBtn').classList.remove('visible');
             if (animationId) cancelAnimationFrame(animationId);
             setMoodEffect(0);
-            stopAllSounds();
             renderCalendar();
         });
 
@@ -2637,10 +2369,7 @@
         loadData();
         renderCalendar();
         initBgCanvas();
-
-        setTimeout(() => {
-            if (!isAmbientPlaying) playMainAmbient();
-        }, 500);
+        initMusic();
 
         window.addEventListener('resize', function() {
             if (canvas) resizeCanvas();
@@ -2655,6 +2384,7 @@
         } catch (e) {}
 
         console.log('📅 Календарь настроения загружен!');
+        console.log('🎵 Фоновая музыка: watching the sky - foreveralone');
         console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
     </script>
 </body>
