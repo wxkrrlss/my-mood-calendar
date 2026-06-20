@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Хрустальный дневник</title>
+    <title>Календарь настроения</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -28,7 +28,6 @@
             overflow-y: auto;
             position: relative;
         }
-        /* ===== КОСМИЧЕСКИЙ ФОН ===== */
         body::before {
             content: '';
             position: fixed;
@@ -251,8 +250,8 @@
             top: 2px;
             right: 4px;
             font-size: 10px;
-            color: #ffd700;
-            text-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
+            color: #b0d0ff;
+            text-shadow: 0 0 16px rgba(150, 200, 255, 0.4);
             z-index: 2;
         }
         .day-wave-container {
@@ -589,9 +588,9 @@
         #starBtn {
             padding: 6px 18px;
             border-radius: 20px;
-            border: 1.5px solid rgba(255, 215, 0, 0.06);
-            background: rgba(255, 215, 0, 0.02);
-            color: #ffd700;
+            border: 1.5px solid rgba(180, 210, 255, 0.06);
+            background: rgba(180, 210, 255, 0.02);
+            color: #b0d0ff;
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
@@ -603,7 +602,7 @@
             width: 100%;
             justify-content: center;
         }
-        #starBtn:hover { background: rgba(255, 215, 0, 0.05); border-color: rgba(255, 215, 0, 0.12); transform: scale(1.01); }
+        #starBtn:hover { background: rgba(180, 210, 255, 0.05); border-color: rgba(180, 210, 255, 0.12); transform: scale(1.01); }
         .star-counter { font-size: 12px; color: rgba(255, 255, 255, 0.12); text-align: center; margin-top: 4px; }
         .star-hint { font-size: 10px; color: rgba(255, 255, 255, 0.05); text-align: center; margin-top: -2px; }
         .note-editor {
@@ -804,7 +803,7 @@
     <div class="calendar-wrapper">
         <div class="calendar">
             <div class="header">
-                <span class="header-title">Мой дневник</span>
+                <span class="header-title">Календарь настроения</span>
                 <div class="header-actions">
                     <button class="header-btn" id="helpBtn">?</button>
                 </div>
@@ -857,8 +856,8 @@
             <div id="statePanel"></div>
             <div id="noteSection">
                 <input type="text" id="noteInput" placeholder="Опиши события дня...">
-                <button id="starBtn">⭐ Добавить звезду</button>
-                <span class="star-counter" id="starCounter">⭐ 0</span>
+                <button id="starBtn">✦ Добавить звезду</button>
+                <span class="star-counter" id="starCounter">✦ 0</span>
                 <div class="star-hint">Звезда — особенный момент дня</div>
             </div>
         </div>
@@ -882,7 +881,7 @@
             <p><b>2. Выбери состояния</b> — до 4-х, которые описывают твой день.</p>
             <p><b>3. Напиши комментарий</b> — опиши события дня.</p>
             <p><b>4. Добавь звезду</b> — нажми кнопку, чтобы отметить особенный момент.</p>
-            <p><b>⭐ Чтобы увидеть заметку</b> — нажми на звезду или волну.</p>
+            <p><b>✦ Чтобы увидеть заметку</b> — нажми на звезду или волну.</p>
             <p><b>🗑️ Чтобы удалить звезду</b> — зажми её на 2 секунды.</p>
             <p><b>🔄 Чтобы вернуться к оценке</b> — нажми стрелку ←.</p>
             <p><b>🗑️ Чтобы сбросить день</b> — зажми дату в центре вверху на 2 секунды.</p>
@@ -1085,25 +1084,6 @@
             }
         }
 
-        function stopAllSounds() {
-            ambientNodes.forEach(node => { try { node.stop(); } catch (e) {} });
-            ambientNodes = [];
-            ambientGainNode = null;
-            if (ambientInterval) {
-                clearTimeout(ambientInterval);
-                ambientInterval = null;
-            }
-            isAmbientPlaying = false;
-            if (mainAudio) {
-                mainAudio.pause();
-                mainAudio.currentTime = 0;
-            }
-            rainNodes1.forEach(node => { try { node.stop(); } catch (e) {} });
-            rainNodes1 = [];
-            rainNodes2.forEach(node => { try { node.stop(); } catch (e) {} });
-            rainNodes2 = [];
-        }
-
         function soundClick() {}
         function soundConfirm() {}
         function soundReset() {}
@@ -1181,7 +1161,7 @@
             ];
             monthYear.textContent = months[currentMonth] + ' ' + currentYear;
             const avg = getMonthAvg(currentYear, currentMonth);
-            monthAvg.textContent = avg ? `★ ${avg}` : '';
+            monthAvg.textContent = avg ? `✦ ${avg}` : '';
 
             const firstDay = new Date(currentYear, currentMonth, 1);
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -1853,6 +1833,7 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
+            // ===== ЗВЁЗДЫ (БЕЗ ИЗМЕНЕНИЙ) =====
             stars.forEach((star, idx) => {
                 const floatOffset = star.floatPhase || 0;
                 const crystalOffset = star.crystalPhase || 0;
@@ -1931,7 +1912,7 @@
         // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ
         // =================================================================
         function updateStarCounter() {
-            document.getElementById('starCounter').textContent = `⭐ ${stars.length}`;
+            document.getElementById('starCounter').textContent = `✦ ${stars.length}`;
         }
 
         function getStarPositions() {
@@ -1949,11 +1930,11 @@
         document.getElementById('starBtn').addEventListener('click', function() {
             if (!currentDateStr) return;
             if (stars.length >= MAX_STARS) {
-                alert(`Можно добавить максимум ${MAX_STARS} звёзд ✨`);
+                alert(`Можно добавить максимум ${MAX_STARS} звёзд ✦`);
                 return;
             }
             const note = document.getElementById('noteInput').value.trim();
-            if (!note) { alert('Напиши заметку для звезды ✨'); return; }
+            if (!note) { alert('Напиши заметку для звезды ✦'); return; }
 
             const data = getDayData(currentDateStr);
             if (!data.stars) data.stars = [];
@@ -2230,7 +2211,7 @@
             content.style.removeProperty('--wave-glow');
             content.classList.remove('wave-color');
             if (type === 'star' && data) {
-                title.textContent = '⭐ Особенный момент';
+                title.textContent = '✦ Особенный момент';
                 textarea.value = data.note || '';
             } else if (type === 'state' && stateId) {
                 const st = STATES.find(s => s.id === stateId);
@@ -2422,6 +2403,14 @@
             playMainAmbient();
         }, 500);
 
+        // Попытка запустить музыку при клике (для обхода автоблокировки)
+        document.addEventListener('click', function playOnClick() {
+            if (!isAmbientPlaying) {
+                playMainAmbient();
+            }
+            document.removeEventListener('click', playOnClick);
+        });
+
         window.addEventListener('resize', function() {
             if (canvas) resizeCanvas();
             resizeBgCanvas();
@@ -2434,7 +2423,8 @@
             }
         } catch (e) {}
 
-        console.log('💎 Хрустальный дневник загружен!');
+        console.log('📅 Календарь настроения загружен!');
+        console.log('🎵 Фоновая музыка: watching the sky - foreveralone');
         console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
     </script>
 </body>
