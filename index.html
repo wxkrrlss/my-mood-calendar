@@ -5,2436 +5,856 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Хрустальный дневник</title>
     <style>
-        /* Все стили остаются без изменений (из предыдущей версии) */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #05050a;
-            min-height: 100vh;
+            background: #0b0a0f;
+            color: #eae6f0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            touch-action: pan-y;
+        }
+
+        /* главный контейнер */
+        .app {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 16px;
-            color: #e0e0e8;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
-            overflow-x: hidden;
+            background: radial-gradient(circle at 20% 20%, #1a1725, #08070b);
+        }
+
+        /* календарь — видим по умолчанию */
+        .calendar-view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 12px 16px 20px;
+            backdrop-filter: blur(2px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
             overflow-y: auto;
-            position: relative;
+            max-height: 100vh;
         }
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(ellipse at 20% 30%, rgba(180, 100, 255, 0.06) 0%, transparent 40%),
-                radial-gradient(ellipse at 70% 60%, rgba(100, 200, 255, 0.05) 0%, transparent 40%);
-            animation: nebula 40s ease-in-out infinite alternate;
+        .calendar-view.hidden {
+            opacity: 0;
+            transform: scale(0.96);
             pointer-events: none;
-            z-index: 0;
-        }
-        @keyframes nebula {
-            0% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 0.5; }
-            33% { transform: translate(5%, -3%) scale(1.1) rotate(2deg); opacity: 0.9; }
-            66% { transform: translate(-4%, 5%) scale(0.9) rotate(-1.5deg); opacity: 0.6; }
-            100% { transform: translate(3%, -2%) scale(1.05) rotate(1deg); opacity: 0.8; }
-        }
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
-                radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,0.3), transparent);
-            background-size: 350px 350px;
-            opacity: 0.7;
-            animation: starField 12s ease-in-out infinite alternate;
-            pointer-events: none;
-            z-index: 0;
-        }
-        @keyframes starField {
-            0% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.02); }
-            100% { opacity: 0.4; transform: scale(0.98); }
-        }
-        .calendar-wrapper {
-            position: relative;
-            background: rgba(10, 10, 18, 0.85);
-            backdrop-filter: blur(16px);
-            border-radius: 32px;
-            padding: 5px;
-            max-width: 420px;
+            position: absolute;
             width: 100%;
-            box-shadow: 0 8px 60px rgba(0,0,0,0.8), inset 0 0 80px rgba(100,150,255,0.02);
-            overflow: hidden;
-            z-index: 1;
-            margin-bottom: 20px;
         }
-        .calendar-wrapper::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(ellipse at 20% 30%, rgba(140,180,255,0.12) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 60%, rgba(200,150,255,0.08) 0%, transparent 50%);
-            animation: northernLights 25s ease-in-out infinite alternate;
-            pointer-events: none;
-            z-index: 0;
-        }
-        @keyframes northernLights {
-            0% { transform: translate(0,0) scale(1); opacity: 0.5; }
-            25% { transform: translate(5%, -4%) scale(1.06); opacity: 1; }
-            50% { transform: translate(-4%, 6%) scale(0.94); opacity: 0.7; }
-            75% { transform: translate(3%, -2%) scale(1.02); opacity: 0.9; }
-            100% { transform: translate(-2%, 4%) scale(0.98); opacity: 0.6; }
-        }
-        .calendar-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: radial-gradient(2px 2px at 15% 25%, rgba(255,255,255,0.5), transparent),
-                radial-gradient(1px 1px at 65% 15%, rgba(255,255,255,0.6), transparent);
-            background-size: 250px 250px;
-            opacity: 0.8;
-            animation: starTwinkle 10s ease-in-out infinite alternate;
-            pointer-events: none;
-            z-index: 0;
-        }
-        @keyframes starTwinkle {
-            0% { opacity: 0.3; }
-            50% { opacity: 0.9; }
-            100% { opacity: 0.4; }
-        }
-        .calendar {
-            position: relative;
-            z-index: 1;
-            background: rgba(16,16,26,0.6);
-            backdrop-filter: blur(8px);
-            border-radius: 28px;
-            padding: 16px;
-        }
-        .header {
+
+        /* шапка календаря */
+        .cal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 4px;
-            padding: 0 4px;
+            padding: 8px 0 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 12px;
+            flex-wrap: wrap;
         }
-        .header-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #f0f0f8;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 30px rgba(100,150,255,0.1);
-        }
-        .header-actions {
+        .cal-header .month-year {
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 16px 4px 12px;
+            border-radius: 48px;
+            backdrop-filter: blur(4px);
             display: flex;
+            align-items: center;
             gap: 12px;
         }
-        .help-btn {
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.15);
-            font-size: 18px;
-            cursor: pointer;
-            transition: 0.3s;
-            padding: 4px 8px;
-            border-radius: 8px;
-        }
-        .help-btn:hover { color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
-        .subheader {
-            font-size: 11px;
-            color: rgba(255,255,255,0.15);
-            margin-bottom: 14px;
-            padding: 0 4px;
-            letter-spacing: 0.5px;
-        }
-        .month-nav {
+        .month-year .avg-score {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            background: rgba(255, 215, 0, 0.12);
+            padding: 2px 12px;
+            border-radius: 30px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 4px 0 14px;
+            gap: 4px;
         }
-        .month-nav button {
-            background: rgba(255,255,255,0.04);
-            border: none;
-            font-size: 20px;
+        .cal-nav {
+            display: flex;
+            gap: 10px;
+        }
+        .cal-nav button {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #d0cce0;
+            width: 40px;
+            height: 40px;
+            border-radius: 40px;
+            font-size: 1.3rem;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
             cursor: pointer;
-            padding: 4px 12px;
-            border-radius: 12px;
-            transition: 0.3s;
-            color: rgba(255,255,255,0.3);
         }
-        .month-nav button:hover { background: rgba(255,255,255,0.08); color: #fff; }
-        .month-nav .month-year {
-            font-size: 17px;
-            font-weight: 600;
-            color: #f0f0f8;
-            text-shadow: 0 0 20px rgba(100,150,255,0.05);
+        .cal-nav button:active {
+            background: rgba(255, 255, 255, 0.12);
+            transform: scale(0.92);
         }
-        .month-nav .month-avg {
-            font-size: 13px;
-            font-weight: 400;
-            color: rgba(255,255,255,0.2);
-            margin-left: 8px;
-        }
+
+        /* сетка дней */
         .weekdays {
             display: grid;
-            grid-template-columns: repeat(7,1fr);
+            grid-template-columns: repeat(7, 1fr);
             text-align: center;
-            font-size: 10px;
-            color: rgba(255,255,255,0.15);
-            font-weight: 600;
-            margin-bottom: 8px;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 1px;
+            color: #6a6480;
+            margin: 6px 0 8px;
+            padding: 0 4px;
         }
         .days-grid {
             display: grid;
-            grid-template-columns: repeat(7,1fr);
-            gap: 5px;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            padding: 0 2px;
         }
-        .day {
-            aspect-ratio: 1;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.2,0.9,0.4,1);
+        .day-cell {
+            aspect-ratio: 1 / 1;
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-weight: 500;
-            font-size: 14px;
-            color: #b0b0c0;
-            border: 1.5px solid transparent;
+            font-weight: 400;
+            font-size: 0.95rem;
+            background: rgba(30, 28, 40, 0.5);
+            backdrop-filter: blur(2px);
+            border: 1px solid transparent;
+            transition: 0.15s;
             position: relative;
-            min-height: 38px;
-            background: rgba(255,255,255,0.02);
+            min-height: 52px;
+            color: #c8c2dc;
         }
-        .day:active { transform: scale(0.92); }
-        .day:hover { transform: scale(1.04); z-index: 2; background: rgba(255,255,255,0.05); }
-        .day.empty { background: transparent !important; cursor: default; border-color: transparent !important; }
-        .day.empty:hover { transform: none; background: transparent !important; }
-        .day.mood-1 { background: #0a0a12; color: #e8e8f0; border-color: #1a1a22; }
-        .day.mood-2 { background: #1a1a2a; color: #e0e0e8; border-color: #2a2a3a; }
-        .day.mood-3 { background: #3a3a42; color: #f0f0f0; border-color: #4a4a52; }
-        .day.mood-4 { background: #7a7a82; color: #1a1a1a; border-color: #8a8a92; }
-        .day.mood-5 { background: #b8b8c8; color: #1a1a1a; border-color: #c8c8d8; }
-        .day.today { border-color: #7a9eff; border-width: 2px; box-shadow: 0 0 30px rgba(100,150,255,0.15); }
-        .day.future { opacity: 0.15; cursor: not-allowed; }
-        .day.future:hover { transform: none; background: rgba(255,255,255,0.02); }
-        .day .day-number { font-size: 14px; font-weight: 500; position: relative; z-index: 2; }
-        .day .star-indicator {
+        .day-cell.future {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .day-cell.today {
+            border-color: #6eb0ff;
+            box-shadow: 0 0 14px rgba(90, 150, 255, 0.25);
+        }
+        .day-cell .mini-waves {
+            display: flex;
+            gap: 2px;
+            margin-top: 2px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .day-cell .mini-waves span {
+            width: 6px;
+            height: 3px;
+            border-radius: 4px;
+            background: #6a6480;
+        }
+        .day-cell .star-badge {
             position: absolute;
             top: 2px;
             right: 4px;
-            font-size: 10px;
-            color: #ffd700;
-            text-shadow: 0 0 16px rgba(255,215,0,0.6);
-            z-index: 2;
+            font-size: 0.6rem;
+            color: #f5d742;
+            text-shadow: 0 0 8px #f5b742;
         }
-        .day-wave-container {
+        .day-cell:active {
+            transform: scale(0.94);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        /* Холст (полноэкранный) */
+        .canvas-view {
             position: absolute;
-            bottom: 0px;
-            left: 0;
-            right: 0;
-            height: 8px;
-            display: flex;
-            justify-content: center;
-            gap: 2px;
-            z-index: 1;
-            opacity: 0.8;
-        }
-        .mini-wave {
-            width: 2px;
-            border-radius: 2px;
-            animation: miniWaveAnim 2s ease-in-out infinite alternate;
-        }
-        .mini-wave:nth-child(odd) { animation-delay: 0.3s; }
-        @keyframes miniWaveAnim {
-            0% { height: 2px; transform: translateY(0); opacity: 0.5; }
-            100% { height: 6px; transform: translateY(-2px); opacity: 1; }
-        }
-        #bgCanvas {
-            display: block;
-            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 999;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
-        #bgCanvas.active {
-            opacity: 1;
-        }
-        #waveContainer {
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1000;
-            background: transparent;
-            transition: opacity 0.6s ease;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: #0f0d18;
             opacity: 0;
             pointer-events: none;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
+            transition: opacity 0.4s ease;
+            z-index: 20;
+            backdrop-filter: blur(0px);
         }
-        #waveContainer.active {
+        .canvas-view.active {
             opacity: 1;
             pointer-events: auto;
         }
-        #waveCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            position: relative;
-            z-index: 10;
-        }
-        .top-bar {
-            position: fixed;
-            top: 16px;
-            left: 16px;
-            right: 16px;
-            z-index: 1001;
+
+        .canvas-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 20px 30px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            pointer-events: none;
+            flex-direction: column;
+            gap: 18px;
+            scrollbar-width: thin;
         }
-        .top-bar>* { pointer-events: auto; }
+
         .back-btn {
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.04);
-            color: rgba(255,255,255,0.4);
-            font-size: 20px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1002;
-        }
-        .back-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
-        .back-btn.visible { display: flex; }
-        .close-btn {
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.04);
-            color: rgba(255,255,255,0.4);
-            font-size: 18px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1002;
-        }
-        .close-btn:hover { background: rgba(255,255,255,0.08); transform: rotate(90deg); color: #fff; }
-        .wave-date {
-            position: fixed;
-            top: 68px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1001;
-            color: rgba(255,255,255,0.3);
-            font-size: 16px;
-            font-weight: 500;
-            text-shadow: 0 2px 30px rgba(0,0,0,0.8);
-            background: rgba(0,0,0,0.2);
-            backdrop-filter: blur(8px);
-            padding: 4px 16px;
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.03);
-            cursor: default;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        /* Описания состояний — компактно, за волнами */
-        .state-descriptions {
-            position: fixed;
-            top: 48%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1003;
-            pointer-events: none;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 12px;
-            font-weight: 300;
-            line-height: 1.6;
-            text-shadow: 0 0 30px rgba(0,0,0,0.9);
-            opacity: 0;
-            transition: opacity 0.8s ease;
-            user-select: none;
-            -webkit-user-select: none;
-            max-width: 70%;
-        }
-        .state-descriptions.active {
-            opacity: 0.7;
-        }
-        .state-descriptions .state-item {
-            display: inline-block;
-            margin: 2px 6px;
-            background: rgba(0,0,0,0.2);
-            backdrop-filter: blur(2px);
-            padding: 1px 8px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.03);
-            font-size: 11px;
-        }
-        .state-descriptions .state-symbol {
-            margin-right: 3px;
-            font-size: 13px;
-        }
-        .state-descriptions .state-desc {
-            font-size: 10px;
-            opacity: 0.6;
-        }
-        #moodSelector {
-            position: fixed;
-            bottom: 180px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1001;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(24px);
-            border-radius: 24px;
-            padding: 14px 20px;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid rgba(255,255,255,0.03);
-            box-shadow: 0 8px 60px rgba(0,0,0,0.6);
-            max-width: 92%;
-            opacity: 0;
-            transition: opacity 0.8s ease, transform 0.8s ease;
-            transform: translateX(-50%) translateY(20px) scale(0.95);
-        }
-        #moodSelector.active {
-            display: flex;
-            opacity: 1;
-            transform: translateX(-50%) translateY(0) scale(1);
-        }
-        .mood-select-label {
-            color: rgba(255,255,255,0.3);
-            font-size: 12px;
-            text-align: center;
-            letter-spacing: 0.5px;
-        }
-        .mood-select-buttons {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            flex-wrap: nowrap;
-        }
-        .mood-select-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1);
-            font-size: 13px;
-            font-weight: 600;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(4px);
-            flex-shrink: 0;
-        }
-        .mood-select-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.08); }
-        .mood-select-btn.selected {
-            border-color: #7a9eff;
-            box-shadow: 0 0 30px rgba(100,150,255,0.15);
-            transform: scale(1.05);
-            background: rgba(255,255,255,0.08);
-        }
-        .mood-select-btn[data-mood="1"] { color: #8a9aba; }
-        .mood-select-btn[data-mood="2"] { color: #9abaca; }
-        .mood-select-btn[data-mood="3"] { color: #d4c88a; }
-        .mood-select-btn[data-mood="4"] { color: #d4a0b0; }
-        .mood-select-btn[data-mood="5"] { color: #8ac4d4; }
-        .mood-confirm-btn {
-            padding: 6px 28px;
-            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.04);
             border: none;
-            background: rgba(100,150,255,0.1);
-            color: #7a9eff;
-            font-size: 13px;
-            font-weight: 500;
+            color: #bfb8d4;
+            font-size: 1.2rem;
+            padding: 10px 0 6px;
+            text-align: left;
             cursor: pointer;
-            transition: 0.3s;
-            margin-top: 4px;
+            backdrop-filter: blur(4px);
+            border-radius: 40px;
+            padding-left: 12px;
+            width: fit-content;
         }
-        .mood-confirm-btn:hover { background: rgba(100,150,255,0.2); }
-        .mood-confirm-btn:disabled { opacity: 0.15; cursor: not-allowed; }
-        #bottomPanel {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1001;
-            display: none;
+        .back-btn:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .step-container {
+            display: flex;
             flex-direction: column;
-            align-items: center;
+            gap: 16px;
+            background: rgba(20, 18, 32, 0.5);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 24px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 420;
+            opacity: 0.8;
+            margin-bottom: 6px;
+        }
+
+        .rating-buttons {
+            display: flex;
             gap: 12px;
-            max-width: 92%;
-            width: 100%;
-            opacity: 0;
-            transition: opacity 0.8s ease, transform 0.8s ease;
-            transform: translateX(-50%) translateY(20px) scale(0.95);
-        }
-        #bottomPanel.active {
-            display: flex;
-            opacity: 1;
-            transform: translateX(-50%) translateY(0) scale(1);
-        }
-        .states-label {
-            color: rgba(255,255,255,0.25);
-            font-size: 12px;
-            text-align: center;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-            animation: fadeFromFog 1s ease;
-        }
-        @keyframes fadeFromFog {
-            0% { opacity: 0; transform: scale(0.95); filter: blur(6px); }
-            100% { opacity: 1; transform: scale(1); filter: blur(0); }
-        }
-        #statePanel {
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 10px 14px;
-            display: flex;
+            justify-content: space-between;
             flex-wrap: wrap;
-            gap: 6px;
-            justify-content: center;
-            border: 1px solid rgba(255,255,255,0.03);
-            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-            width: 100%;
-            animation: fadeFromFog 1.2s ease;
+        }
+        .rating-buttons button {
+            flex: 1;
+            min-width: 48px;
+            height: 56px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #d4cee8;
+            backdrop-filter: blur(4px);
+            transition: 0.15s;
+        }
+        .rating-buttons button:active {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(0.92);
+        }
+        .rating-buttons button.selected {
+            border-color: #9a8ec2;
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 16px rgba(150, 130, 220, 0.15);
+        }
+
+        .states-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
         }
         .state-btn {
-            padding: 4px 12px;
-            border-radius: 16px;
-            border: 1.5px solid transparent;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0.25;
-            background: rgba(255,255,255,0.02);
-            color: #fff;
-            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 60px;
+            padding: 12px 6px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #cac4dd;
+            backdrop-filter: blur(4px);
+            transition: 0.12s;
+            line-height: 1.2;
         }
-        .state-btn:hover { opacity: 0.5; transform: scale(1.04); }
-        .state-btn.selected {
-            opacity: 1;
-            transform: scale(1.04);
-            border-color: currentColor;
-            box-shadow: 0 0 30px currentColor;
-            background: rgba(255,255,255,0.04);
+        .state-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.06);
         }
-        #noteSection {
-            width: 100%;
+        .state-btn .emoji {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .state-btn.active {
+            border-color: #9c8ec9;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .star-section {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            animation: fadeFromFog 1.4s ease;
+            gap: 16px;
         }
-        #noteInput {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.04);
-            background: rgba(0,0,0,0.2);
-            backdrop-filter: blur(8px);
-            color: #d0d0d8;
-            font-size: 14px;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 44px;
-            transition: 0.3s;
-            outline: none;
-            user-select: text;
-            -webkit-user-select: text;
-        }
-        #noteInput:focus { border-color: rgba(255,255,255,0.08); background: rgba(0,0,0,0.3); }
-        #noteInput::placeholder { color: rgba(255,255,255,0.1); }
-        .star-btn-wrapper {
+        .star-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            width: 100%;
+            gap: 16px;
+            flex-wrap: wrap;
         }
-        #starBtn {
-            padding: 6px 18px;
-            border-radius: 20px;
-            border: 1.5px solid rgba(255,215,0,0.08);
-            background: rgba(255,215,0,0.02);
-            color: #ffd700;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(8px);
+        .star-btn {
+            background: rgba(255, 215, 0, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.12);
+            border-radius: 60px;
+            padding: 12px 22px;
+            font-size: 1rem;
+            color: #f5e37a;
+            backdrop-filter: blur(4px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .star-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 215, 0, 0.12);
+        }
+        .star-btn .count {
+            background: rgba(255, 215, 0, 0.15);
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+
+        .note-input {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 40px;
+            padding: 14px 18px;
+            width: 100%;
+            color: #e0daf0;
+            font-size: 0.95rem;
+            resize: vertical;
+            backdrop-filter: blur(4px);
+        }
+        .note-input::placeholder {
+            color: #6a6480;
+        }
+
+        .confirm-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 60px;
+            padding: 14px;
+            font-size: 1rem;
+            color: #d0cae6;
+            backdrop-filter: blur(4px);
+            transition: 0.15s;
+            margin-top: 6px;
+        }
+        .confirm-btn:active {
+            transform: scale(0.94);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* волны на холсте (имитация) */
+        .wave-container {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 6px 0;
+        }
+        .wave-tag {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            border-left: 4px solid #6a6480;
+        }
+        .reset-zone {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.7rem;
+            opacity: 0.3;
+            letter-spacing: 1px;
+        }
+        .reset-zone:active {
+            opacity: 0.8;
+        }
+
+        /* звезды на холсте */
+        .star-display {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 6px 0;
+        }
+        .star-item {
+            background: rgba(255, 215, 0, 0.06);
+            border-radius: 60px;
+            padding: 6px 16px 6px 12px;
+            border: 1px solid rgba(255, 215, 0, 0.08);
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             gap: 6px;
+            transition: 0.15s;
         }
-        #starBtn:hover { background: rgba(255,215,0,0.06); border-color: rgba(255,215,0,0.2); transform: scale(1.02); }
-        .star-counter { font-size: 12px; color: rgba(255,255,255,0.15); }
-        .star-hint { font-size: 10px; color: rgba(255,255,255,0.08); text-align: center; margin-top: -2px; }
-        .note-editor {
-            display: none;
+        .star-item:active {
+            transform: scale(0.9);
+        }
+        .star-item .del {
+            opacity: 0.4;
+            font-size: 0.7rem;
+            cursor: default;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* всплывашка сброса */
+        .toast {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 2000;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(24px);
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-        .note-editor.active { display: flex; }
-        .note-editor-content {
-            background: rgba(12,12,20,0.95);
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            background: rgba(10, 8, 18, 0.85);
             backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 24px 20px;
-            max-width: 360px;
-            width: 100%;
-            border: 1px solid rgba(255,255,255,0.03);
-            box-shadow: 0 20px 80px rgba(0,0,0,0.6);
-            animation: slideUp 0.3s ease;
-            transition: border-color 0.5s ease, box-shadow 0.5s ease;
-        }
-        .note-editor-content.wave-color {
-            border-color: var(--wave-color, rgba(255,255,255,0.05));
-            box-shadow: 0 0 60px var(--wave-glow, rgba(255,255,255,0.02));
-        }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .note-editor-header {
+            padding: 18px 22px;
+            border-radius: 60px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            z-index: 99;
+            color: #d0cae6;
+            font-size: 0.95rem;
             display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-        .note-editor-back {
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.3);
-            font-size: 22px;
-            cursor: pointer;
-            transition: 0.3s;
-            padding: 4px;
-        }
-        .note-editor-back:hover { color: rgba(255,255,255,0.6); }
-        .note-editor-title { color: #f0f0f8; font-size: 16px; font-weight: 500; }
-        .note-editor-textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.04);
-            background: rgba(0,0,0,0.2);
-            color: #d0d0d8;
-            font-size: 14px;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 100px;
-            max-height: 300px;
-            outline: none;
-            transition: 0.3s;
-            line-height: 1.5;
-            user-select: text;
-            -webkit-user-select: text;
-        }
-        .note-editor-textarea:focus { border-color: rgba(255,255,255,0.08); background: rgba(0,0,0,0.3); }
-        .note-editor-save {
-            width: 100%;
-            padding: 10px;
-            border-radius: 16px;
-            border: none;
-            background: rgba(100,150,255,0.08);
-            color: #7a9eff;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-        .note-editor-save:hover { background: rgba(100,150,255,0.15); }
-        .help-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 3000;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(24px);
-            align-items: center;
+            gap: 20px;
             justify-content: center;
-            padding: 24px;
+            align-items: center;
         }
-        .help-modal.active { display: flex; }
-        .help-content {
-            background: rgba(12,12,20,0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 24px 20px;
-            max-width: 360px;
-            width: 100%;
-            border: 1px solid rgba(255,255,255,0.03);
-            box-shadow: 0 20px 80px rgba(0,0,0,0.6);
-            animation: slideUp 0.3s ease;
-            max-height: 80vh;
-            overflow-y: auto;
-            user-select: text;
-            -webkit-user-select: text;
-        }
-        .help-content h3 { color: #f0f0f8; font-size: 18px; margin-bottom: 12px; text-align: center; }
-        .help-content p { color: rgba(255,255,255,0.4); font-size: 13px; line-height: 1.6; margin-bottom: 8px; }
-        .help-close {
-            width: 100%;
-            padding: 10px;
-            border-radius: 16px;
+        .toast button {
+            background: rgba(255, 255, 255, 0.04);
             border: none;
-            background: rgba(255,255,255,0.03);
-            color: #fff;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 12px;
+            color: #d0cae6;
+            padding: 8px 22px;
+            border-radius: 60px;
+            font-size: 0.9rem;
         }
-        .help-close:hover { background: rgba(255,255,255,0.06); }
-        .fog-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1500;
-            pointer-events: none;
-            background: radial-gradient(ellipse at center, rgba(150,200,255,0.3) 0%, rgba(100,150,200,0.15) 30%, rgba(50,80,120,0.05) 60%, transparent 80%);
-            opacity: 0;
-            transition: opacity 1.2s ease;
-        }
-        .fog-overlay.active { opacity: 1; }
-        @media (max-width: 400px) {
-            .day { font-size: 12px; min-height: 34px; border-radius: 12px; }
-            .calendar { padding: 12px; }
-            .state-btn { font-size: 11px; padding: 3px 10px; }
-            #statePanel { padding: 8px 10px; gap: 4px; }
-            .header-title { font-size: 18px; }
-            .mood-select-btn { width: 34px; height: 34px; font-size: 12px; }
-            .mood-select-buttons { gap: 5px; }
-            #moodSelector { padding: 10px 14px; bottom: 160px; }
-            .close-btn, .back-btn { width: 36px; height: 36px; font-size: 16px; }
-            .wave-date { font-size: 14px; padding: 4px 12px; top: 60px; }
-            .top-bar { top: 12px; left: 12px; right: 12px; }
-            .state-descriptions { font-size: 10px; max-width: 80%; }
-            .state-descriptions .state-item { font-size: 9px; padding: 1px 6px; }
-            .state-descriptions .state-desc { font-size: 8px; }
+        .toast button:active {
+            background: rgba(255, 255, 255, 0.08);
         }
     </style>
 </head>
 <body>
+<div class="app" id="app">
+    <!-- КАЛЕНДАРЬ -->
+    <div class="calendar-view" id="calendarView">
+        <div class="cal-header">
+            <div class="month-year" id="monthYear">
+                <span id="monthLabel">Март 2026</span>
+                <span class="avg-score" id="avgScore">✦ 0.0</span>
+            </div>
+            <div class="cal-nav">
+                <button id="prevMonth">←</button>
+                <button id="nextMonth">→</button>
+            </div>
+        </div>
+        <div class="weekdays">
+            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+        </div>
+        <div class="days-grid" id="daysGrid"></div>
+    </div>
 
-    <div class="calendar-wrapper">
-        <div class="calendar">
-            <div class="header">
-                <span class="header-title">Мой дневник</span>
-                <div class="header-actions">
-                    <button class="help-btn" id="helpBtn">?</button>
+    <!-- ХОЛСТ (полноэкранный) -->
+    <div class="canvas-view" id="canvasView">
+        <div class="canvas-scroll">
+            <button class="back-btn" id="closeCanvas">← Назад</button>
+            <div class="step-container" id="stepRating">
+                <div class="step-title">Оцените день (1–5)</div>
+                <div class="rating-buttons" id="ratingButtons">
+                    <button data-val="1">1</button><button data-val="2">2</button>
+                    <button data-val="3">3</button><button data-val="4">4</button>
+                    <button data-val="5">5</button>
                 </div>
+                <button class="confirm-btn" id="confirmRating">Подтвердить</button>
             </div>
-            <div class="subheader">Нажми на день, чтобы вспомнить</div>
-            <div class="month-nav">
-                <button id="prevMonth">‹</button>
-                <span class="month-year" id="monthYear">Январь 2026</span>
-                <span class="month-avg" id="monthAvg"></span>
-                <button id="nextMonth">›</button>
-            </div>
-            <div class="weekdays">
-                <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
-            </div>
-            <div class="days-grid" id="daysGrid"></div>
-        </div>
-    </div>
 
-    <canvas id="bgCanvas"></canvas>
-
-    <div id="waveContainer">
-        <div class="fog-overlay" id="fogOverlay"></div>
-
-        <div class="top-bar">
-            <button class="back-btn" id="backBtn">←</button>
-            <div></div>
-            <div class="right-buttons">
-                <button class="close-btn" id="closeWaves">✕</button>
-            </div>
-        </div>
-        <div class="wave-date" id="waveDate">12 января</div>
-        <canvas id="waveCanvas"></canvas>
-
-        <!-- Описания состояний — компактно, за волнами -->
-        <div class="state-descriptions" id="stateDescriptions">
-            <span class="state-item"><span class="state-symbol">🌊</span> Поток — день прошёл на одном дыхании</span>
-            <span class="state-item"><span class="state-symbol">☀️</span> Свет — день был тёплым и радостным</span>
-            <span class="state-item"><span class="state-symbol">🏠</span> Уют — чувствовала себя в безопасности</span>
-            <span class="state-item"><span class="state-symbol">🌙</span> Тень — день был тяжёлым или грустным</span>
-            <span class="state-item"><span class="state-symbol">⚡</span> Искра — случилось что-то яркое и неожиданное</span>
-            <span class="state-item"><span class="state-symbol">🌿</span> Тишина — спокойный, но не пустой день</span>
-            <span class="state-item"><span class="state-symbol">🌫️</span> Туман — день прошёл как в дымке</span>
-        </div>
-
-        <div id="moodSelector">
-            <div class="mood-select-label">Оцените ваш сегодняшний день по шкале от 1 до 5</div>
-            <div class="mood-select-buttons">
-                <button class="mood-select-btn" data-mood="1">1</button>
-                <button class="mood-select-btn" data-mood="2">2</button>
-                <button class="mood-select-btn" data-mood="3">3</button>
-                <button class="mood-select-btn" data-mood="4">4</button>
-                <button class="mood-select-btn" data-mood="5">5</button>
-            </div>
-            <button class="mood-confirm-btn" id="moodConfirmBtn" disabled>Подтвердить</button>
-        </div>
-
-        <div id="bottomPanel">
-            <div class="states-label">Какое состояние лучше всего описывает ваш день? (выбери до 4-х)</div>
-            <div id="statePanel"></div>
-            <div id="noteSection">
-                <input type="text" id="noteInput" placeholder="Опиши события дня...">
-                <div class="star-btn-wrapper">
-                    <button id="starBtn">⭐ Добавить звезду</button>
-                    <span class="star-counter" id="starCounter">⭐ 0</span>
+            <div class="step-container hidden" id="stepStates">
+                <div class="step-title">Состояния (до 4)</div>
+                <div class="states-grid" id="statesGrid">
+                    <div class="state-btn" data-state="Поток"><span class="emoji">🌊</span>Поток</div>
+                    <div class="state-btn" data-state="Свет"><span class="emoji">☀️</span>Свет</div>
+                    <div class="state-btn" data-state="Уют"><span class="emoji">🏠</span>Уют</div>
+                    <div class="state-btn" data-state="Тень"><span class="emoji">🌙</span>Тень</div>
+                    <div class="state-btn" data-state="Искра"><span class="emoji">⚡</span>Искра</div>
+                    <div class="state-btn" data-state="Тишина"><span class="emoji">🌿</span>Тишина</div>
+                    <div class="state-btn" data-state="Туман"><span class="emoji">🌫️</span>Туман</div>
                 </div>
-                <div class="star-hint">Звезда — особенный момент дня</div>
+                <div class="wave-container" id="waveContainer"></div>
+            </div>
+
+            <div class="step-container hidden" id="stepNotes">
+                <div class="step-title">Заметка</div>
+                <textarea class="note-input" id="noteInput" placeholder="Что произошло сегодня?" rows="2"></textarea>
+                <div class="star-section">
+                    <div class="star-row">
+                        <button class="star-btn" id="addStarBtn">⭐ Добавить звезду <span class="count" id="starCount">0</span></button>
+                    </div>
+                    <div class="star-display" id="starDisplay"></div>
+                </div>
+                <button class="confirm-btn" id="saveDayBtn">Сохранить день</button>
+                <div class="reset-zone" id="resetDayZone">⏎ долгое нажатие для сброса</div>
             </div>
         </div>
     </div>
 
-    <div class="note-editor" id="noteEditor">
-        <div class="note-editor-content" id="noteEditorContent">
-            <div class="note-editor-header">
-                <button class="note-editor-back" id="noteEditorBack">‹</button>
-                <span class="note-editor-title" id="noteEditorTitle">Заметка</span>
-            </div>
-            <textarea class="note-editor-textarea" id="noteEditorTextarea" placeholder="Напиши что-нибудь..."></textarea>
-            <button class="note-editor-save" id="noteEditorSave">Сохранить</button>
-        </div>
-    </div>
+    <!-- тост -->
+    <div class="toast hidden" id="toast"><span id="toastMsg"></span><button id="toastConfirm">Да</button><button id="toastCancel">Нет</button></div>
+</div>
 
-    <div class="help-modal" id="helpModal">
-        <div class="help-content">
-            <h3>📖 Как пользоваться</h3>
-            <p><b>1. Оцени день</b> — выбери число от 1 до 5. Фон будет меняться. Нажми «Подтвердить».</p>
-            <p><b>2. Выбери состояния</b> — до 4-х штук, которые описывают твой день.</p>
-            <p><b>3. Напиши комментарий</b> — опиши события дня.</p>
-            <p><b>4. Добавь звезду</b> — нажми кнопку, чтобы отметить особенный момент.</p>
-            <p><b>⭐ Чтобы увидеть заметку</b> — нажми на звезду или волну.</p>
-            <p><b>🗑️ Чтобы удалить звезду</b> — зажми её на 2 секунды.</p>
-            <p><b>🔄 Чтобы вернуться к оценке</b> — нажми стрелку ←.</p>
-            <p><b>🗑️ Чтобы сбросить день</b> — зажми дату в центре вверху на 2 секунды.</p>
-            <button class="help-close" id="helpClose">Понятно!</button>
-        </div>
-    </div>
-
-    <script>
-        // =================================================================
-        // 1. КОНСТАНТЫ И НАСТРОЙКИ
-        // =================================================================
-        const STATES = [
-            { id: 'поток', label: '🌊 Поток', color: '#4dd0e1', desc: 'день прошёл на одном дыхании' },
-            { id: 'свет', label: '☀️ Свет', color: '#ffca28', desc: 'день был тёплым и радостным' },
-            { id: 'уют', label: '🏠 Уют', color: '#ffab91', desc: 'чувствовала себя в безопасности' },
-            { id: 'тень', label: '🌙 Тень', color: '#90caf9', desc: 'день был тяжёлым или грустным' },
-            { id: 'искра', label: '⚡ Искра', color: '#ce93d8', desc: 'случилось что-то яркое и неожиданное' },
-            { id: 'тишина', label: '🌿 Тишина', color: '#81c784', desc: 'спокойный, но не пустой день' },
-            { id: 'туман', label: '🌫️ Туман', color: '#b0bec5', desc: 'день прошёл как в дымке' }
-        ];
-
-        let moodData = {};
+<script>
+    (function(){
+        // ---- state ----
         let currentDate = new Date();
-        let currentMonth = currentDate.getMonth();
         let currentYear = currentDate.getFullYear();
-        let currentDateStr = null;
-        let selectedStates = [];
-        let stars = [];
-        let canvas, ctx, animationId;
-        let selectedMood = 0;
-        const MAX_STARS = 7;
-        let isResetInProgress = false;
-        let waveStates = {};
+        let currentMonth = currentDate.getMonth();
+        let todayDate = currentDate.getDate();
 
-        // =================================================================
-        // 2. ЗВУКИ
-        // =================================================================
-        let audioCtx = null;
-        let currentSoundNodes = [];
-        let soundFadeInterval = null;
+        // данные в localStorage
+        const STORAGE_KEY = 'crystal_diary_data';
+        let diaryData = {};
 
-        function initAudio() {
-            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-        }
-
-        function stopAllSounds() {
-            currentSoundNodes.forEach(node => {
-                try {
-                    node.stop();
-                } catch (e) {}
-            });
-            currentSoundNodes = [];
-            if (soundFadeInterval) {
-                clearInterval(soundFadeInterval);
-                soundFadeInterval = null;
-            }
-        }
-
-        function playAmbientSound(type) {
-            stopAllSounds();
-            initAudio();
-            try {
-                switch (type) {
-                    case 1: { // Гроза — дождь + гром
-                        const bufferSize = audioCtx.sampleRate * 0.5;
-                        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                        const data = buffer.getChannelData(0);
-                        for (let i = 0; i < bufferSize; i++) {
-                            data[i] = (Math.random() * 2 - 1) * 0.3 * (1 - i / bufferSize);
-                        }
-                        const noise = audioCtx.createBufferSource();
-                        noise.buffer = buffer;
-                        const gain = audioCtx.createGain();
-                        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
-                        noise.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        noise.start();
-                        noise.stop(audioCtx.currentTime + 2);
-                        currentSoundNodes.push(noise);
-
-                        // Гром (низкие удары)
-                        const osc = audioCtx.createOscillator();
-                        osc.type = 'sawtooth';
-                        osc.frequency.setValueAtTime(60, audioCtx.currentTime);
-                        osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 1.5);
-                        const gain2 = audioCtx.createGain();
-                        gain2.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                        gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
-                        osc.connect(gain2);
-                        gain2.connect(audioCtx.destination);
-                        osc.start();
-                        osc.stop(audioCtx.currentTime + 1.5);
-                        currentSoundNodes.push(osc);
-                        break;
-                    }
-                    case 2: { // Лёгкий дождь — шум дождя + ветер
-                        const bufferSize = audioCtx.sampleRate * 0.3;
-                        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                        const data = buffer.getChannelData(0);
-                        for (let i = 0; i < bufferSize; i++) {
-                            data[i] = (Math.random() * 2 - 1) * 0.15 * (1 - i / bufferSize);
-                        }
-                        const noise = audioCtx.createBufferSource();
-                        noise.buffer = buffer;
-                        const gain = audioCtx.createGain();
-                        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
-                        noise.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        noise.start();
-                        noise.stop(audioCtx.currentTime + 2);
-                        currentSoundNodes.push(noise);
-
-                        // Ветер (шум с低频)
-                        const osc2 = audioCtx.createOscillator();
-                        osc2.type = 'sine';
-                        osc2.frequency.setValueAtTime(80, audioCtx.currentTime);
-                        osc2.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 2);
-                        const gain3 = audioCtx.createGain();
-                        gain3.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                        gain3.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
-                        osc2.connect(gain3);
-                        gain3.connect(audioCtx.destination);
-                        osc2.start();
-                        osc2.stop(audioCtx.currentTime + 2);
-                        currentSoundNodes.push(osc2);
-                        break;
-                    }
-                    case 3: { // Облачный фон — тихий шум ветра
-                        const bufferSize = audioCtx.sampleRate * 0.4;
-                        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                        const data = buffer.getChannelData(0);
-                        for (let i = 0; i < bufferSize; i++) {
-                            data[i] = (Math.random() * 2 - 1) * 0.08 * (1 - i / bufferSize);
-                        }
-                        const noise = audioCtx.createBufferSource();
-                        noise.buffer = buffer;
-                        const gain = audioCtx.createGain();
-                        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
-                        noise.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        noise.start();
-                        noise.stop(audioCtx.currentTime + 2);
-                        currentSoundNodes.push(noise);
-                        break;
-                    }
-                    case 4: { // Цветы — шуршание листьев + лёгкие колокольчики (но мягкие)
-                        const bufferSize = audioCtx.sampleRate * 0.3;
-                        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                        const data = buffer.getChannelData(0);
-                        for (let i = 0; i < bufferSize; i++) {
-                            data[i] = (Math.random() * 2 - 1) * 0.06 * (1 - i / bufferSize);
-                        }
-                        const noise = audioCtx.createBufferSource();
-                        noise.buffer = buffer;
-                        const gain = audioCtx.createGain();
-                        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
-                        noise.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        noise.start();
-                        noise.stop(audioCtx.currentTime + 2);
-                        currentSoundNodes.push(noise);
-
-                        // Мягкие высокие тона (шуршание)
-                        for (let i = 0; i < 5; i++) {
-                            const osc = audioCtx.createOscillator();
-                            osc.type = 'sine';
-                            osc.frequency.setValueAtTime(300 + i * 80, audioCtx.currentTime);
-                            osc.frequency.exponentialRampToValueAtTime(400 + i * 60, audioCtx.currentTime + 1.5);
-                            const gain2 = audioCtx.createGain();
-                            gain2.gain.setValueAtTime(0.02, audioCtx.currentTime);
-                            gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
-                            osc.connect(gain2);
-                            gain2.connect(audioCtx.destination);
-                            osc.start();
-                            osc.stop(audioCtx.currentTime + 1.5);
-                            currentSoundNodes.push(osc);
-                        }
-                        break;
-                    }
-                    case 5: { // Радуга — райские высокие тона (мягкие, нерезкие)
-                        // Шумовая основа
-                        const bufferSize = audioCtx.sampleRate * 0.3;
-                        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                        const data = buffer.getChannelData(0);
-                        for (let i = 0; i < bufferSize; i++) {
-                            data[i] = (Math.random() * 2 - 1) * 0.03 * (1 - i / bufferSize);
-                        }
-                        const noise = audioCtx.createBufferSource();
-                        noise.buffer = buffer;
-                        const gain = audioCtx.createGain();
-                        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
-                        noise.connect(gain);
-                        gain.connect(audioCtx.destination);
-                        noise.start();
-                        noise.stop(audioCtx.currentTime + 2);
-                        currentSoundNodes.push(noise);
-
-                        // Мягкие высокие тона
-                        const notes = [440, 554, 659, 880, 1108];
-                        notes.forEach((freq, i) => {
-                            const osc = audioCtx.createOscillator();
-                            osc.type = 'sine';
-                            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.1);
-                            osc.frequency.exponentialRampToValueAtTime(freq * 1.05, audioCtx.currentTime + 1.5 + i *
-                                0.1);
-                            const gain2 = audioCtx.createGain();
-                            gain2.gain.setValueAtTime(0.025, audioCtx.currentTime + i * 0.1);
-                            gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5 + i * 0.1);
-                            osc.connect(gain2);
-                            gain2.connect(audioCtx.destination);
-                            osc.start(audioCtx.currentTime + i * 0.1);
-                            osc.stop(audioCtx.currentTime + 1.5 + i * 0.1);
-                            currentSoundNodes.push(osc);
-                        });
-                        break;
-                    }
-                }
-            } catch (e) {}
-        }
-
-        // Звук хрустальной звезды (битое стекло / хрусталь)
-        function playCrystalSound() {
-            initAudio();
-            try {
-                // Основной удар (звон)
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.3);
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
-                currentSoundNodes.push(osc);
-
-                // Звук осколков (шум + тона)
-                const bufferSize = audioCtx.sampleRate * 0.2;
-                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = (Math.random() * 2 - 1) * 0.06 * (1 - i / bufferSize);
-                }
-                const noise = audioCtx.createBufferSource();
-                noise.buffer = buffer;
-                const gain2 = audioCtx.createGain();
-                gain2.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-                noise.connect(gain2);
-                gain2.connect(audioCtx.destination);
-                noise.start();
-                noise.stop(audioCtx.currentTime + 0.2);
-                currentSoundNodes.push(noise);
-
-                // Дополнительные тона (как разбивающиеся кристаллы)
-                for (let i = 0; i < 4; i++) {
-                    const osc2 = audioCtx.createOscillator();
-                    osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(800 + Math.random() * 400, audioCtx.currentTime + i * 0.03);
-                    osc2.frequency.exponentialRampToValueAtTime(400 + Math.random() * 300, audioCtx.currentTime + 0.2 + i *
-                        0.03);
-                    const gain3 = audioCtx.createGain();
-                    gain3.gain.setValueAtTime(0.03, audioCtx.currentTime + i * 0.03);
-                    gain3.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2 + i * 0.03);
-                    osc2.connect(gain3);
-                    gain3.connect(audioCtx.destination);
-                    osc2.start(audioCtx.currentTime + i * 0.03);
-                    osc2.stop(audioCtx.currentTime + 0.2 + i * 0.03);
-                    currentSoundNodes.push(osc2);
-                }
-            } catch (e) {}
-        }
-
-        // Звук добавления звезды (лёгкий хрустальный звон)
-        function playStarAddSound() {
-            initAudio();
-            try {
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(1400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.2);
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.2);
-                currentSoundNodes.push(osc);
-            } catch (e) {}
-        }
-
-        // Звук клика
-        function soundClick() {
-            initAudio();
-            try {
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.05);
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.05);
-                currentSoundNodes.push(osc);
-            } catch (e) {}
-        }
-
-        // =================================================================
-        // 3. РАБОТА С ДАННЫМИ
-        // =================================================================
         function loadData() {
-            try { const raw = localStorage.getItem('mood_diary_data');
-                if (raw) moodData = JSON.parse(raw); } catch (e) { moodData = {}; }
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if(raw) diaryData = JSON.parse(raw);
+                else diaryData = {};
+            } catch(e){ diaryData = {}; }
         }
         function saveData() {
-            try { localStorage.setItem('mood_diary_data', JSON.stringify(moodData)); } catch (e) {}
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(diaryData));
         }
-        function getDayData(dateStr) {
-            if (!moodData[dateStr]) moodData[dateStr] = { mood: 0, states: [], stars: [], note: '', stateNotes: {} };
-            return moodData[dateStr];
+        loadData();
+
+        // ---- helper ----
+        function getDayKey(year, month, day) {
+            return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
         }
-        function isToday(dateStr) {
-            const today = new Date();
-            const ts = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today
-                .getDate()).padStart(2, '0');
-            return dateStr === ts;
+        function getDayData(year, month, day) {
+            const key = getDayKey(year, month, day);
+            return diaryData[key] || null;
         }
-        function isFuture(dateStr) {
-            const today = new Date();
-            const ts = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today
-                .getDate()).padStart(2, '0');
-            return dateStr > ts;
-        }
-        function getMonthAvg(year, month) {
-            let total = 0,
-                count = 0;
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            for (let d = 1; d <= daysInMonth; d++) {
-                const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                const data = getDayData(ds);
-                if (data.mood > 0) { total += data.mood;
-                    count++; }
-            }
-            return count > 0 ? (total / count).toFixed(1) : null;
+        function setDayData(year, month, day, data) {
+            const key = getDayKey(year, month, day);
+            if(data) diaryData[key] = data;
+            else delete diaryData[key];
+            saveData();
         }
 
-        // =================================================================
-        // 4. КАЛЕНДАРЬ
-        // =================================================================
-        function renderMiniWaves(container, states) {
-            container.innerHTML = '';
-            if (!states || states.length === 0) return;
-            const colors = states.map(id => {
-                const st = STATES.find(s => s.id === id);
-                return st ? st.color : '#888';
-            });
-            colors.forEach(color => {
-                const wave = document.createElement('div');
-                wave.className = 'mini-wave';
-                wave.style.background = color;
-                wave.style.boxShadow = `0 0 8px ${color}`;
-                container.appendChild(wave);
-            });
-        }
-
+        // ---- рендер календаря ----
         function renderCalendar() {
             const grid = document.getElementById('daysGrid');
-            const monthYear = document.getElementById('monthYear');
-            const monthAvg = document.getElementById('monthAvg');
-            const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь',
-                'Ноябрь', 'Декабрь'
-            ];
-            monthYear.textContent = months[currentMonth] + ' ' + currentYear;
-            const avg = getMonthAvg(currentYear, currentMonth);
-            monthAvg.textContent = avg ? `★ ${avg}` : '';
-
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const startDay = firstDay.getDay() || 7;
             grid.innerHTML = '';
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            let startDay = firstDay.getDay(); // 0=вс
+            startDay = (startDay === 0) ? 6 : startDay - 1; // пн=0
+            const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+            const today = new Date();
+            const todayY = today.getFullYear(), todayM = today.getMonth(), todayD = today.getDate();
 
-            for (let i = 1; i < startDay; i++) {
+            document.getElementById('monthLabel').innerText = new Date(currentYear, currentMonth).toLocaleString('ru', { month: 'long', year: 'numeric' });
+
+            // средняя оценка
+            let sum = 0, count = 0;
+            for(let d=1; d<=daysInMonth; d++) {
+                const data = getDayData(currentYear, currentMonth, d);
+                if(data && data.rating) { sum += data.rating; count++; }
+            }
+            const avg = count ? (sum/count).toFixed(1) : '0.0';
+            document.getElementById('avgScore').innerHTML = `✦ ${avg}`;
+
+            for(let i=0; i<startDay; i++) {
                 const empty = document.createElement('div');
-                empty.className = 'day empty';
+                empty.className = 'day-cell future';
                 grid.appendChild(empty);
             }
+            for(let d=1; d<=daysInMonth; d++) {
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+                const data = getDayData(currentYear, currentMonth, d);
+                const isFuture = (currentYear > todayY) || (currentYear === todayY && currentMonth > todayM) || (currentYear === todayY && currentMonth === todayM && d > todayD);
+                if(isFuture) cell.classList.add('future');
+                if(currentYear === todayY && currentMonth === todayM && d === todayD) cell.classList.add('today');
 
-            for (let d = 1; d <= daysInMonth; d++) {
-                const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                const data = getDayData(dateStr);
-                const mood = data.mood || 0;
-                const dayEl = document.createElement('div');
-                dayEl.className = `day mood-${mood}`;
-                if (isToday(dateStr)) dayEl.classList.add('today');
-                if (isFuture(dateStr)) dayEl.classList.add('future');
-
-                const numSpan = document.createElement('span');
-                numSpan.className = 'day-number';
-                numSpan.textContent = d;
-                dayEl.appendChild(numSpan);
-
-                if (data.states && data.states.length > 0) {
-                    const waveContainer = document.createElement('div');
-                    waveContainer.className = 'day-wave-container';
-                    renderMiniWaves(waveContainer, data.states);
-                    dayEl.appendChild(waveContainer);
-                }
-                if (data.stars && data.stars.length > 0) {
-                    const starDot = document.createElement('span');
-                    starDot.className = 'star-indicator';
-                    starDot.textContent = '✦';
-                    dayEl.appendChild(starDot);
+                // цвет фона по оценке
+                if(data && data.rating) {
+                    const r = data.rating;
+                    const brightness = 15 + (r-1)*20; // 1->15%, 5->95%
+                    const bg = `hsl(0, 0%, ${brightness}%)`;
+                    cell.style.background = bg;
+                } else {
+                    cell.style.background = 'rgba(30,28,40,0.4)';
                 }
 
-                dayEl.addEventListener('click', (function(ds) {
-                    return function() {
-                        if (!isFuture(ds)) { soundClick();
-                            openDay(ds); } else alert('Этот день ещё не наступил 😊');
-                    };
-                })(dateStr));
-                grid.appendChild(dayEl);
-            }
-        }
-
-        // =================================================================
-        // 5. ФОНОВЫЙ ХОЛСТ (реалистичные эффекты)
-        // =================================================================
-        let bgCanvas, bgCtx;
-        let bgAnimId = null;
-        let currentMood = 0;
-        let rainDrops = [];
-        let rainDrops2 = [];
-        let glassDrops = [];
-        let clouds = [];
-        let flowers = [];
-        let flareParticles = [];
-        let lightningFlash = 0;
-
-        function initBgCanvas() {
-            bgCanvas = document.getElementById('bgCanvas');
-            bgCtx = bgCanvas.getContext('2d');
-            resizeBgCanvas();
-            window.addEventListener('resize', resizeBgCanvas);
-        }
-
-        function resizeBgCanvas() {
-            if (!bgCanvas) return;
-            bgCanvas.width = window.innerWidth;
-            bgCanvas.height = window.innerHeight;
-        }
-
-        function generateRain(dropsArray, count, angle, speed, lengthRange, width) {
-            for (let i = 0; i < count; i++) {
-                dropsArray.push({
-                    x: Math.random() * bgCanvas.width,
-                    y: Math.random() * bgCanvas.height,
-                    speed: speed * (0.8 + Math.random() * 0.4),
-                    length: lengthRange[0] + Math.random() * (lengthRange[1] - lengthRange[0]),
-                    width: width || 1.5,
-                    angle: angle,
-                    opacity: 0.4 + Math.random() * 0.4,
-                });
-            }
-        }
-
-        function updateRain(dropsArray) {
-            for (let drop of dropsArray) {
-                drop.x += Math.sin(drop.angle) * drop.speed;
-                drop.y += Math.cos(drop.angle) * drop.speed;
-                if (drop.y > bgCanvas.height) {
-                    drop.y = -10;
-                    drop.x = Math.random() * bgCanvas.width;
+                cell.innerHTML = `<span>${d}</span>`;
+                // мини-волны
+                if(data && data.states && data.states.length) {
+                    const waves = document.createElement('div');
+                    waves.className = 'mini-waves';
+                    data.states.forEach(s => {
+                        const dot = document.createElement('span');
+                        dot.style.background = getStateColor(s);
+                        waves.appendChild(dot);
+                    });
+                    cell.appendChild(waves);
                 }
-                if (drop.x < -10) drop.x = bgCanvas.width + 10;
-                if (drop.x > bgCanvas.width + 10) drop.x = -10;
-            }
-        }
-
-        function drawRain(dropsArray, color) {
-            bgCtx.save();
-            for (let drop of dropsArray) {
-                bgCtx.beginPath();
-                bgCtx.moveTo(drop.x, drop.y);
-                bgCtx.lineTo(drop.x + Math.sin(drop.angle) * drop.length, drop.y + Math.cos(drop.angle) * drop.length);
-                bgCtx.strokeStyle = color || 'rgba(180,200,255,0.6)';
-                bgCtx.lineWidth = drop.width;
-                bgCtx.globalAlpha = drop.opacity;
-                bgCtx.stroke();
-            }
-            bgCtx.restore();
-        }
-
-        function generateGlassDrops(count) {
-            for (let i = 0; i < count; i++) {
-                glassDrops.push({
-                    x: Math.random() * bgCanvas.width,
-                    y: Math.random() * bgCanvas.height,
-                    radius: 3 + Math.random() * 8,
-                    speed: 0.2 + Math.random() * 0.5,
-                    opacity: 0.3 + Math.random() * 0.3,
-                });
-            }
-        }
-
-        function updateGlassDrops() {
-            for (let drop of glassDrops) {
-                drop.y += drop.speed;
-                if (drop.y > bgCanvas.height) {
-                    drop.y = -10;
-                    drop.x = Math.random() * bgCanvas.width;
-                    drop.radius = 3 + Math.random() * 8;
+                // звезда
+                if(data && data.stars && data.stars.length > 0) {
+                    const star = document.createElement('span');
+                    star.className = 'star-badge';
+                    star.innerText = '✦';
+                    cell.appendChild(star);
                 }
+                cell.dataset.day = d;
+                grid.appendChild(cell);
             }
-        }
 
-        function drawGlassDrops() {
-            for (let drop of glassDrops) {
-                const grad = bgCtx.createRadialGradient(drop.x, drop.y, 0, drop.x, drop.y, drop.radius);
-                grad.addColorStop(0, 'rgba(255,255,255,0.5)');
-                grad.addColorStop(0.5, 'rgba(200,220,255,0.2)');
-                grad.addColorStop(1, 'rgba(200,220,255,0)');
-                bgCtx.beginPath();
-                bgCtx.arc(drop.x, drop.y, drop.radius, 0, Math.PI * 2);
-                bgCtx.fillStyle = grad;
-                bgCtx.fill();
-                bgCtx.beginPath();
-                bgCtx.arc(drop.x - drop.radius * 0.3, drop.y - drop.radius * 0.3, drop.radius * 0.2, 0, Math.PI * 2);
-                bgCtx.fillStyle = 'rgba(255,255,255,0.6)';
-                bgCtx.fill();
-            }
-        }
-
-        function generateClouds(count) {
-            for (let i = 0; i < count; i++) {
-                clouds.push({
-                    x: Math.random() * bgCanvas.width,
-                    y: Math.random() * bgCanvas.height * 0.8,
-                    w: 100 + Math.random() * 200,
-                    h: 40 + Math.random() * 60,
-                    speed: 0.2 + Math.random() * 0.3,
-                    opacity: 0.5 + Math.random() * 0.3,
+            // клик по дню
+            document.querySelectorAll('.day-cell:not(.future)').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    const day = parseInt(el.dataset.day);
+                    openDay(currentYear, currentMonth, day);
                 });
-            }
+            });
         }
 
-        function updateClouds() {
-            for (let cloud of clouds) {
-                cloud.x += cloud.speed;
-                if (cloud.x > bgCanvas.width + cloud.w) cloud.x = -cloud.w;
-            }
+        function getStateColor(state) {
+            const map = {
+                'Поток':'#4fc3f7','Свет':'#ffd54f','Уют':'#ffab91',
+                'Тень':'#78909c','Искра':'#ff8a65','Тишина':'#aed581',
+                'Туман':'#b0bec5'
+            };
+            return map[state] || '#6a6480';
         }
 
-        function drawClouds() {
-            for (let cloud of clouds) {
-                bgCtx.save();
-                bgCtx.globalAlpha = cloud.opacity;
-                const gradient = bgCtx.createRadialGradient(cloud.x, cloud.y, 0, cloud.x, cloud.y, cloud.w);
-                gradient.addColorStop(0, 'rgba(255,255,255,0.8)');
-                gradient.addColorStop(0.7, 'rgba(255,255,255,0.3)');
-                gradient.addColorStop(1, 'rgba(255,255,255,0)');
-                bgCtx.beginPath();
-                bgCtx.ellipse(cloud.x, cloud.y, cloud.w, cloud.h, 0, 0, Math.PI * 2);
-                bgCtx.fillStyle = gradient;
-                bgCtx.fill();
-                bgCtx.restore();
-            }
-        }
+        // ---- открыть день ----
+        let currentEditDay = null;
+        let selectedRating = 0;
+        let selectedStates = [];
+        let stars = [];
+        let noteText = '';
 
-        function generateFlowers(count) {
-            for (let i = 0; i < count; i++) {
-                flowers.push({
-                    x: Math.random() * bgCanvas.width,
-                    y: Math.random() * bgCanvas.height,
-                    size: 25 + Math.random() * 45,
-                    angle: Math.random() * Math.PI * 2,
-                    petalCount: 5 + Math.floor(Math.random() * 3),
-                    phase: Math.random() * Math.PI * 2,
-                    speed: 0.003 + Math.random() * 0.005,
-                    color: ['#ff6a8a', '#d84a6a', '#ff8a9a', '#f06a8a', '#e85a7a'][Math.floor(Math.random() * 5)]
-                });
-            }
-        }
-
-        function drawFlowers(time) {
-            for (let flower of flowers) {
-                const bloom = 0.6 + 0.4 * Math.sin(time * flower.speed + flower.phase);
-                const size = flower.size * (0.75 + 0.25 * bloom);
-                bgCtx.save();
-                bgCtx.translate(flower.x, flower.y);
-                bgCtx.rotate(flower.angle);
-                const petalCount = flower.petalCount;
-                for (let i = 0; i < petalCount; i++) {
-                    const angle = (i / petalCount) * Math.PI * 2;
-                    bgCtx.save();
-                    bgCtx.rotate(angle);
-                    bgCtx.beginPath();
-                    bgCtx.ellipse(size * 0.3, 0, size * 0.25, size * 0.55, 0, 0, Math.PI * 2);
-                    const grad = bgCtx.createRadialGradient(0, 0, 0, 0, 0, size * 0.55);
-                    grad.addColorStop(0, flower.color);
-                    grad.addColorStop(0.5, flower.color);
-                    grad.addColorStop(1, '#5a1a2a');
-                    bgCtx.fillStyle = grad;
-                    bgCtx.fill();
-                    bgCtx.restore();
-                }
-                // Тычинка
-                bgCtx.beginPath();
-                bgCtx.arc(0, 0, size * 0.1, 0, Math.PI * 2);
-                bgCtx.fillStyle = '#ffd700';
-                bgCtx.fill();
-                bgCtx.restore();
-            }
-        }
-
-        function generateFlareParticles(count) {
-            for (let i = 0; i < count; i++) {
-                flareParticles.push({
-                    x: Math.random() * bgCanvas.width,
-                    y: Math.random() * bgCanvas.height,
-                    radius: 50 + Math.random() * 150,
-                    speedX: (Math.random() - 0.5) * 0.3,
-                    speedY: (Math.random() - 0.5) * 0.3,
-                    opacity: 0.1 + Math.random() * 0.25,
-                    color: `hsla(${200 + Math.random()*60}, 80%, 70%, 0.3)`,
-                });
-            }
-        }
-
-        function updateFlareParticles() {
-            for (let p of flareParticles) {
-                p.x += p.speedX;
-                p.y += p.speedY;
-                if (p.x < -p.radius) p.x = bgCanvas.width + p.radius;
-                if (p.x > bgCanvas.width + p.radius) p.x = -p.radius;
-                if (p.y < -p.radius) p.y = bgCanvas.height + p.radius;
-                if (p.y > bgCanvas.height + p.radius) p.y = -p.radius;
-            }
-        }
-
-        function drawFlareParticles() {
-            for (let p of flareParticles) {
-                const grad = bgCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-                grad.addColorStop(0, p.color);
-                grad.addColorStop(1, 'transparent');
-                bgCtx.beginPath();
-                bgCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                bgCtx.fillStyle = grad;
-                bgCtx.fill();
-            }
-        }
-
-        function renderBg(time) {
-            if (!bgCtx) return;
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-
-            if (currentMood === 0) {
-                bgCtx.fillStyle = 'rgba(10,10,18,0)';
-                bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                return;
-            }
-
-            // Заливка фона
-            switch (currentMood) {
-                case 1:
-                    bgCtx.fillStyle = '#0a0a1a';
-                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                    updateRain(rainDrops);
-                    drawRain(rainDrops, 'rgba(180,200,255,0.5)');
-                    updateGlassDrops();
-                    drawGlassDrops();
-                    if (Math.random() < 0.0005) lightningFlash = 0.8;
-                    if (lightningFlash > 0) {
-                        bgCtx.fillStyle = `rgba(200,220,255,${lightningFlash * 0.3})`;
-                        bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                        lightningFlash *= 0.98;
-                    }
-                    break;
-                case 2:
-                    bgCtx.fillStyle = '#1a2a3a';
-                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                    updateRain(rainDrops2);
-                    drawRain(rainDrops2, 'rgba(200,220,255,0.3)');
-                    updateGlassDrops();
-                    drawGlassDrops();
-                    break;
-                case 3:
-                    bgCtx.fillStyle = '#f5e6b0';
-                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                    updateClouds();
-                    drawClouds();
-                    break;
-                case 4:
-                    bgCtx.fillStyle = '#7a2a4a';
-                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                    drawFlowers(time);
-                    break;
-                case 5:
-                    bgCtx.fillStyle = '#8ac4d4';
-                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                    const grad = bgCtx.createConicGradient(0, bgCanvas.width / 2, bgCanvas.height * 0.8);
-                    grad.addColorStop(0, 'rgba(255,0,0,0.1)');
-                    grad.addColorStop(0.17, 'rgba(255,165,0,0.1)');
-                    grad.addColorStop(0.33, 'rgba(255,255,0,0.1)');
-                    grad.addColorStop(0.5, 'rgba(0,255,0,0.1)');
-                    grad.addColorStop(0.67, 'rgba(0,0,255,0.1)');
-                    grad.addColorStop(0.83, 'rgba(75,0,130,0.1)');
-                    grad.addColorStop(1, 'rgba(238,130,238,0.1)');
-                    bgCtx.beginPath();
-                    bgCtx.arc(bgCanvas.width / 2, bgCanvas.height * 0.8, Math.min(bgCanvas.width, bgCanvas.height) * 0.6, 0,
-                        Math.PI);
-                    bgCtx.fillStyle = grad;
-                    bgCtx.fill();
-                    break;
-            }
-
-            if (currentMood !== 0) {
-                updateFlareParticles();
-                drawFlareParticles();
-            }
-        }
-
-        function setMoodEffect(mood) {
-            if (bgAnimId) {
-                cancelAnimationFrame(bgAnimId);
-                bgAnimId = null;
-            }
-            currentMood = mood;
-            const bgCanvasEl = document.getElementById('bgCanvas');
-            if (mood === 0) {
-                bgCanvasEl.classList.remove('active');
-                stopAllSounds();
-                return;
-            }
-            bgCanvasEl.classList.add('active');
-
-            rainDrops = [];
-            rainDrops2 = [];
-            glassDrops = [];
-            clouds = [];
-            flowers = [];
-            flareParticles = [];
-            lightningFlash = 0;
-
-            switch (mood) {
-                case 1:
-                    generateRain(rainDrops, 180, 0.2, 8, [15, 30], 1.5);
-                    generateGlassDrops(15);
-                    generateFlareParticles(10);
-                    playAmbientSound(1);
-                    break;
-                case 2:
-                    generateRain(rainDrops2, 100, 0.4, 6, [12, 25], 1.2);
-                    generateGlassDrops(8);
-                    generateFlareParticles(8);
-                    playAmbientSound(2);
-                    break;
-                case 3:
-                    generateClouds(6);
-                    generateFlareParticles(6);
-                    playAmbientSound(3);
-                    break;
-                case 4:
-                    generateFlowers(15);
-                    generateFlareParticles(12);
-                    playAmbientSound(4);
-                    break;
-                case 5:
-                    generateFlareParticles(25);
-                    playAmbientSound(5);
-                    break;
-            }
-
-            function animateBg(time) {
-                renderBg(time);
-                bgAnimId = requestAnimationFrame(animateBg);
-            }
-            bgAnimId = requestAnimationFrame(animateBg);
-        }
-
-        // =================================================================
-        // 6. ОТКРЫТЬ ДЕНЬ
-        // =================================================================
-        function openDay(dateStr) {
-            currentDateStr = dateStr;
-            const data = getDayData(dateStr);
+        function openDay(year, month, day) {
+            currentEditDay = { year, month, day };
+            const data = getDayData(year, month, day) || {};
+            selectedRating = data.rating || 0;
             selectedStates = data.states ? [...data.states] : [];
             stars = data.stars ? [...data.stars] : [];
-            selectedMood = data.mood || 0;
+            noteText = data.note || '';
 
+            document.getElementById('canvasView').classList.add('active');
+            document.getElementById('calendarView').classList.add('hidden');
+
+            // сброс UI
+            document.getElementById('stepRating').classList.remove('hidden');
+            document.getElementById('stepStates').classList.add('hidden');
+            document.getElementById('stepNotes').classList.add('hidden');
+            document.getElementById('confirmRating').style.display = 'block';
+
+            // подсветка рейтинга
+            document.querySelectorAll('#ratingButtons button').forEach(b => {
+                b.classList.toggle('selected', parseInt(b.dataset.val) === selectedRating);
+            });
+
+            // состояния
+            renderStates();
+            renderWaves();
+            renderStars();
+            document.getElementById('noteInput').value = noteText || '';
+            document.getElementById('starCount').innerText = stars.length;
+
+            // если уже была оценка — переходим к состояниям
+            if(selectedRating > 0) {
+                document.getElementById('stepRating').classList.add('hidden');
+                document.getElementById('stepStates').classList.remove('hidden');
+                document.getElementById('stepNotes').classList.remove('hidden');
+                document.getElementById('confirmRating').style.display = 'none';
+            }
+        }
+
+        function renderStates() {
+            document.querySelectorAll('#statesGrid .state-btn').forEach(el => {
+                const st = el.dataset.state;
+                el.classList.toggle('active', selectedStates.includes(st));
+            });
+        }
+        function renderWaves() {
             const container = document.getElementById('waveContainer');
-            container.classList.add('active');
-
-            const parts = dateStr.split('-');
-            const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября',
-                'ноября', 'декабря'
-            ];
-            document.getElementById('waveDate').textContent = `${parts[2]} ${months[parts[1]-1]} ${parts[0]}`;
-
-            document.getElementById('stateDescriptions').classList.add('active');
-
-            waveStates = {};
-            STATES.forEach(st => {
-                waveStates[st.id] = {
-                    currentAmp: 0,
-                    targetAmp: 0,
-                    currentAlpha: 0,
-                    targetAlpha: 0,
-                    offset: (Math.random() - 0.5) * 120
-                };
+            container.innerHTML = '';
+            selectedStates.forEach(s => {
+                const tag = document.createElement('span');
+                tag.className = 'wave-tag';
+                tag.style.borderColor = getStateColor(s);
+                tag.innerText = s;
+                container.appendChild(tag);
             });
-
-            if (selectedMood > 0) {
-                setMoodEffect(selectedMood);
-                document.getElementById('moodSelector').classList.remove('active');
-                document.getElementById('backBtn').classList.add('visible');
-                document.getElementById('bottomPanel').classList.add('active');
-                document.getElementById('noteInput').value = data.note || '';
-                buildStatePanel();
-                updateStarCounter();
-                selectedStates.forEach(stId => setWaveTarget(stId, true));
-            } else {
-                document.getElementById('moodSelector').classList.add('active');
-                document.getElementById('bottomPanel').classList.remove('active');
-                document.getElementById('backBtn').classList.remove('visible');
-                document.getElementById('noteInput').value = data.note || '';
-                document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
-                document.getElementById('moodConfirmBtn').disabled = true;
-                setMoodEffect(0);
-                document.getElementById('stateDescriptions').classList.remove('active');
-            }
-
-            canvas = document.getElementById('waveCanvas');
-            ctx = canvas.getContext('2d');
-            resizeCanvas();
-            if (animationId) cancelAnimationFrame(animationId);
-            animateWaves();
-
-            try { if (window.Telegram && Telegram.WebApp) Telegram.WebApp.expand(); } catch (e) {}
         }
-
-        function buildStatePanel() {
-            const panel = document.getElementById('statePanel');
-            panel.innerHTML = '';
-            STATES.forEach(st => {
-                const btn = document.createElement('button');
-                btn.className = 'state-btn';
-                btn.dataset.state = st.id;
-                btn.textContent = st.label;
-                btn.style.color = st.color;
-                if (selectedStates.includes(st.id)) btn.classList.add('selected');
-                btn.addEventListener('click', function() {
-                    soundClick();
-                    toggleState(st.id, this);
+        function renderStars() {
+            const container = document.getElementById('starDisplay');
+            container.innerHTML = '';
+            stars.forEach((s, idx) => {
+                const el = document.createElement('span');
+                el.className = 'star-item';
+                el.innerText = '✦ ' + (s.length > 12 ? s.slice(0,12)+'…' : s);
+                el.dataset.idx = idx;
+                // долгое нажатие удаления (имитация)
+                let timer;
+                el.addEventListener('pointerdown', () => {
+                    timer = setTimeout(() => {
+                        if(confirm('Удалить звезду?')) {
+                            stars.splice(idx, 1);
+                            renderStars();
+                            document.getElementById('starCount').innerText = stars.length;
+                        }
+                    }, 800);
                 });
-                panel.appendChild(btn);
+                el.addEventListener('pointerup', () => clearTimeout(timer));
+                el.addEventListener('pointerleave', () => clearTimeout(timer));
+                // клик для редактирования заметки (звезды)
+                el.addEventListener('click', () => {
+                    const newText = prompt('Заметка для звезды:', s);
+                    if(newText !== null) stars[idx] = newText.trim() || '✨';
+                    renderStars();
+                });
+                container.appendChild(el);
             });
         }
 
-        // =================================================================
-        // 7. ВЫБОР ОЦЕНКИ
-        // =================================================================
-        document.querySelectorAll('.mood-select-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                soundClick();
-                selectedMood = parseInt(this.dataset.mood);
-                document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                document.getElementById('moodConfirmBtn').disabled = false;
-                setMoodEffect(selectedMood);
-            });
-        });
-
-        document.getElementById('moodConfirmBtn').addEventListener('click', function() {
-            if (selectedMood === 0) return;
-            if (currentDateStr) {
-                const data = getDayData(currentDateStr);
-                data.mood = selectedMood;
-                saveData();
-                renderCalendar();
-                showAdditions();
-            }
-        });
-
-        function showAdditions() {
-            document.getElementById('moodSelector').classList.remove('active');
-            document.getElementById('backBtn').classList.add('visible');
-            buildStatePanel();
-            document.getElementById('bottomPanel').classList.add('active');
-            updateStarCounter();
-            selectedStates.forEach(stId => setWaveTarget(stId, true));
-        }
-
-        function goBackToMood() {
-            soundClick();
-            document.getElementById('bottomPanel').classList.remove('active');
-            document.getElementById('backBtn').classList.remove('visible');
-            document.getElementById('moodSelector').classList.add('active');
-            setMoodEffect(0);
-            document.getElementById('stateDescriptions').classList.remove('active');
-            document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.toggle('selected', parseInt(b
-                .dataset.mood) === selectedMood));
-            document.getElementById('moodConfirmBtn').disabled = selectedMood === 0;
-            STATES.forEach(st => setWaveTarget(st.id, false));
-        }
-        document.getElementById('backBtn').addEventListener('click', goBackToMood);
-
-        // =================================================================
-        // 8. УПРАВЛЕНИЕ СОСТОЯНИЯМИ
-        // =================================================================
-        function toggleState(stateId, btn) {
-            const index = selectedStates.indexOf(stateId);
-            if (index > -1) {
-                selectedStates.splice(index, 1);
-                btn.classList.remove('selected');
-                setWaveTarget(stateId, false);
-            } else if (selectedStates.length < 4) {
-                selectedStates.push(stateId);
+        // ---- события ----
+        document.querySelectorAll('#ratingButtons button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedRating = parseInt(btn.dataset.val);
+                document.querySelectorAll('#ratingButtons button').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
-                setWaveTarget(stateId, true);
-            } else {
-                alert('Можно выбрать максимум 4 состояния ✨');
+            });
+        });
+
+        document.getElementById('confirmRating').addEventListener('click', () => {
+            if(selectedRating < 1 || selectedRating > 5) {
+                alert('Выберите оценку');
                 return;
             }
-            if (currentDateStr) {
-                const data = getDayData(currentDateStr);
-                data.states = [...selectedStates];
-                saveData();
-                renderCalendar();
-            }
-        }
-
-        // =================================================================
-        // 9. ВОЛНЫ
-        // =================================================================
-        function getWaveState(stateId) {
-            if (!waveStates[stateId]) {
-                waveStates[stateId] = {
-                    currentAmp: 0,
-                    targetAmp: 0,
-                    currentAlpha: 0,
-                    targetAlpha: 0,
-                    offset: (Math.random() - 0.5) * 120
-                };
-            }
-            return waveStates[stateId];
-        }
-
-        function setWaveTarget(stateId, active) {
-            const state = getWaveState(stateId);
-            if (active) {
-                state.targetAmp = 35 + Math.random() * 10;
-                state.targetAlpha = 0.7 + Math.random() * 0.2;
-            } else {
-                state.targetAmp = 0;
-                state.targetAlpha = 0;
-            }
-        }
-
-        function resizeCanvas() {
-            if (!canvas) return;
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-        }
-
-        // =================================================================
-        // 10. АНИМАЦИЯ ВОЛН И ХРУСТАЛЬНЫХ ЗВЁЗД
-        // =================================================================
-        function animateWaves() {
-            if (!canvas || !ctx) return;
-            const w = canvas.width,
-                h = canvas.height,
-                time = Date.now() / 1000;
-            ctx.clearRect(0, 0, w, h);
-
-            let hasActive = false;
-            STATES.forEach((st, index) => {
-                const state = waveStates[st.id];
-                if (!state) return;
-                state.currentAmp += (state.targetAmp - state.currentAmp) * 0.06;
-                state.currentAlpha += (state.targetAlpha - state.currentAlpha) * 0.06;
-                if (Math.abs(state.currentAmp - state.targetAmp) < 0.01) state.currentAmp = state.targetAmp;
-                if (Math.abs(state.currentAlpha - state.targetAlpha) < 0.001) state.currentAlpha = state.targetAlpha;
-
-                const amp = state.currentAmp;
-                const alpha = state.currentAlpha;
-                if (amp < 0.5 || alpha < 0.01) return;
-                hasActive = true;
-
-                const color = st.color;
-                const offset = state.offset || 0;
-                const centerY = h * 0.4;
-                const freq = 0.014 + index * 0.003;
-                const speed = 0.9 + index * 0.1;
-
-                ctx.save();
-                const glowSize = 80 + Math.sin(time * 0.5 + index) * 20;
-                const grad = ctx.createRadialGradient(w / 2, centerY + offset, 0, w / 2, centerY + offset, glowSize);
-                grad.addColorStop(0, st.color + '20');
-                grad.addColorStop(1, 'transparent');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, w, h);
-
-                ctx.beginPath();
-                ctx.moveTo(0, centerY + offset);
-                for (let x = 0; x <= w; x += 2) {
-                    const y = centerY + offset +
-                        Math.sin(x * freq + time * speed + index * 1.2) * amp +
-                        Math.sin(x * freq * 0.6 + time * 0.9 + index * 2.6) * amp * 0.5 +
-                        Math.sin(x * freq * 2.0 + time * 2.2 + index * 0.6) * amp * 0.25;
-                    ctx.lineTo(x, y);
-                }
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 4 + Math.sin(time * 0.3 + index) * 1.2;
-                ctx.globalAlpha = alpha * (0.8 + Math.sin(time * 0.4 + index * 1.0) * 0.15);
-                ctx.shadowBlur = 60;
-                ctx.shadowColor = color;
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(0, centerY + offset + 18 + Math.sin(time * 0.2 + index) * 10);
-                for (let x = 0; x <= w; x += 3) {
-                    const y = centerY + offset + 18 + Math.sin(time * 0.2 + index) * 10 +
-                        Math.sin(x * freq * 0.7 + time * 1.0 + index * 1.9) * amp * 0.6 +
-                        Math.sin(x * freq * 0.4 + time * 0.6 + index * 2.9) * amp * 0.3;
-                    ctx.lineTo(x, y);
-                }
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 2.5;
-                ctx.globalAlpha = alpha * 0.2;
-                ctx.shadowBlur = 40;
-                ctx.shadowColor = color;
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(0, centerY + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 7);
-                for (let x = 0; x <= w; x += 4) {
-                    const y = centerY + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 7 +
-                        Math.sin(x * freq * 0.5 + time * 0.6 + index * 1.6) * amp * 0.35 +
-                        Math.sin(x * freq * 0.3 + time * 0.4 + index * 2.6) * amp * 0.12;
-                    ctx.lineTo(x, y);
-                }
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 1.5;
-                ctx.globalAlpha = alpha * 0.08;
-                ctx.shadowBlur = 25;
-                ctx.shadowColor = color;
-                ctx.stroke();
-                ctx.restore();
-            });
-
-            if (!hasActive && selectedStates.length === 0) {
-                ctx.fillStyle = 'rgba(255,255,255,0.04)';
-                ctx.font = '16px system-ui';
-                ctx.textAlign = 'center';
-                ctx.fillText('Выбери состояния ↓', w / 2, h * 0.4 - 10);
-                ctx.fillStyle = 'rgba(255,255,255,0.02)';
-                ctx.font = '13px system-ui';
-                ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
-            }
-
-            // === ХРУСТАЛЬНЫЕ ЗВЁЗДЫ (с углами) ===
-            stars.forEach((star, idx) => {
-                const twinkle = 0.6 + Math.sin(time * 1.8 + idx * 2.3) * 0.4;
-                const size = 16 + Math.sin(time * 1.2 + idx * 1.7) * 4;
-
-                // Свечение
-                const glowGrad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, size * 14);
-                glowGrad.addColorStop(0, `rgba(255,255,255,${0.25 * twinkle})`);
-                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.15 * twinkle})`);
-                glowGrad.addColorStop(1, 'rgba(255,255,255,0)');
-                ctx.fillStyle = glowGrad;
-                ctx.fillRect(star.x - size * 14, star.y - size * 14, size * 28, size * 28);
-
-                // Хрустальная звезда с углами
-                ctx.save();
-                ctx.translate(star.x, star.y);
-                ctx.rotate(time * 0.3 + idx);
-                ctx.beginPath();
-                const spikes = 5;
-                const outerR = size;
-                const innerR = size * 0.4;
-                for (let i = 0; i < spikes * 2; i++) {
-                    const radius = i % 2 === 0 ? outerR : innerR;
-                    const angle = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
-                    if (i === 0) ctx.moveTo(radius * Math.cos(angle), radius * Math.sin(angle));
-                    else ctx.lineTo(radius * Math.cos(angle), radius * Math.sin(angle));
-                }
-                ctx.closePath();
-                ctx.fillStyle = `rgba(255, 255, 255, ${0.85 + 0.15 * twinkle})`;
-                ctx.shadowBlur = 80;
-                ctx.shadowColor = 'rgba(200,230,255,0.6)';
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                // Внутреннее свечение
-                const innerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.6);
-                innerGrad.addColorStop(0, `rgba(255,255,255,${0.8 + 0.2 * twinkle})`);
-                innerGrad.addColorStop(1, 'rgba(200,230,255,0)');
-                ctx.fillStyle = innerGrad;
-                ctx.beginPath();
-                ctx.arc(0, 0, size * 0.6, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-
-                // Подпись
-                if (star.note) {
-                    ctx.fillStyle = 'rgba(255,255,255,0.12)';
-                    ctx.font = '10px system-ui';
-                    ctx.textAlign = 'center';
-                    const displayNote = star.note.length > 15 ? star.note.slice(0, 15) + '…' : star.note;
-                    ctx.fillText(displayNote, star.x, star.y + size + 22);
-                }
-            });
-
-            ctx.globalAlpha = 1;
-            ctx.shadowBlur = 0;
-            animationId = requestAnimationFrame(animateWaves);
-        }
-
-        // =================================================================
-        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ
-        // =================================================================
-        function updateStarCounter() {
-            document.getElementById('starCounter').textContent = `⭐ ${stars.length}`;
-        }
-
-        document.getElementById('starBtn').addEventListener('click', function() {
-            if (!currentDateStr) return;
-            if (stars.length >= MAX_STARS) {
-                alert(`Можно добавить максимум ${MAX_STARS} звёзд ✨`);
-                return;
-            }
-            const note = document.getElementById('noteInput').value.trim();
-            if (!note) { alert('Напиши заметку для звезды ✨'); return; }
-            playStarAddSound();
-            const data = getDayData(currentDateStr);
-            if (!data.stars) data.stars = [];
-            const centerX = canvas.width / 2,
-                centerY = canvas.height * 0.2;
-            const x = centerX + (Math.random() - 0.5) * canvas.width * 0.6;
-            const y = centerY + (Math.random() - 0.5) * canvas.height * 0.15;
-            const newStar = { x, y, note, date: currentDateStr };
-            data.stars.push(newStar);
-            stars = data.stars;
-            saveData();
-            updateStarCounter();
-            renderCalendar();
-            createMagicAppearance(x, y);
-            document.getElementById('noteInput').value = '';
-            data.note = '';
-            saveData();
+            document.getElementById('stepRating').classList.add('hidden');
+            document.getElementById('stepStates').classList.remove('hidden');
+            document.getElementById('stepNotes').classList.remove('hidden');
+            document.getElementById('confirmRating').style.display = 'none';
         });
 
-        function createMagicAppearance(x, y) {
-            // Вспышка
-            const flash = document.createElement('div');
-            flash.style.cssText = `
-                position: fixed; left: ${x-80}px; top: ${y-80}px;
-                width: 160px; height: 160px; border-radius: 50%;
-                background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(200,230,255,0.3) 40%, transparent 70%);
-                pointer-events: none; z-index: 2000;
-                transform: scale(0);
-                animation: magicFlash 0.8s ease-out forwards;
-            `;
-            document.body.appendChild(flash);
-            setTimeout(() => flash.remove(), 900);
-
-            // Осколки (хрустальные)
-            for (let i = 0; i < 20; i++) {
-                const spark = document.createElement('div');
-                const angle = Math.random() * Math.PI * 2;
-                const dist = 80 + Math.random() * 150;
-                const dx = Math.cos(angle) * dist;
-                const dy = Math.sin(angle) * dist;
-                const size = 4 + Math.random() * 8;
-                const hue = 200 + Math.random() * 40;
-                const color = `hsl(${hue}, 80%, ${70 + Math.random() * 30}%)`;
-                // Создаём звездообразные осколки
-                spark.style.cssText = `
-                    position: fixed; left: ${x}px; top: ${y}px;
-                    width: ${size}px; height: ${size}px;
-                    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-                    background: ${color};
-                    box-shadow: 0 0 20px ${color};
-                    pointer-events: none; z-index: 2000;
-                    transition: all 0.8s ease-out;
-                    opacity: 1;
-                `;
-                document.body.appendChild(spark);
-                requestAnimationFrame(() => {
-                    spark.style.transform = `translate(${dx}px, ${dy}px) scale(0) rotate(${Math.random()*360}deg)`;
-                    spark.style.opacity = '0';
-                });
-                setTimeout(() => spark.remove(), 900);
-            }
-        }
-
-        const styleFlash = document.createElement('style');
-        styleFlash.textContent = `
-            @keyframes magicFlash {
-                0% { transform: scale(0); opacity: 1; }
-                50% { transform: scale(2); opacity: 0.6; }
-                100% { transform: scale(3.5); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(styleFlash);
-
-        // =================================================================
-        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ (ХРУСТАЛЬНЫЙ ВЗРЫВ)
-        // =================================================================
-        function deleteStar(star) {
-            playCrystalSound();
-            const numParticles = 50;
-            for (let i = 0; i < numParticles; i++) {
-                const particle = document.createElement('div');
-                const angle = Math.random() * Math.PI * 2;
-                const speed = 100 + Math.random() * 250;
-                const dx = Math.cos(angle) * speed;
-                const dy = Math.sin(angle) * speed;
-                const size = 5 + Math.random() * 12;
-                const hue = 190 + Math.random() * 50;
-                const color = `hsl(${hue}, 80%, ${70 + Math.random() * 30}%)`;
-                particle.style.cssText = `
-                    position: fixed; left: ${star.x}px; top: ${star.y}px;
-                    width: ${size}px; height: ${size}px;
-                    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-                    background: ${color};
-                    box-shadow: 0 0 25px ${color};
-                    pointer-events: none; z-index: 2000;
-                    transition: all 0.9s cubic-bezier(0.2, 0.9, 0.4, 1);
-                    opacity: 1;
-                    transform: scale(1) rotate(0deg);
-                `;
-                document.body.appendChild(particle);
-                requestAnimationFrame(() => {
-                    particle.style.transform =
-                        `translate(${dx}px, ${dy}px) scale(0) rotate(${Math.random()*720}deg)`;
-                    particle.style.opacity = '0';
-                });
-                setTimeout(() => particle.remove(), 1000);
-            }
-
-            const data = getDayData(currentDateStr);
-            data.stars = data.stars.filter(s => s.x !== star.x || s.y !== star.y);
-            stars = data.stars;
-            saveData();
-            updateStarCounter();
-            renderCalendar();
-            longPressTarget = null;
-        }
-
-        // =================================================================
-        // 13. ДОЛГОЕ НАЖАТИЕ ДЛЯ УДАЛЕНИЯ ЗВЕЗДЫ
-        // =================================================================
-        let longPressTimer = null,
-            longPressTarget = null;
-
-        document.addEventListener('mousedown', function(e) {
-            if (e.target.id !== 'waveCanvas') return;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left,
-                y = e.clientY - rect.top;
-            let found = null;
-            for (const star of stars) {
-                if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 50) { found = star; break; }
-            }
-            if (found) {
-                longPressTarget = found;
-                longPressTimer = setTimeout(() => deleteStar(found), 800);
-            }
-        });
-        document.addEventListener('mouseup', function() {
-            if (longPressTimer) { clearTimeout(longPressTimer);
-                longPressTimer = null; }
-            longPressTarget = null;
-        });
-        document.addEventListener('touchstart', function(e) {
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const x = touch.clientX - rect.left,
-                y = touch.clientY - rect.top;
-            let found = null;
-            for (const star of stars) {
-                if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 50) { found = star; break; }
-            }
-            if (found) {
-                longPressTarget = found;
-                longPressTimer = setTimeout(() => deleteStar(found), 800);
-            }
-        });
-        document.addEventListener('touchend', function() {
-            if (longPressTimer) { clearTimeout(longPressTimer);
-                longPressTimer = null; }
-            longPressTarget = null;
-        });
-
-        // =================================================================
-        // 14. РЕДАКТОР ЗАМЕТОК
-        // =================================================================
-        let editingTarget = null,
-            editingType = null,
-            editingStateId = null;
-
-        document.addEventListener('click', function(e) {
-            if (e.target.id !== 'waveCanvas') return;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left,
-                y = e.clientY - rect.top;
-
-            let found = null;
-            for (const star of stars) {
-                if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 50) { found = star; break; }
-            }
-            if (found) { openNoteEditor('star', found, null); return; }
-
-            if (selectedStates.length > 0 && y > canvas.height * 0.25 && y < canvas.height * 0.55) {
-                let closestState = null;
-                let closestDist = Infinity;
-                selectedStates.forEach((stateId) => {
-                    const state = waveStates[stateId];
-                    if (!state) return;
-                    const waveY = canvas.height * 0.4 + (state.offset || 0);
-                    const dist = Math.abs(y - waveY);
-                    if (dist < closestDist) {
-                        closestDist = dist;
-                        closestState = stateId;
-                    }
-                });
-                if (closestState && closestDist < 80) {
-                    openNoteEditor('state', null, closestState);
+        document.querySelectorAll('#statesGrid .state-btn').forEach(el => {
+            el.addEventListener('click', () => {
+                const st = el.dataset.state;
+                const idx = selectedStates.indexOf(st);
+                if(idx >= 0) {
+                    selectedStates.splice(idx, 1);
                 } else {
-                    openNoteEditor('day', null, null);
-                }
-            }
-        });
-
-        function openNoteEditor(type, data, stateId) {
-            const editor = document.getElementById('noteEditor');
-            const textarea = document.getElementById('noteEditorTextarea');
-            const title = document.getElementById('noteEditorTitle');
-            const content = document.getElementById('noteEditorContent');
-            editingType = type;
-            editingTarget = data;
-            editingStateId = stateId;
-            content.style.removeProperty('--wave-color');
-            content.style.removeProperty('--wave-glow');
-            content.classList.remove('wave-color');
-            if (type === 'star' && data) {
-                title.textContent = '⭐ Особенный момент';
-                textarea.value = data.note || '';
-            } else if (type === 'state' && stateId) {
-                const st = STATES.find(s => s.id === stateId);
-                if (st) {
-                    title.textContent = `🌊 ${st.label}`;
-                    const data = getDayData(currentDateStr);
-                    textarea.value = data.stateNotes?.[stateId] || '';
-                    content.style.setProperty('--wave-color', st.color);
-                    content.style.setProperty('--wave-glow', `${st.color}33`);
-                    content.classList.add('wave-color');
-                }
-            } else if (type === 'day') {
-                title.textContent = '📝 Комментарий ко дню';
-                const dayData = getDayData(currentDateStr);
-                textarea.value = dayData.note || '';
-            }
-            editor.classList.add('active');
-            textarea.focus();
-        }
-
-        document.getElementById('noteEditorBack').addEventListener('click', function() {
-            document.getElementById('noteEditor').classList.remove('active');
-        });
-        document.getElementById('noteEditorSave').addEventListener('click', function() {
-            const textarea = document.getElementById('noteEditorTextarea');
-            const value = textarea.value.trim();
-            if (editingType === 'star' && editingTarget) {
-                editingTarget.note = value;
-                const data = getDayData(currentDateStr);
-                const starIndex = data.stars.findIndex(s => s.x === editingTarget.x && s.y === editingTarget.y);
-                if (starIndex !== -1) { data.stars[starIndex].note = value;
-                    saveData(); }
-                const localIndex = stars.findIndex(s => s.x === editingTarget.x && s.y === editingTarget.y);
-                if (localIndex !== -1) { stars[localIndex].note = value; }
-            } else if (editingType === 'state' && editingStateId) {
-                const data = getDayData(currentDateStr);
-                if (!data.stateNotes) data.stateNotes = {};
-                data.stateNotes[editingStateId] = value;
-                saveData();
-            } else if (editingType === 'day') {
-                const data = getDayData(currentDateStr);
-                data.note = value;
-                saveData();
-                document.getElementById('noteInput').value = value;
-            }
-            document.getElementById('noteEditor').classList.remove('active');
-            editingTarget = null;
-            editingType = null;
-            editingStateId = null;
-        });
-
-        // =================================================================
-        // 15. СБРОС ДНЯ
-        // =================================================================
-        let resetPressTimer = null;
-
-        document.getElementById('waveDate').addEventListener('mousedown', function() {
-            resetPressTimer = setTimeout(() => {
-                if (currentDateStr && !isResetInProgress) {
-                    soundReset();
-                    if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
-                        resetDay();
+                    if(selectedStates.length >= 4) {
+                        alert('Можно выбрать не более 4 состояний');
+                        return;
                     }
+                    selectedStates.push(st);
                 }
-                resetPressTimer = null;
-            }, 1000);
-        });
-        document.getElementById('waveDate').addEventListener('mouseup', function() {
-            if (resetPressTimer) { clearTimeout(resetPressTimer);
-                resetPressTimer = null; }
-        });
-        document.getElementById('waveDate').addEventListener('mouseleave', function() {
-            if (resetPressTimer) { clearTimeout(resetPressTimer);
-                resetPressTimer = null; }
-        });
-        document.getElementById('waveDate').addEventListener('touchstart', function(e) {
-            resetPressTimer = setTimeout(() => {
-                if (currentDateStr && !isResetInProgress) {
-                    soundReset();
-                    if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
-                        resetDay();
-                    }
-                }
-                resetPressTimer = null;
-            }, 1000);
-        });
-        document.getElementById('waveDate').addEventListener('touchend', function() {
-            if (resetPressTimer) { clearTimeout(resetPressTimer);
-                resetPressTimer = null; }
-        });
-
-        function resetDay() {
-            if (!currentDateStr) return;
-            isResetInProgress = true;
-            const fog = document.getElementById('fogOverlay');
-            fog.classList.add('active');
-            const data = getDayData(currentDateStr);
-            data.mood = 0;
-            data.states = [];
-            data.stars = [];
-            data.note = '';
-            data.stateNotes = {};
-            selectedStates = [];
-            stars = [];
-            selectedMood = 0;
-            saveData();
-            updateStarCounter();
-            renderCalendar();
-            STATES.forEach(st => {
-                const state = waveStates[st.id];
-                if (state) { state.currentAmp = 0;
-                    state.targetAmp = 0;
-                    state.currentAlpha = 0;
-                    state.targetAlpha = 0; }
+                renderStates();
+                renderWaves();
             });
-            setTimeout(() => {
-                fog.classList.remove('active');
-                document.getElementById('bottomPanel').classList.remove('active');
-                document.getElementById('backBtn').classList.remove('visible');
-                const selector = document.getElementById('moodSelector');
-                selector.classList.add('active');
-                document.getElementById('moodConfirmBtn').disabled = true;
-                document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
-                setMoodEffect(0);
-                document.getElementById('stateDescriptions').classList.remove('active');
-                const container = document.getElementById('waveContainer');
-                container.style.background = 'transparent';
-                container.style.boxShadow = 'none';
-                isResetInProgress = false;
-            }, 1200);
+        });
+
+        document.getElementById('addStarBtn').addEventListener('click', () => {
+            if(stars.length >= 7) {
+                alert('Максимум 7 звёзд в день');
+                return;
+            }
+            const text = prompt('Заметка для звезды (необязательно):', '');
+            stars.push(text && text.trim() ? text.trim() : '✨');
+            renderStars();
+            document.getElementById('starCount').innerText = stars.length;
+        });
+
+        document.getElementById('saveDayBtn').addEventListener('click', () => {
+            if(!currentEditDay) return;
+            const { year, month, day } = currentEditDay;
+            const note = document.getElementById('noteInput').value;
+            const data = {
+                rating: selectedRating,
+                states: selectedStates,
+                stars: stars,
+                note: note
+            };
+            if(selectedRating === 0) {
+                alert('Оцените день');
+                return;
+            }
+            setDayData(year, month, day, data);
+            closeCanvas();
+            renderCalendar();
+        });
+
+        document.getElementById('closeCanvas').addEventListener('click', closeCanvas);
+
+        function closeCanvas() {
+            document.getElementById('canvasView').classList.remove('active');
+            document.getElementById('calendarView').classList.remove('hidden');
+            currentEditDay = null;
         }
 
-        // =================================================================
-        // 16. ЗАКРЫТИЕ ХОЛСТА, НАВИГАЦИЯ
-        // =================================================================
-        document.getElementById('closeWaves').addEventListener('click', function() {
-            const container = document.getElementById('waveContainer');
-            container.classList.remove('active');
-            document.getElementById('moodSelector').classList.remove('active');
-            document.getElementById('bottomPanel').classList.remove('active');
-            document.getElementById('backBtn').classList.remove('visible');
-            if (animationId) cancelAnimationFrame(animationId);
-            setMoodEffect(0);
-            document.getElementById('stateDescriptions').classList.remove('active');
-            renderCalendar();
+        // сброс дня (долгое нажатие)
+        let resetTimer = null;
+        document.getElementById('resetDayZone').addEventListener('pointerdown', () => {
+            resetTimer = setTimeout(() => {
+                if(!currentEditDay) return;
+                if(confirm('Точно сбросить все данные за этот день?')) {
+                    const { year, month, day } = currentEditDay;
+                    setDayData(year, month, day, null);
+                    closeCanvas();
+                    renderCalendar();
+                }
+            }, 1200);
         });
+        document.getElementById('resetDayZone').addEventListener('pointerup', () => clearTimeout(resetTimer));
+        document.getElementById('resetDayZone').addEventListener('pointerleave', () => clearTimeout(resetTimer));
 
-        document.getElementById('prevMonth').addEventListener('click', function() {
+        // навигация
+        document.getElementById('prevMonth').addEventListener('click', () => {
             currentMonth--;
-            if (currentMonth < 0) { currentMonth = 11;
-                currentYear--; }
+            if(currentMonth < 0) { currentMonth = 11; currentYear--; }
             renderCalendar();
         });
-        document.getElementById('nextMonth').addEventListener('click', function() {
+        document.getElementById('nextMonth').addEventListener('click', () => {
             currentMonth++;
-            if (currentMonth > 11) { currentMonth = 0;
-                currentYear++; }
+            if(currentMonth > 11) { currentMonth = 0; currentYear++; }
             renderCalendar();
         });
 
-        // =================================================================
-        // 17. ИНСТРУКЦИЯ
-        // =================================================================
-        document.getElementById('helpBtn').addEventListener('click', function() {
-            document.getElementById('helpModal').classList.add('active');
-        });
-        document.getElementById('helpClose').addEventListener('click', function() {
-            document.getElementById('helpModal').classList.remove('active');
-        });
-        document.getElementById('helpModal').addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('active');
-        });
-
-        // =================================================================
-        // 18. ИНИЦИАЛИЗАЦИЯ
-        // =================================================================
-        loadData();
+        // инициализация
         renderCalendar();
-        initBgCanvas();
 
-        window.addEventListener('resize', function() {
-            if (canvas) resizeCanvas();
-            resizeBgCanvas();
-        });
+        // телеграм экспанд
+        if(window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.expand();
+        }
 
-        try {
-            if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                Telegram.WebApp.expand();
-            }
-        } catch (e) {}
+        // аудио-имитация (заглушки)
+        function playSound(type){ /* ничего не делаем, но концепт */ }
 
-        console.log('💎 Хрустальный дневник загружен!');
-        console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
-    </script>
+        // дополнительно: обработка звезд на холсте (редактирование)
+    })();
+</script>
 </body>
 </html>
