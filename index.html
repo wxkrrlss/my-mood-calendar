@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Календарь настроения</title>
+    <title>Хрустальный дневник</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -251,8 +251,8 @@
             top: 2px;
             right: 4px;
             font-size: 10px;
-            color: #b0d0ff;
-            text-shadow: 0 0 16px rgba(150, 200, 255, 0.4);
+            color: #ffd700;
+            text-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
             z-index: 2;
         }
         .day-wave-container {
@@ -589,9 +589,9 @@
         #starBtn {
             padding: 6px 18px;
             border-radius: 20px;
-            border: 1.5px solid rgba(180, 210, 255, 0.06);
-            background: rgba(180, 210, 255, 0.02);
-            color: #b0d0ff;
+            border: 1.5px solid rgba(255, 215, 0, 0.06);
+            background: rgba(255, 215, 0, 0.02);
+            color: #ffd700;
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
@@ -603,7 +603,7 @@
             width: 100%;
             justify-content: center;
         }
-        #starBtn:hover { background: rgba(180, 210, 255, 0.05); border-color: rgba(180, 210, 255, 0.12); transform: scale(1.01); }
+        #starBtn:hover { background: rgba(255, 215, 0, 0.05); border-color: rgba(255, 215, 0, 0.12); transform: scale(1.01); }
         .star-counter { font-size: 12px; color: rgba(255, 255, 255, 0.12); text-align: center; margin-top: 4px; }
         .star-hint { font-size: 10px; color: rgba(255, 255, 255, 0.05); text-align: center; margin-top: -2px; }
         .note-editor {
@@ -792,48 +792,19 @@
             .top-bar { top: 14px; left: 14px; right: 14px; }
             .info-btn-small { width: 26px; height: 26px; font-size: 14px; }
         }
-        /* Аудио плеер */
-        #audioPlayer {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            z-index: 9999;
-            opacity: 0.3;
-            transition: opacity 0.3s;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.05);
-            cursor: pointer;
-        }
-        #audioPlayer:hover { opacity: 0.8; }
-        #audioPlayer audio {
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        #audioPlayer .play-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: rgba(255,255,255,0.2);
-            font-size: 12px;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body>
 
+    <!-- ===== ФОНОВЫЙ АУДИО-ПЛЕЕР (ПЕСНЯ) ===== -->
+    <audio id="bgMusic" loop style="display:none;">
+        <source src="background.mp3" type="audio/mpeg">
+    </audio>
+
     <div class="calendar-wrapper">
         <div class="calendar">
             <div class="header">
-                <span class="header-title">Календарь настроения</span>
+                <span class="header-title">Мой дневник</span>
                 <div class="header-actions">
                     <button class="header-btn" id="helpBtn">?</button>
                 </div>
@@ -886,19 +857,11 @@
             <div id="statePanel"></div>
             <div id="noteSection">
                 <input type="text" id="noteInput" placeholder="Опиши события дня...">
-                <button id="starBtn">✦ Добавить звезду</button>
-                <span class="star-counter" id="starCounter">✦ 0</span>
+                <button id="starBtn">⭐ Добавить звезду</button>
+                <span class="star-counter" id="starCounter">⭐ 0</span>
                 <div class="star-hint">Звезда — особенный момент дня</div>
             </div>
         </div>
-    </div>
-
-    <!-- Аудио плеер с песней -->
-    <div id="audioPlayer" title="watching the sky - foreveralone">
-        <div class="play-icon">♪</div>
-        <audio id="bgMusic" loop preload="auto">
-            <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_8f8e6c8f8e.mp3?filename=watching-the-sky-foreveralone-114589.mp3" type="audio/mpeg">
-        </audio>
     </div>
 
     <div class="note-editor" id="noteEditor">
@@ -919,11 +882,10 @@
             <p><b>2. Выбери состояния</b> — до 4-х, которые описывают твой день.</p>
             <p><b>3. Напиши комментарий</b> — опиши события дня.</p>
             <p><b>4. Добавь звезду</b> — нажми кнопку, чтобы отметить особенный момент.</p>
-            <p><b>✦ Чтобы увидеть заметку</b> — нажми на звезду или волну.</p>
+            <p><b>⭐ Чтобы увидеть заметку</b> — нажми на звезду или волну.</p>
             <p><b>🗑️ Чтобы удалить звезду</b> — зажми её на 2 секунды.</p>
             <p><b>🔄 Чтобы вернуться к оценке</b> — нажми стрелку ←.</p>
             <p><b>🗑️ Чтобы сбросить день</b> — зажми дату в центре вверху на 2 секунды.</p>
-            <p><b>🎵 Фоновая музыка</b> — нажми на значок ♪ в правом нижнем углу.</p>
             <button class="help-close" id="helpClose">Понятно!</button>
         </div>
     </div>
@@ -970,43 +932,120 @@
         let waveStates = {};
 
         // =================================================================
-        // 2. МУЗЫКА — ТОЛЬКО ОДНА ПЕСНЯ
+        // 2. ЗВУКИ — ТОЛЬКО ДОЖДЬ ДЛЯ ФОНОВ 1 И 2
         // =================================================================
-        let isMusicPlaying = false;
-        let audioElement = null;
+        let audioCtx = null;
+        let ambientNodes = [];
+        let ambientGainNode = null;
+        let isAmbientPlaying = false;
 
-        function initMusic() {
-            audioElement = document.getElementById('bgMusic');
-            if (!audioElement) return;
-            
-            // Автозапуск при первом клике
-            document.addEventListener('click', function playOnClick() {
-                if (!isMusicPlaying && audioElement) {
-                    audioElement.play().then(() => {
-                        isMusicPlaying = true;
-                        document.querySelector('.play-icon').textContent = '♫';
-                    }).catch(() => {});
-                    document.removeEventListener('click', playOnClick);
-                }
-            });
-
-            // Клик по плееру для включения/выключения
-            const player = document.getElementById('audioPlayer');
-            player.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (!audioElement) return;
-                if (isMusicPlaying) {
-                    audioElement.pause();
-                    isMusicPlaying = false;
-                    document.querySelector('.play-icon').textContent = '♪';
-                } else {
-                    audioElement.play().then(() => {
-                        isMusicPlaying = true;
-                        document.querySelector('.play-icon').textContent = '♫';
-                    }).catch(() => {});
-                }
-            });
+        function initAudio() {
+            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
         }
+
+        function stopAllSounds() {
+            ambientNodes.forEach(node => { try { node.stop(); } catch (e) {} });
+            ambientNodes = [];
+            ambientGainNode = null;
+            isAmbientPlaying = false;
+        }
+
+        // ===== ДОЖДЬ ДЛЯ ФОНА 1 =====
+        function createRainSound1() {
+            stopAllSounds();
+            initAudio();
+            try {
+                const now = audioCtx.currentTime;
+                const bufferSize = audioCtx.sampleRate * 5;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    const t = i / audioCtx.sampleRate;
+                    let val = (Math.random() * 2 - 1) * 0.12 * (0.8 + 0.2 * Math.sin(t * 0.3));
+                    if (Math.random() < 0.002) {
+                        val += (Math.random() * 2 - 1) * 0.15;
+                    }
+                    val += Math.sin(t * 0.05) * 0.01;
+                    data[i] = val;
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                noise.loop = true;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.06, now + 1);
+                noise.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start(now);
+                noise.stop(now + 25);
+                ambientNodes.push(noise);
+                ambientNodes.push(gain);
+
+                // Гром
+                for (let i = 0; i < 3; i++) {
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(50 + i * 15, now + i * 2.5 + 1);
+                    osc.frequency.exponentialRampToValueAtTime(30 + i * 10, now + i * 2.5 + 2.5);
+                    const g = audioCtx.createGain();
+                    g.gain.setValueAtTime(0.03, now + i * 2.5 + 1);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + i * 2.5 + 2.5);
+                    osc.connect(g);
+                    g.connect(audioCtx.destination);
+                    osc.start(now + i * 2.5 + 1);
+                    osc.stop(now + i * 2.5 + 2.5);
+                    ambientNodes.push(osc);
+                    ambientNodes.push(g);
+                }
+                isAmbientPlaying = true;
+            } catch (e) {}
+        }
+
+        // ===== ДОЖДЬ ДЛЯ ФОНА 2 =====
+        function createRainSound2() {
+            stopAllSounds();
+            initAudio();
+            try {
+                const now = audioCtx.currentTime;
+                const bufferSize = audioCtx.sampleRate * 5;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    const t = i / audioCtx.sampleRate;
+                    let val = (Math.random() * 2 - 1) * 0.07 * (0.5 + 0.5 * Math.sin(t * 0.1));
+                    val += Math.sin(t * 3.5 + 0.3) * 0.015;
+                    val += Math.sin(t * 4.2 + 0.7) * 0.010;
+                    val += Math.sin(t * 0.15 + 0.5) * 0.02;
+                    data[i] = val;
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                noise.loop = true;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.035, now + 1);
+                noise.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start(now);
+                noise.stop(now + 25);
+                ambientNodes.push(noise);
+                ambientNodes.push(gain);
+                isAmbientPlaying = true;
+            } catch (e) {}
+        }
+
+        // ===== ОСТАЛЬНЫЕ ЗВУКИ — ПУСТЫЕ =====
+        function playMainAmbient() {}
+        function createMoodSound(type) {
+            if (type === 1) createRainSound1();
+            else if (type === 2) createRainSound2();
+            else stopAllSounds();
+        }
+        function playStarSound(type) {}
+        function soundClick() {}
+        function soundConfirm() {}
+        function soundReset() {}
+        function setAmbientVolume(vol) {}
 
         // =================================================================
         // 3. ДАННЫЕ
@@ -1080,7 +1119,7 @@
             ];
             monthYear.textContent = months[currentMonth] + ' ' + currentYear;
             const avg = getMonthAvg(currentYear, currentMonth);
-            monthAvg.textContent = avg ? `✦ ${avg}` : '';
+            monthAvg.textContent = avg ? `★ ${avg}` : '';
 
             const firstDay = new Date(currentYear, currentMonth, 1);
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -1122,8 +1161,8 @@
 
                 dayEl.addEventListener('click', (function(ds) {
                     return function() {
-                        if (!isFuture(ds)) openDay(ds);
-                        else alert('Этот день ещё не наступил 😊');
+                        if (!isFuture(ds)) { soundClick();
+                            openDay(ds); } else alert('Этот день ещё не наступил 😊');
                     };
                 })(dateStr));
                 grid.appendChild(dayEl);
@@ -1429,6 +1468,7 @@
             const bgCanvasEl = document.getElementById('bgCanvas');
             if (mood === 0) {
                 bgCanvasEl.classList.remove('active');
+                stopAllSounds();
                 return;
             }
             bgCanvasEl.classList.add('active');
@@ -1439,6 +1479,15 @@
             flowers = [];
             flareParticles = [];
             lightningFlash = 0;
+
+            // Запускаем звук дождя для 1 и 2
+            if (mood === 1) {
+                createRainSound1();
+            } else if (mood === 2) {
+                createRainSound2();
+            } else {
+                stopAllSounds();
+            }
 
             switch (mood) {
                 case 1:
@@ -1473,8 +1522,7 @@
 
         // =================================================================
         // 6. ОТКРЫТЬ ДЕНЬ
-        // =================================================================
-        function openDay(dateStr) {
+        // =================================================================        function openDay(dateStr) {
             currentDateStr = dateStr;
             const data = getDayData(dateStr);
             selectedStates = data.states ? [...data.states] : [];
@@ -1542,6 +1590,7 @@
                 btn.style.color = st.color;
                 if (selectedStates.includes(st.id)) btn.classList.add('selected');
                 btn.addEventListener('click', function() {
+                    soundClick();
                     toggleState(st.id, this);
                 });
                 panel.appendChild(btn);
@@ -1553,6 +1602,7 @@
         // =================================================================
         document.querySelectorAll('.mood-select-btn').forEach(btn => {
             btn.addEventListener('click', function() {
+                soundClick();
                 selectedMood = parseInt(this.dataset.mood);
                 document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
@@ -1563,6 +1613,7 @@
 
         document.getElementById('moodConfirmBtn').addEventListener('click', function() {
             if (selectedMood === 0) return;
+            soundConfirm();
             if (currentDateStr) {
                 const data = getDayData(currentDateStr);
                 data.mood = selectedMood;
@@ -1582,6 +1633,7 @@
         }
 
         function goBackToMood() {
+            soundClick();
             document.getElementById('bottomPanel').classList.remove('active');
             document.getElementById('backBtn').classList.remove('visible');
             document.getElementById('moodSelector').classList.add('active');
@@ -1590,6 +1642,7 @@
                 .dataset.mood) === selectedMood));
             document.getElementById('moodConfirmBtn').disabled = selectedMood === 0;
             STATES.forEach(st => setWaveTarget(st.id, false));
+            stopAllSounds();
         }
         document.getElementById('backBtn').addEventListener('click', goBackToMood);
 
@@ -1655,7 +1708,7 @@
         }
 
         // =================================================================
-        // 10. АНИМАЦИЯ ВОЛН И ПЯТИКОНЕЧНЫХ ЗВЁЗД (ПЕРЕРИСОВАННЫХ)
+        // 10. АНИМАЦИЯ ВОЛН И ЗВЁЗД
         // =================================================================
         function animateWaves() {
             if (!canvas || !ctx) return;
@@ -1750,35 +1803,34 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
-            // ===== ПЕРЕРИСОВАННАЯ ПЯТИКОНЕЧНАЯ ЗВЕЗДА =====
+            // ЗВЁЗДЫ
             stars.forEach((star, idx) => {
                 const floatOffset = star.floatPhase || 0;
-                const floatY = Math.sin(time * 0.4 + floatOffset) * 10;
-                const floatX = Math.sin(time * 0.3 + floatOffset * 0.5) * 6;
-                const twinkle = 0.6 + 0.4 * Math.sin(time * 1.2 + floatOffset);
+                const crystalOffset = star.crystalPhase || 0;
+                const floatY = Math.sin(time * 0.4 + floatOffset) * 12;
+                const floatX = Math.sin(time * 0.3 + floatOffset * 0.5) * 8;
+                const pulse = 0.5 + 0.5 * Math.sin(time * 0.8 + crystalOffset);
+                const twinkle = 0.5 + 0.5 * Math.sin(time * 1.2 + floatOffset);
 
                 const x = star.x + floatX;
                 const y = star.y + floatY;
-                const size = 16;
+                const size = 14 + 4 * pulse;
 
-                // Серебристо-голубое свечение
-                const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 12);
-                glowGrad.addColorStop(0, `rgba(200,230,255,${0.2 * twinkle})`);
-                glowGrad.addColorStop(0.3, `rgba(180,210,255,${0.1 * twinkle})`);
-                glowGrad.addColorStop(0.7, `rgba(150,190,255,${0.04 * twinkle})`);
+                const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 15);
+                glowGrad.addColorStop(0, `rgba(255,255,255,${0.08 * twinkle + 0.05})`);
+                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.05 * twinkle + 0.03})`);
                 glowGrad.addColorStop(1, 'rgba(255,255,255,0)');
                 ctx.fillStyle = glowGrad;
-                ctx.fillRect(x - size * 12, y - size * 12, size * 24, size * 24);
+                ctx.fillRect(x - size * 15, y - size * 15, size * 30, size * 30);
 
-                // ЧЁТКАЯ ПЯТИКОНЕЧНАЯ ЗВЕЗДА
                 ctx.save();
                 ctx.translate(x, y);
-                ctx.rotate(time * 0.02 + idx * 0.3);
+                ctx.rotate(time * 0.06 + idx * 0.25 + Math.sin(time * 0.2 + idx) * 0.1);
 
                 ctx.beginPath();
                 const spikes = 5;
                 const outerR = size;
-                const innerR = size * 0.4;
+                const innerR = size * 0.35;
                 for (let i = 0; i < spikes * 2; i++) {
                     const radius = i % 2 === 0 ? outerR : innerR;
                     const angle = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
@@ -1787,69 +1839,37 @@
                 }
                 ctx.closePath();
 
-                // Четкий контур
-                ctx.strokeStyle = `rgba(200,230,255,${0.5 * twinkle})`;
-                ctx.lineWidth = 1.5;
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = `rgba(180,210,255,0.3)`;
-                ctx.stroke();
-
-                // Бело-голубая заливка
-                const starGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
-                starGrad.addColorStop(0, `rgba(255,255,255,${0.95 * twinkle})`);
-                starGrad.addColorStop(0.3, `rgba(235,245,255,${0.8 * twinkle})`);
-                starGrad.addColorStop(0.6, `rgba(210,230,255,${0.6 * twinkle})`);
-                starGrad.addColorStop(0.85, `rgba(180,210,240,${0.4 * twinkle})`);
-                starGrad.addColorStop(1, `rgba(150,190,220,${0.2 * twinkle})`);
-                ctx.fillStyle = starGrad;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = `rgba(180,210,255,0.2)`;
+                const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+                grad.addColorStop(0, `rgba(255,255,255,${0.7 + 0.3 * twinkle})`);
+                grad.addColorStop(0.4, `rgba(220,240,255,${0.5 + 0.2 * twinkle})`);
+                grad.addColorStop(1, `rgba(180,210,240,${0.2 + 0.1 * twinkle})`);
+                ctx.fillStyle = grad;
+                ctx.shadowBlur = 50;
+                ctx.shadowColor = 'rgba(200,230,255,0.2)';
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Внутренний блеск
-                const innerGlow = ctx.createRadialGradient(-size * 0.15, -size * 0.2, 0, 0, 0, size * 0.5);
-                innerGlow.addColorStop(0, `rgba(255,255,255,${0.6 * twinkle})`);
-                innerGlow.addColorStop(0.5, `rgba(230,245,255,${0.2 * twinkle})`);
-                innerGlow.addColorStop(1, 'rgba(255,255,255,0)');
-                ctx.fillStyle = innerGlow;
+                const innerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.5);
+                innerGrad.addColorStop(0, `rgba(255,255,255,${0.8 + 0.2 * twinkle})`);
+                innerGrad.addColorStop(1, 'rgba(200,230,255,0)');
+                ctx.fillStyle = innerGrad;
                 ctx.beginPath();
                 ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Блик
                 ctx.beginPath();
-                ctx.ellipse(-size * 0.3, -size * 0.4, size * 0.2, size * 0.08, -0.5, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255,255,255,${0.4 * twinkle})`;
+                ctx.ellipse(-size * 0.2, -size * 0.3, size * 0.15, size * 0.08, -0.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,255,255,${0.3 + 0.2 * twinkle})`;
                 ctx.fill();
 
                 ctx.restore();
 
-                // Маленькие искорки
-                for (let i = 0; i < 2; i++) {
-                    const sparkAngle = time * 0.2 + i * 2.5 + idx * 0.5;
-                    const sparkDist = size * (0.8 + 0.3 * Math.sin(time * 0.15 + i * 1.5 + idx));
-                    const sx = x + Math.cos(sparkAngle) * sparkDist;
-                    const sy = y + Math.sin(sparkAngle) * sparkDist;
-                    const sparkSize = 1.5 + 2 * Math.sin(time * 0.4 + i * 2.0 + idx);
-                    ctx.beginPath();
-                    ctx.arc(sx, sy, sparkSize * 0.5, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(200,230,255,${0.2 * twinkle})`;
-                    ctx.shadowBlur = 8;
-                    ctx.shadowColor = 'rgba(180,210,255,0.15)';
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
-
-                // Текст заметки
                 if (star.note) {
-                    ctx.save();
-                    ctx.fillStyle = `rgba(200,220,255,${0.08 * twinkle})`;
+                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
                     ctx.font = '10px system-ui';
                     ctx.textAlign = 'center';
-                    const displayNote = star.note.length > 18 ? star.note.slice(0, 18) + '…' : star.note;
-                    ctx.fillText(displayNote, x, y + size + 20);
-                    ctx.restore();
+                    const displayNote = star.note.length > 15 ? star.note.slice(0, 15) + '…' : star.note;
+                    ctx.fillText(displayNote, x, y + size + 18);
                 }
             });
 
@@ -1859,10 +1879,10 @@
         }
 
         // =================================================================
-        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ (ЭФФЕКТ КАПЛИ В ВОДЕ)
+        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ
         // =================================================================
         function updateStarCounter() {
-            document.getElementById('starCounter').textContent = `✦ ${stars.length}`;
+            document.getElementById('starCounter').textContent = `⭐ ${stars.length}`;
         }
 
         function getStarPositions() {
@@ -1880,11 +1900,11 @@
         document.getElementById('starBtn').addEventListener('click', function() {
             if (!currentDateStr) return;
             if (stars.length >= MAX_STARS) {
-                alert(`Можно добавить максимум ${MAX_STARS} звёзд ✦`);
+                alert(`Можно добавить максимум ${MAX_STARS} звёзд ✨`);
                 return;
             }
             const note = document.getElementById('noteInput').value.trim();
-            if (!note) { alert('Напиши заметку для звезды ✦'); return; }
+            if (!note) { alert('Напиши заметку для звезды ✨'); return; }
 
             const data = getDayData(currentDateStr);
             if (!data.stars) data.stars = [];
@@ -1918,55 +1938,48 @@
             saveData();
             updateStarCounter();
             renderCalendar();
-            createWaterDropEffect(x, y);
+            createCrystalAppearance(x, y);
             document.getElementById('noteInput').value = '';
             data.note = '';
             saveData();
         });
 
-        // Эффект "капли упавшей в воду"
-        function createWaterDropEffect(x, y) {
-            for (let ring = 0; ring < 3; ring++) {
-                setTimeout(() => {
-                    const ripple = document.createElement('div');
-                    const size = 20 + ring * 40;
-                    ripple.style.cssText = `
-                        position: fixed; left: ${x - size/2}px; top: ${y - size/2}px;
-                        width: ${size}px; height: ${size}px;
-                        border: 1.5px solid rgba(200,230,255,${0.25 - ring * 0.06});
-                        border-radius: 50%;
-                        pointer-events: none; z-index: 2000;
-                        transform: scale(0.3);
-                        opacity: 0.8;
-                        animation: waterDropRipple ${0.8 + ring * 0.2}s ease-out forwards;
-                    `;
-                    document.body.appendChild(ripple);
-                    setTimeout(() => ripple.remove(), 1500);
-                }, ring * 80);
-            }
+        function createCrystalAppearance(x, y) {
+            const ripple = document.createElement('div');
+            ripple.style.cssText = `
+                position: fixed; left: ${x-80}px; top: ${y-80}px;
+                width: 160px; height: 160px;
+                border: 1px solid rgba(200,230,255,0.10);
+                border-radius: 50%;
+                pointer-events: none; z-index: 2000;
+                transform: scale(0);
+                animation: rippleCrystal 1s ease-out forwards;
+            `;
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 1100);
 
             const flash = document.createElement('div');
             flash.style.cssText = `
-                position: fixed; left: ${x-30}px; top: ${y-30}px;
-                width: 60px; height: 60px;
+                position: fixed; left: ${x-50}px; top: ${y-50}px;
+                width: 100px; height: 100px;
                 border-radius: 50%;
-                background: radial-gradient(circle, rgba(200,230,255,0.2) 0%, rgba(200,230,255,0.05) 50%, transparent 80%);
+                background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(200,230,255,0.05) 40%, transparent 70%);
                 pointer-events: none; z-index: 2000;
                 transform: scale(0);
-                animation: waterDropFlash 0.6s ease-out forwards;
+                animation: flashCrystal 0.8s ease-out forwards;
             `;
             document.body.appendChild(flash);
-            setTimeout(() => flash.remove(), 800);
+            setTimeout(() => flash.remove(), 900);
 
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 15; i++) {
                 const spark = document.createElement('div');
                 const angle = Math.random() * Math.PI * 2;
-                const dist = 20 + Math.random() * 40;
+                const dist = 40 + Math.random() * 80;
                 const dx = Math.cos(angle) * dist;
-                const dy = Math.sin(angle) * dist - 15;
-                const size = 2 + Math.random() * 3;
-                const colors = ['#c8e6ff', '#b0d4ff', '#ffffff', '#e0f0ff'];
-                const color = colors[Math.floor(Math.random() * colors.length)];
+                const dy = Math.sin(angle) * dist;
+                const size = 2 + Math.random() * 4;
+                const hue = 200 + Math.random() * 40;
+                const color = `hsl(${hue}, 70%, ${70 + Math.random() * 30}%)`;
                 spark.style.cssText = `
                     position: fixed; left: ${x}px; top: ${y}px;
                     width: ${size}px; height: ${size}px;
@@ -1974,27 +1987,29 @@
                     background: ${color};
                     box-shadow: 0 0 10px ${color};
                     pointer-events: none; z-index: 2000;
-                    transition: all 0.7s cubic-bezier(0.2, 0.9, 0.4, 1);
-                    opacity: 0.7;
+                    transition: all 0.8s ease-out;
+                    opacity: 0.6;
                 `;
                 document.body.appendChild(spark);
                 requestAnimationFrame(() => {
                     spark.style.transform = `translate(${dx}px, ${dy}px) scale(0)`;
                     spark.style.opacity = '0';
                 });
-                setTimeout(() => spark.remove(), 800);
+                setTimeout(() => spark.remove(), 900);
             }
 
-            if (!document.getElementById('waterDropStyles')) {
+            if (!document.getElementById('crystalStyles')) {
                 const style = document.createElement('style');
-                style.id = 'waterDropStyles';
+                style.id = 'crystalStyles';
                 style.textContent = `
-                    @keyframes waterDropRipple {
-                        0% { transform: scale(0.3); opacity: 0.8; }
-                        100% { transform: scale(4); opacity: 0; }
-                    }
-                    @keyframes waterDropFlash {
+                    @keyframes rippleCrystal {
                         0% { transform: scale(0); opacity: 1; }
+                        60% { transform: scale(1.4); opacity: 0.5; }
+                        100% { transform: scale(2); opacity: 0; }
+                    }
+                    @keyframes flashCrystal {
+                        0% { transform: scale(0); opacity: 1; }
+                        50% { transform: scale(1.8); opacity: 0.6; }
                         100% { transform: scale(3); opacity: 0; }
                     }
                 `;
@@ -2003,46 +2018,32 @@
         }
 
         // =================================================================
-        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ (МЕДЛЕННОЕ РАСТВОРЕНИЕ)
+        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ
         // =================================================================
         function deleteStar(star) {
-            const dissolve = document.createElement('div');
-            dissolve.style.cssText = `
-                position: fixed; left: ${star.x-80}px; top: ${star.y-80}px;
-                width: 160px; height: 160px;
+            const mist = document.createElement('div');
+            mist.style.cssText = `
+                position: fixed; left: ${star.x-100}px; top: ${star.y-100}px;
+                width: 200px; height: 200px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(200,230,255,0.08) 0%, rgba(150,200,255,0.04) 30%, transparent 70%);
                 pointer-events: none; z-index: 2000;
-                animation: starDissolve 1.8s ease-out forwards;
+                transform: scale(0.5);
+                opacity: 0;
+                animation: mistCrystal 1s ease-out forwards;
             `;
-            
-            for (let i = 0; i < 5; i++) {
-                const ring = document.createElement('div');
-                const size = 30 + i * 25;
-                const delay = i * 0.15;
-                ring.style.cssText = `
-                    position: absolute; left: ${50 - size/2}%; top: ${50 - size/2}%;
-                    width: ${size}%; height: ${size}%;
-                    border-radius: 50%;
-                    background: radial-gradient(circle, rgba(200,230,255,${0.06 - i * 0.01}) 0%, transparent 70%);
-                    animation: dissolveRing 1.8s ease-out forwards;
-                    animation-delay: ${delay}s;
-                    transform: scale(0.5);
-                    opacity: 0.6;
-                `;
-                dissolve.appendChild(ring);
-            }
-            document.body.appendChild(dissolve);
-            setTimeout(() => dissolve.remove(), 2000);
+            document.body.appendChild(mist);
+            setTimeout(() => mist.remove(), 1100);
 
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 25; i++) {
                 const particle = document.createElement('div');
-                const angle = Math.random() * Math.PI * 2;
-                const dist = 30 + Math.random() * 120;
-                const dx = Math.cos(angle) * dist;
-                const dy = Math.sin(angle) * dist - 30;
+                const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.0;
+                const speed = 60 + Math.random() * 120;
+                const dx = Math.cos(angle) * speed;
+                const dy = Math.sin(angle) * speed - 60;
                 const size = 2 + Math.random() * 4;
-                const colors = ['#c8e6ff', '#b0d4ff', '#ffffff', '#e0f0ff', '#d0e8ff'];
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                const duration = 1.2 + Math.random() * 0.8;
+                const hue = 190 + Math.random() * 40;
+                const color = `hsl(${hue}, 60%, ${70 + Math.random() * 30}%)`;
                 particle.style.cssText = `
                     position: fixed; left: ${star.x}px; top: ${star.y}px;
                     width: ${size}px; height: ${size}px;
@@ -2050,15 +2051,15 @@
                     background: ${color};
                     box-shadow: 0 0 15px ${color};
                     pointer-events: none; z-index: 2000;
-                    transition: all ${duration}s cubic-bezier(0.3, 0.8, 0.4, 1);
-                    opacity: 0.5;
+                    transition: all 1s cubic-bezier(0.2, 0.9, 0.4, 1);
+                    opacity: 0.6;
                 `;
                 document.body.appendChild(particle);
                 requestAnimationFrame(() => {
-                    particle.style.transform = `translate(${dx}px, ${dy}px) scale(0.1)`;
+                    particle.style.transform = `translate(${dx}px, ${dy}px) scale(0)`;
                     particle.style.opacity = '0';
                 });
-                setTimeout(() => particle.remove(), duration * 1000 + 200);
+                setTimeout(() => particle.remove(), 1200);
             }
 
             const data = getDayData(currentDateStr);
@@ -2069,17 +2070,14 @@
             renderCalendar();
             longPressTarget = null;
 
-            if (!document.getElementById('dissolveStyles')) {
+            if (!document.getElementById('mistCrystalStyles')) {
                 const style = document.createElement('style');
-                style.id = 'dissolveStyles';
+                style.id = 'mistCrystalStyles';
                 style.textContent = `
-                    @keyframes starDissolve {
-                        0% { transform: scale(0.8); opacity: 1; }
-                        100% { transform: scale(2.5); opacity: 0; }
-                    }
-                    @keyframes dissolveRing {
-                        0% { transform: scale(0.5); opacity: 0.6; }
-                        100% { transform: scale(3); opacity: 0; }
+                    @keyframes mistCrystal {
+                        0% { transform: scale(0.5); opacity: 0; }
+                        30% { transform: scale(1.2); opacity: 0.5; }
+                        100% { transform: scale(2.2); opacity: 0; }
                     }
                 `;
                 document.head.appendChild(style);
@@ -2183,7 +2181,7 @@
             content.style.removeProperty('--wave-glow');
             content.classList.remove('wave-color');
             if (type === 'star' && data) {
-                title.textContent = '✦ Особенный момент';
+                title.textContent = '⭐ Особенный момент';
                 textarea.value = data.note || '';
             } else if (type === 'state' && stateId) {
                 const st = STATES.find(s => s.id === stateId);
@@ -2243,6 +2241,7 @@
         document.getElementById('waveDate').addEventListener('mousedown', function() {
             resetPressTimer = setTimeout(() => {
                 if (currentDateStr && !isResetInProgress) {
+                    soundReset();
                     if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
                         resetDay();
                     }
@@ -2261,6 +2260,7 @@
         document.getElementById('waveDate').addEventListener('touchstart', function(e) {
             resetPressTimer = setTimeout(() => {
                 if (currentDateStr && !isResetInProgress) {
+                    soundReset();
                     if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
                         resetDay();
                     }
@@ -2309,6 +2309,7 @@
                 const container = document.getElementById('waveContainer');
                 container.style.background = 'rgba(0,0,0,0.10)';
                 container.style.boxShadow = 'none';
+                stopAllSounds();
                 isResetInProgress = false;
             }, 1200);
         }
@@ -2324,6 +2325,7 @@
             document.getElementById('backBtn').classList.remove('visible');
             if (animationId) cancelAnimationFrame(animationId);
             setMoodEffect(0);
+            stopAllSounds();
             renderCalendar();
         });
 
@@ -2364,12 +2366,31 @@
         });
 
         // =================================================================
-        // 18. ИНИЦИАЛИЗАЦИЯ
+        // 18. ЗАПУСК ПЕСНИ И ИНИЦИАЛИЗАЦИЯ
         // =================================================================
+        function startBackgroundMusic() {
+            try {
+                const audio = document.getElementById('bgMusic');
+                if (audio) {
+                    audio.volume = 0.4;
+                    audio.play().catch(e => {
+                        console.log('Автозапуск музыки заблокирован, ожидаем взаимодействия');
+                        // При первом клике пользователя запустим музыку
+                        document.addEventListener('click', function playOnClick() {
+                            audio.play().catch(() => {});
+                            document.removeEventListener('click', playOnClick);
+                        }, { once: true });
+                    });
+                }
+            } catch (e) {}
+        }
+
         loadData();
         renderCalendar();
         initBgCanvas();
-        initMusic();
+
+        // Запускаем песню после загрузки
+        setTimeout(startBackgroundMusic, 100);
 
         window.addEventListener('resize', function() {
             if (canvas) resizeCanvas();
@@ -2383,8 +2404,7 @@
             }
         } catch (e) {}
 
-        console.log('📅 Календарь настроения загружен!');
-        console.log('🎵 Фоновая музыка: watching the sky - foreveralone');
+        console.log('💎 Хрустальный дневник загружен!');
         console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
     </script>
 </body>
