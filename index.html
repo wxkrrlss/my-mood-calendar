@@ -26,6 +26,7 @@
             touch-action: none;
             position: relative;
             overflow-x: hidden;
+            overflow-y: auto;
         }
         body::before {
             content: '';
@@ -34,7 +35,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(ellipse at 20% 40%, rgba(140, 200, 255, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 60%, rgba(200, 160, 255, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(100, 180, 255, 0.10) 0%, transparent 50%), radial-gradient(ellipse at 10% 20%, rgba(220, 240, 255, 0.08) 0%, transparent 40%), radial-gradient(ellipse at 90% 30%, rgba(160, 190, 255, 0.12) 0%, transparent 40%);
+            background: radial-gradient(ellipse at 20% 40%, rgba(140, 200, 255, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 60%, rgba(200, 160, 255, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(100, 180, 255, 0.10) 0%, transparent 50%);
             animation: auroraBg 20s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
@@ -58,7 +59,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: radial-gradient(1px 1px at 15% 25%, rgba(255, 255, 255, 0.3), transparent), radial-gradient(1px 1px at 35% 65%, rgba(255, 255, 255, 0.2), transparent), radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.35), transparent), radial-gradient(1px 1px at 85% 75%, rgba(255, 255, 255, 0.15), transparent), radial-gradient(1px 1px at 5% 85%, rgba(255, 255, 255, 0.25), transparent);
+            background-image: radial-gradient(1px 1px at 15% 25%, rgba(255, 255, 255, 0.3), transparent), radial-gradient(1px 1px at 35% 65%, rgba(255, 255, 255, 0.2), transparent), radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.35), transparent);
             background-size: 300px 300px;
             opacity: 0.5;
             animation: starBg 7s ease-in-out infinite alternate;
@@ -90,7 +91,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(ellipse at 20% 40%, rgba(140, 200, 255, 0.20) 0%, transparent 50%), radial-gradient(ellipse at 80% 60%, rgba(200, 160, 255, 0.18) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(100, 180, 255, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 10% 20%, rgba(220, 240, 255, 0.12) 0%, transparent 40%);
+            background: radial-gradient(ellipse at 20% 40%, rgba(140, 200, 255, 0.20) 0%, transparent 50%), radial-gradient(ellipse at 80% 60%, rgba(200, 160, 255, 0.18) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(100, 180, 255, 0.15) 0%, transparent 50%);
             animation: aurora 18s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
@@ -357,19 +358,26 @@
             -webkit-user-select: none;
             touch-action: none;
         }
+
+        /* Блики на фоне */
         .lens-flare {
             position: fixed;
             border-radius: 50%;
             pointer-events: none;
             z-index: 0;
             mix-blend-mode: screen;
-            opacity: 0.3;
+            opacity: 0;
+            transition: opacity 1.2s ease, transform 1.2s ease, background 1.2s ease;
             animation: flareMove 12s ease-in-out infinite alternate;
+        }
+        .lens-flare.show {
+            opacity: 0.4;
         }
         @keyframes flareMove {
             0% { transform: translate(0, 0) scale(1); }
             100% { transform: translate(10%, -5%) scale(1.2); }
         }
+
         .top-bar {
             position: fixed;
             top: 16px;
@@ -986,10 +994,12 @@
     <!-- ===== ХОЛСТ ===== -->
     <div id="waveContainer">
         <div class="fog-overlay" id="fogOverlay"></div>
-        <div class="lens-flare" style="top:10%;left:5%;width:300px;height:300px;background:radial-gradient(circle,rgba(180,210,255,0.15),transparent 70%);animation-delay:0s;"></div>
-        <div class="lens-flare" style="bottom:20%;right:10%;width:200px;height:200px;background:radial-gradient(circle,rgba(200,180,255,0.10),transparent 70%);animation-delay:2s;"></div>
-        <div class="lens-flare" style="top:40%;left:60%;width:150px;height:150px;background:radial-gradient(circle,rgba(180,220,255,0.12),transparent 70%);animation-delay:4s;"></div>
-        <div class="lens-flare" style="bottom:50%;left:10%;width:180px;height:180px;background:radial-gradient(circle,rgba(200,200,255,0.08),transparent 70%);animation-delay:1s;"></div>
+
+        <!-- Блики на фоне (динамически меняются) -->
+        <div class="lens-flare" id="flare1" style="top:10%;left:5%;width:300px;height:300px;background:radial-gradient(circle,rgba(180,210,255,0.4),transparent 70%);animation-delay:0s;"></div>
+        <div class="lens-flare" id="flare2" style="bottom:20%;right:10%;width:200px;height:200px;background:radial-gradient(circle,rgba(200,180,255,0.3),transparent 70%);animation-delay:2s;"></div>
+        <div class="lens-flare" id="flare3" style="top:40%;left:60%;width:150px;height:150px;background:radial-gradient(circle,rgba(180,220,255,0.3),transparent 70%);animation-delay:4s;"></div>
+        <div class="lens-flare" id="flare4" style="bottom:50%;left:10%;width:180px;height:180px;background:radial-gradient(circle,rgba(200,200,255,0.2),transparent 70%);animation-delay:1s;"></div>
 
         <div class="top-bar">
             <button class="back-btn" id="backBtn">←</button>
@@ -1072,12 +1082,38 @@
             { id: 'комфорт', label: '🌿 Комфорт', color: '#2ed573' }
         ];
 
+        // Цвета фона для оценок (без градиента)
         const MOOD_COLORS = {
             1: { bg: '#0a0a2a', glow: 'rgba(5,10,50,0.95)' },
             2: { bg: '#1a2a4a', glow: 'rgba(30,60,120,0.8)' },
             3: { bg: '#4a4a55', glow: 'rgba(100,100,120,0.5)' },
             4: { bg: '#2a1520', glow: 'rgba(160,60,90,0.6)' },
             5: { bg: '#d0d8e8', glow: 'rgba(200,220,255,0.4)' }
+        };
+
+        // Блики для каждой оценки
+        const FLARE_COLORS = {
+            1: [
+                'rgba(100,150,255,0.3)', 'rgba(80,120,220,0.2)',
+                'rgba(60,100,200,0.2)', 'rgba(120,170,255,0.15)'
+            ],
+            2: [
+                'rgba(150,200,255,0.3)', 'rgba(100,180,255,0.25)',
+                'rgba(200,230,255,0.2)', 'rgba(120,210,255,0.15)'
+            ],
+            3: [
+                'rgba(200,200,220,0.2)', 'rgba(180,180,200,0.15)',
+                'rgba(220,220,240,0.15)', 'rgba(160,160,180,0.1)'
+            ],
+            4: [
+                'rgba(255,150,180,0.25)', 'rgba(220,120,160,0.2)',
+                'rgba(255,180,200,0.15)', 'rgba(200,100,140,0.15)'
+            ],
+            5: [
+                'rgba(255,200,220,0.25)', 'rgba(200,220,255,0.25)',
+                'rgba(255,220,200,0.2)', 'rgba(220,255,240,0.2)',
+                'rgba(255,200,240,0.15)', 'rgba(200,240,255,0.15)'
+            ]
         };
 
         let moodData = {};
@@ -1277,6 +1313,7 @@
             } else {
                 container.style.background = '#2a2a30';
                 container.style.boxShadow = 'none';
+                updateFlares(0);
             }
 
             canvas = document.getElementById('waveCanvas');
@@ -1303,6 +1340,34 @@
             } else {
                 container.style.boxShadow = `inset 0 0 150px ${color.glow}`;
             }
+            updateFlares(mood);
+        }
+
+        // ===================================================================
+        // ОБНОВЛЕНИЕ БЛИКОВ
+        // ===================================================================
+
+        function updateFlares(mood) {
+            const flares = [
+                document.getElementById('flare1'),
+                document.getElementById('flare2'),
+                document.getElementById('flare3'),
+                document.getElementById('flare4')
+            ];
+
+            if (mood === 0) {
+                flares.forEach(f => {
+                    f.classList.remove('show');
+                });
+                return;
+            }
+
+            const colors = FLARE_COLORS[mood] || FLARE_COLORS[3];
+            flares.forEach((flare, index) => {
+                const color = colors[index % colors.length] || 'rgba(255,255,255,0.1)';
+                flare.style.background = `radial-gradient(circle, ${color}, transparent 70%)`;
+                flare.classList.add('show');
+            });
         }
 
         // ===================================================================
@@ -1342,6 +1407,7 @@
             const container = document.getElementById('waveContainer');
             container.style.background = '#2a2a30';
             container.style.boxShadow = 'none';
+            updateFlares(0);
             document.querySelectorAll('.mood-select-btn').forEach(btn => {
                 btn.classList.toggle('selected', parseInt(btn.dataset.mood) === selectedMood);
             });
@@ -1360,8 +1426,34 @@
         }
 
         // ===================================================================
-        // АНИМАЦИЯ ВОЛН
+        // АНИМАЦИЯ ВОЛН (С ПЛАВНЫМ ПОЯВЛЕНИЕМ/ИСЧЕЗНОВЕНИЕМ)
         // ===================================================================
+
+        // Состояния волн для анимации
+        let waveStates = {};
+
+        function getWaveState(emotionId) {
+            if (!waveStates[emotionId]) {
+                waveStates[emotionId] = {
+                    targetAmp: 0,
+                    currentAmp: 0,
+                    targetAlpha: 0,
+                    currentAlpha: 0,
+                };
+            }
+            return waveStates[emotionId];
+        }
+
+        function setWaveTarget(emotionId, active) {
+            const state = getWaveState(emotionId);
+            if (active) {
+                state.targetAmp = 30 + Math.random() * 5;
+                state.targetAlpha = 0.5 + Math.random() * 0.15;
+            } else {
+                state.targetAmp = 0;
+                state.targetAlpha = 0;
+            }
+        }
 
         function animateWaves() {
             if (!canvas || !ctx) return;
@@ -1374,6 +1466,7 @@
             const mood = getDayData(currentDateStr).mood || 0;
             const color = MOOD_COLORS[mood] || MOOD_COLORS[3];
 
+            // Фоновое свечение (без градиента)
             if (mood === 5) {
                 const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.8);
                 grad.addColorStop(0, 'rgba(255,240,250,0.25)');
@@ -1391,62 +1484,94 @@
                 ctx.fillRect(0, 0, w, h);
             }
 
-            if (selectedEmotions.length > 0) {
-                selectedEmotions.forEach((emotionId, index) => {
-                    const em = EMOTIONS.find(e => e.id === emotionId);
-                    if (!em) return;
-                    const color = em.color;
-                    const offset = (index - (selectedEmotions.length - 1) / 2) * 45;
-                    const baseAmp = 30 + Math.sin(time * 0.25 + index * 1.3) * 10;
-                    const freq = 0.018 + index * 0.003;
-                    const speed = 1.2 + index * 0.15;
+            // Плавное обновление состояний волн
+            const activeEmotions = selectedEmotions;
+            // Устанавливаем цели для активных эмоций
+            EMOTIONS.forEach(em => {
+                const isActive = activeEmotions.includes(em.id);
+                setWaveTarget(em.id, isActive);
+            });
 
-                    ctx.beginPath();
-                    ctx.moveTo(0, h / 2 + offset);
-                    for (let x = 0; x <= w; x += 2) {
-                        const y = h / 2 + offset +
-                            Math.sin(x * freq + time * speed + index * 1.1) * baseAmp +
-                            Math.sin(x * freq * 0.6 + time * 0.7 + index * 2.2) * baseAmp * 0.5 +
-                            Math.sin(x * freq * 1.8 + time * 2.0 + index * 0.5) * baseAmp * 0.2;
-                        ctx.lineTo(x, y);
-                    }
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = 3.0 + Math.sin(time * 0.3 + index) * 0.8;
-                    ctx.globalAlpha = 0.5 + Math.sin(time * 0.4 + index * 1.0) * 0.15;
-                    ctx.shadowBlur = 40;
-                    ctx.shadowColor = color;
-                    ctx.stroke();
+            // Рисуем волны
+            let hasActiveWaves = false;
+            EMOTIONS.forEach((em, index) => {
+                const state = waveStates[em.id];
+                if (!state) return;
 
-                    ctx.beginPath();
-                    ctx.moveTo(0, h / 2 + offset + 18 + Math.sin(time * 0.2 + index) * 8);
-                    for (let x = 0; x <= w; x += 3) {
-                        const y = h / 2 + offset + 18 + Math.sin(time * 0.2 + index) * 8 +
-                            Math.sin(x * freq * 0.7 + time * 0.9 + index * 1.8) * baseAmp * 0.6 +
-                            Math.sin(x * freq * 0.4 + time * 0.5 + index * 2.8) * baseAmp * 0.3;
-                        ctx.lineTo(x, y);
-                    }
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = 1.5;
-                    ctx.globalAlpha = 0.15;
-                    ctx.shadowBlur = 20;
-                    ctx.shadowColor = color;
-                    ctx.stroke();
+                // Плавная интерполяция
+                state.currentAmp += (state.targetAmp - state.currentAmp) * 0.08;
+                state.currentAlpha += (state.targetAlpha - state.currentAlpha) * 0.08;
 
-                    ctx.beginPath();
-                    ctx.moveTo(0, h / 2 + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6);
-                    for (let x = 0; x <= w; x += 4) {
-                        const y = h / 2 + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6 +
-                            Math.sin(x * freq * 0.5 + time * 0.6 + index * 1.5) * baseAmp * 0.3;
-                        ctx.lineTo(x, y);
-                    }
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = 1.0;
-                    ctx.globalAlpha = 0.08;
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = color;
-                    ctx.stroke();
-                });
-            } else {
+                // Защита от бесконечного приближения
+                if (Math.abs(state.currentAmp - state.targetAmp) < 0.01) {
+                    state.currentAmp = state.targetAmp;
+                }
+                if (Math.abs(state.currentAlpha - state.targetAlpha) < 0.001) {
+                    state.currentAlpha = state.targetAlpha;
+                }
+
+                const currentAmp = state.currentAmp;
+                const currentAlpha = state.currentAlpha;
+
+                if (currentAmp < 0.5 || currentAlpha < 0.01) return;
+                hasActiveWaves = true;
+
+                const color = em.color;
+                const offset = (index - (EMOTIONS.length - 1) / 2) * 45;
+                const baseAmp = currentAmp + Math.sin(time * 0.25 + index * 1.3) * 8;
+                const freq = 0.018 + index * 0.003;
+                const speed = 1.2 + index * 0.15;
+
+                // Основная волна
+                ctx.beginPath();
+                ctx.moveTo(0, h / 2 + offset);
+                for (let x = 0; x <= w; x += 2) {
+                    const y = h / 2 + offset +
+                        Math.sin(x * freq + time * speed + index * 1.1) * baseAmp +
+                        Math.sin(x * freq * 0.6 + time * 0.7 + index * 2.2) * baseAmp * 0.5 +
+                        Math.sin(x * freq * 1.8 + time * 2.0 + index * 0.5) * baseAmp * 0.2;
+                    ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3.0 + Math.sin(time * 0.3 + index) * 0.8;
+                ctx.globalAlpha = currentAlpha * (0.5 + Math.sin(time * 0.4 + index * 1.0) * 0.15);
+                ctx.shadowBlur = 40;
+                ctx.shadowColor = color;
+                ctx.stroke();
+
+                // Слой 2
+                ctx.beginPath();
+                ctx.moveTo(0, h / 2 + offset + 18 + Math.sin(time * 0.2 + index) * 8);
+                for (let x = 0; x <= w; x += 3) {
+                    const y = h / 2 + offset + 18 + Math.sin(time * 0.2 + index) * 8 +
+                        Math.sin(x * freq * 0.7 + time * 0.9 + index * 1.8) * baseAmp * 0.6 +
+                        Math.sin(x * freq * 0.4 + time * 0.5 + index * 2.8) * baseAmp * 0.3;
+                    ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = currentAlpha * 0.15;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = color;
+                ctx.stroke();
+
+                // Слой 3
+                ctx.beginPath();
+                ctx.moveTo(0, h / 2 + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6);
+                for (let x = 0; x <= w; x += 4) {
+                    const y = h / 2 + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6 +
+                        Math.sin(x * freq * 0.5 + time * 0.6 + index * 1.5) * baseAmp * 0.3;
+                    ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.0;
+                ctx.globalAlpha = currentAlpha * 0.08;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = color;
+                ctx.stroke();
+            });
+
+            if (!hasActiveWaves && selectedEmotions.length === 0) {
                 ctx.fillStyle = 'rgba(255,255,255,0.06)';
                 ctx.font = '16px system-ui';
                 ctx.textAlign = 'center';
@@ -1456,6 +1581,7 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h / 2 + 24);
             }
 
+            // Звёзды
             stars.forEach((star, idx) => {
                 const twinkle = 0.6 + Math.sin(time * 1.8 + idx * 2.3) * 0.4;
                 const size = 10 + Math.sin(time * 1.2 + idx * 1.7) * 3;
@@ -1516,9 +1642,13 @@
             if (index > -1) {
                 selectedEmotions.splice(index, 1);
                 btn.classList.remove('selected');
+                // Устанавливаем цель для исчезновения
+                setWaveTarget(emotionId, false);
             } else if (selectedEmotions.length < 4) {
                 selectedEmotions.push(emotionId);
                 btn.classList.add('selected');
+                // Устанавливаем цель для появления
+                setWaveTarget(emotionId, true);
             } else {
                 alert('Можно выбрать максимум 4 состояния ✨');
                 return;
@@ -1532,9 +1662,20 @@
             }
         }
 
+        // Инициализация состояний волн при загрузке
+        function initWaveStates() {
+            EMOTIONS.forEach(em => {
+                const state = getWaveState(em.id);
+                state.currentAmp = 0;
+                state.targetAmp = 0;
+                state.currentAlpha = 0;
+                state.targetAlpha = 0;
+            });
+        }
+        initWaveStates();
+
         // ===================================================================
-        // ВЫБОР ОЦЕНКИ
-        // ===================================================================
+        // ВЫБОР ОЦЕНКИ        // ===================================================================
 
         document.querySelectorAll('.mood-select-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1938,6 +2079,15 @@
             updateStarCounter();
             renderCalendar();
 
+            // Сброс состояний волн
+            EMOTIONS.forEach(em => {
+                const state = getWaveState(em.id);
+                state.currentAmp = 0;
+                state.targetAmp = 0;
+                state.currentAlpha = 0;
+                state.targetAlpha = 0;
+            });
+
             setTimeout(() => {
                 fog.classList.remove('active');
                 document.getElementById('bottomPanel').classList.remove('active');
@@ -1949,6 +2099,7 @@
                 const container = document.getElementById('waveContainer');
                 container.style.background = '#2a2a30';
                 container.style.boxShadow = 'none';
+                updateFlares(0);
                 isResetInProgress = false;
             }, 1200);
         }
