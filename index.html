@@ -22,6 +22,8 @@
             padding: 16px;
             color: #e0e0e8;
             user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
             position: relative;
             overflow-x: hidden;
             overflow-y: auto;
@@ -84,6 +86,7 @@
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
             overflow: hidden;
             z-index: 1;
+            touch-action: none;
         }
         .calendar-wrapper::before {
             content: '';
@@ -141,6 +144,7 @@
             backdrop-filter: blur(8px);
             border-radius: 24px;
             padding: 16px;
+            touch-action: none;
         }
         .header {
             display: flex;
@@ -243,6 +247,9 @@
             position: relative;
             min-height: 38px;
             background: rgba(255, 255, 255, 0.03);
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         .day:active {
             transform: scale(0.92);
@@ -294,6 +301,8 @@
             font-weight: 500;
             position: relative;
             z-index: 2;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .day .star-indicator {
             position: absolute;
@@ -303,6 +312,8 @@
             color: #ffd700;
             text-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
             z-index: 2;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .day-wave-container {
             position: absolute;
@@ -320,6 +331,8 @@
             width: 3px;
             border-radius: 2px;
             animation: miniWaveAnim 2s ease-in-out infinite alternate;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .mini-wave:nth-child(odd) {
             animation-delay: 0.3s;
@@ -343,6 +356,9 @@
             overflow: hidden;
             opacity: 0;
             pointer-events: none;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
         #waveContainer.active {
             opacity: 1;
@@ -352,6 +368,9 @@
             width: 100%;
             height: 100%;
             display: block;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .lens-flare {
             position: fixed;
@@ -360,11 +379,14 @@
             z-index: 0;
             mix-blend-mode: screen;
             opacity: 0;
-            transition: opacity 1.2s ease, background 1.2s ease;
+            transition: opacity 1.2s ease, transform 1.2s ease, background 1.2s ease;
             animation: flareMove 12s ease-in-out infinite alternate;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .lens-flare.show {
-            opacity: 0.4;
+            opacity: 0.5;
         }
         @keyframes flareMove {
             0% { transform: translate(0, 0) scale(1); }
@@ -380,6 +402,9 @@
             justify-content: space-between;
             align-items: center;
             pointer-events: none;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .top-bar>* {
             pointer-events: auto;
@@ -399,6 +424,9 @@
             align-items: center;
             justify-content: center;
             z-index: 1002;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .back-btn:hover {
             background: rgba(255, 255, 255, 0.12);
@@ -425,6 +453,9 @@
             align-items: center;
             justify-content: center;
             z-index: 1002;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .close-btn:hover {
             background: rgba(255, 255, 255, 0.12);
@@ -438,6 +469,9 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .wave-date {
             position: fixed;
@@ -455,6 +489,9 @@
             border-radius: 14px;
             border: 1px solid rgba(255, 255, 255, 0.04);
             cursor: default;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         .wave-date:active {
             transform: translateX(-50%) scale(0.95);
@@ -479,6 +516,9 @@
             opacity: 0;
             transition: opacity 0.8s ease, transform 0.8s ease;
             transform: translateX(-50%) translateY(20px) scale(0.95);
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         #moodSelector.active {
             display: flex;
@@ -490,6 +530,8 @@
             font-size: 13px;
             text-align: center;
             letter-spacing: 0.3px;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .mood-select-buttons {
             display: flex;
@@ -512,6 +554,9 @@
             justify-content: center;
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(4px);
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         .mood-select-btn:hover {
             transform: scale(1.1);
@@ -539,6 +584,9 @@
             cursor: pointer;
             transition: 0.3s;
             margin-top: 4px;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         .mood-confirm-btn:hover {
             background: rgba(100, 150, 255, 0.25);
@@ -565,6 +613,9 @@
             opacity: 0;
             transition: opacity 0.8s ease, transform 0.8s ease;
             transform: translateX(-50%) translateY(20px) scale(0.95);
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         #bottomPanel.active {
             display: flex;
@@ -578,6 +629,8 @@
             letter-spacing: 0.3px;
             margin-bottom: 4px;
             animation: fadeFromFog 1s ease;
+            user-select: none;
+            -webkit-user-select: none;
         }
         @keyframes fadeFromFog {
             0% { opacity: 0;
@@ -600,6 +653,9 @@
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
             width: 100%;
             animation: fadeFromFog 1.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         .emotion-btn {
             padding: 4px 10px;
@@ -613,6 +669,9 @@
             background: rgba(255, 255, 255, 0.03);
             color: #fff;
             white-space: nowrap;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         .emotion-btn:hover {
             opacity: 0.6;
@@ -631,6 +690,9 @@
             flex-direction: column;
             gap: 6px;
             animation: fadeFromFog 1.4s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         #noteInput {
             width: 100%;
@@ -646,6 +708,9 @@
             min-height: 44px;
             transition: 0.3s;
             outline: none;
+            user-select: text;
+            -webkit-user-select: text;
+            touch-action: none;
         }
         #noteInput:focus {
             border-color: rgba(255, 255, 255, 0.15);
@@ -660,6 +725,9 @@
             align-items: center;
             gap: 12px;
             width: 100%;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         #starBtn {
             padding: 6px 16px;
@@ -675,6 +743,9 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         #starBtn:hover {
             background: rgba(255, 215, 0, 0.08);
@@ -687,12 +758,16 @@
         .star-counter {
             font-size: 12px;
             color: rgba(255, 255, 255, 0.2);
+            user-select: none;
+            -webkit-user-select: none;
         }
         .star-hint {
             font-size: 11px;
             color: rgba(255, 255, 255, 0.15);
             text-align: center;
             margin-top: -2px;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .note-editor {
             display: none;
@@ -708,6 +783,7 @@
             justify-content: center;
             padding: 24px;
             transition: opacity 0.4s ease;
+            touch-action: none;
         }
         .note-editor.active {
             display: flex;
@@ -723,6 +799,7 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
             animation: slideUp 0.3s ease;
             transition: border-color 0.5s ease, box-shadow 0.5s ease;
+            touch-action: none;
         }
         .note-editor-content.wave-color {
             border-color: var(--wave-color, rgba(255, 255, 255, 0.1));
@@ -748,6 +825,7 @@
             cursor: pointer;
             transition: 0.3s;
             padding: 4px;
+            touch-action: none;
         }
         .note-editor-back:hover {
             color: rgba(255, 255, 255, 0.8);
@@ -772,6 +850,9 @@
             outline: none;
             transition: 0.3s;
             line-height: 1.5;
+            user-select: text;
+            -webkit-user-select: text;
+            touch-action: none;
         }
         .note-editor-textarea:focus {
             border-color: rgba(255, 255, 255, 0.15);
@@ -789,6 +870,9 @@
             cursor: pointer;
             transition: 0.3s;
             margin-top: 10px;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         .note-editor-save:hover {
             background: rgba(100, 150, 255, 0.25);
@@ -809,6 +893,7 @@
             align-items: center;
             justify-content: center;
             padding: 24px;
+            touch-action: none;
         }
         .help-modal.active {
             display: flex;
@@ -825,6 +910,9 @@
             animation: slideUp 0.3s ease;
             max-height: 80vh;
             overflow-y: auto;
+            user-select: text;
+            -webkit-user-select: text;
+            touch-action: none;
         }
         .help-content h3 {
             color: #f0f0f8;
@@ -850,6 +938,9 @@
             cursor: pointer;
             transition: 0.3s;
             margin-top: 12px;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         .help-content .help-close:hover {
             background: rgba(255, 255, 255, 0.08);
@@ -865,6 +956,7 @@
             background: radial-gradient(ellipse at center, rgba(200, 220, 255, 0.5) 0%, rgba(150, 180, 200, 0.3) 30%, rgba(100, 120, 140, 0.15) 60%, transparent 80%);
             opacity: 0;
             transition: opacity 1.2s ease;
+            touch-action: none;
         }
         .fog-overlay.active {
             opacity: 1;
@@ -927,11 +1019,11 @@
         <div class="fog-overlay" id="fogOverlay"></div>
 
         <!-- Блики на фоне -->
-        <div class="lens-flare" id="flare1" style="top:5%;left:8%;width:350px;height:350px;animation-delay:0s;"></div>
-        <div class="lens-flare" id="flare2" style="bottom:25%;right:12%;width:250px;height:250px;animation-delay:2s;"></div>
+        <div class="lens-flare" id="flare1" style="top:5%;left:5%;width:350px;height:350px;animation-delay:0s;"></div>
+        <div class="lens-flare" id="flare2" style="bottom:15%;right:8%;width:250px;height:250px;animation-delay:2s;"></div>
         <div class="lens-flare" id="flare3" style="top:35%;left:55%;width:180px;height:180px;animation-delay:4s;"></div>
         <div class="lens-flare" id="flare4" style="bottom:45%;left:8%;width:200px;height:200px;animation-delay:1s;"></div>
-        <div class="lens-flare" id="flare5" style="top:60%;left:30%;width:120px;height:120px;animation-delay:3s;"></div>
+        <div class="lens-flare" id="flare5" style="top:60%;right:15%;width:150px;height:150px;animation-delay:3s;"></div>
 
         <div class="top-bar">
             <button class="back-btn" id="backBtn">←</button>
@@ -1021,21 +1113,32 @@
             5: { bg: '#d0d8e8', glow: 'rgba(200,220,255,0.4)' }
         };
 
+        // Блики для каждой оценки (более детальные)
         const FLARE_COLORS = {
-            1: ['rgba(80,130,255,0.25)', 'rgba(60,100,200,0.2)', 'rgba(120,170,255,0.15)', 'rgba(40,80,180,0.15)',
-                'rgba(100,150,255,0.1)'
+            1: [
+                'rgba(80,150,255,0.3)', 'rgba(60,120,220,0.25)',
+                'rgba(40,100,200,0.2)', 'rgba(120,180,255,0.2)',
+                'rgba(20,80,180,0.15)'
             ],
-            2: ['rgba(130,190,255,0.25)', 'rgba(100,180,255,0.2)', 'rgba(180,220,255,0.15)', 'rgba(80,160,255,0.15)',
-                'rgba(150,210,255,0.1)'
+            2: [
+                'rgba(150,210,255,0.35)', 'rgba(100,190,255,0.25)',
+                'rgba(200,235,255,0.2)', 'rgba(120,220,255,0.2)',
+                'rgba(180,240,255,0.15)'
             ],
-            3: ['rgba(200,200,220,0.2)', 'rgba(180,180,200,0.15)', 'rgba(220,220,240,0.15)', 'rgba(160,160,180,0.1)',
-                'rgba(210,210,230,0.1)'
+            3: [
+                'rgba(210,210,230,0.25)', 'rgba(190,190,210,0.2)',
+                'rgba(230,230,245,0.15)', 'rgba(170,170,190,0.15)',
+                'rgba(200,200,220,0.1)'
             ],
-            4: ['rgba(255,140,170,0.25)', 'rgba(220,120,160,0.2)', 'rgba(255,170,190,0.15)', 'rgba(200,100,140,0.15)',
-                'rgba(230,150,180,0.1)'
+            4: [
+                'rgba(255,160,190,0.3)', 'rgba(230,130,170,0.25)',
+                'rgba(255,190,210,0.2)', 'rgba(210,110,150,0.2)',
+                'rgba(255,140,180,0.15)'
             ],
-            5: ['rgba(255,200,220,0.25)', 'rgba(200,220,255,0.25)', 'rgba(255,220,200,0.2)', 'rgba(220,255,240,0.2)',
-                'rgba(200,200,255,0.15)', 'rgba(255,200,200,0.15)'
+            5: [
+                'rgba(255,210,230,0.3)', 'rgba(210,230,255,0.3)',
+                'rgba(255,230,210,0.25)', 'rgba(230,255,245,0.25)',
+                'rgba(255,210,245,0.2)', 'rgba(210,245,255,0.2)'
             ]
         };
 
@@ -1330,7 +1433,7 @@
         }
 
         // ===================================================================
-        // АНИМАЦИЯ ВОЛН (СМЕЩЕНА ВВЕРХ)
+        // АНИМАЦИЯ ВОЛН (ВСЕ НА ОДНОМ УРОВНЕ)
         // ===================================================================
 
         function animateWaves() {
@@ -1360,10 +1463,8 @@
                 ctx.fillRect(0, 0, w, h);
             }
 
+            // Все волны на одном уровне (центр)
             let hasActiveWaves = false;
-            // Смещаем волны выше — центр на 30% от верха, чтобы не перекрывались кнопками
-            const centerY = h * 0.30;
-
             EMOTIONS.forEach((em, index) => {
                 const state = waveStates[em.id];
                 if (!state) return;
@@ -1378,15 +1479,16 @@
                 hasActiveWaves = true;
 
                 const color = em.color;
-                const offset = (index - (EMOTIONS.length - 1) / 2) * 40;
+                // Все волны центрированы: смещение = (индекс - 1.5) * 12
+                const offset = (index - (EMOTIONS.length - 1) / 2) * 12;
                 const baseAmp = currentAmp + Math.sin(time * 0.25 + index * 1.3) * 8;
                 const freq = 0.018 + index * 0.003;
                 const speed = 1.2 + index * 0.15;
 
                 ctx.beginPath();
-                ctx.moveTo(0, centerY + offset);
+                ctx.moveTo(0, h / 2 + offset);
                 for (let x = 0; x <= w; x += 2) {
-                    const y = centerY + offset +
+                    const y = h / 2 + offset +
                         Math.sin(x * freq + time * speed + index * 1.1) * baseAmp +
                         Math.sin(x * freq * 0.6 + time * 0.7 + index * 2.2) * baseAmp * 0.5 +
                         Math.sin(x * freq * 1.8 + time * 2.0 + index * 0.5) * baseAmp * 0.2;
@@ -1400,9 +1502,9 @@
                 ctx.stroke();
 
                 ctx.beginPath();
-                ctx.moveTo(0, centerY + offset + 18 + Math.sin(time * 0.2 + index) * 8);
+                ctx.moveTo(0, h / 2 + offset + 18 + Math.sin(time * 0.2 + index) * 8);
                 for (let x = 0; x <= w; x += 3) {
-                    const y = centerY + offset + 18 + Math.sin(time * 0.2 + index) * 8 +
+                    const y = h / 2 + offset + 18 + Math.sin(time * 0.2 + index) * 8 +
                         Math.sin(x * freq * 0.7 + time * 0.9 + index * 1.8) * baseAmp * 0.6 +
                         Math.sin(x * freq * 0.4 + time * 0.5 + index * 2.8) * baseAmp * 0.3;
                     ctx.lineTo(x, y);
@@ -1415,9 +1517,9 @@
                 ctx.stroke();
 
                 ctx.beginPath();
-                ctx.moveTo(0, centerY + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6);
+                ctx.moveTo(0, h / 2 + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6);
                 for (let x = 0; x <= w; x += 4) {
-                    const y = centerY + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6 +
+                    const y = h / 2 + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6 +
                         Math.sin(x * freq * 0.5 + time * 0.6 + index * 1.5) * baseAmp * 0.3;
                     ctx.lineTo(x, y);
                 }
@@ -1433,10 +1535,10 @@
                 ctx.fillStyle = 'rgba(255,255,255,0.06)';
                 ctx.font = '16px system-ui';
                 ctx.textAlign = 'center';
-                ctx.fillText('Выбери состояния ↓', w / 2, centerY + 40);
+                ctx.fillText('Выбери состояния ↓', w / 2, h / 2 - 10);
                 ctx.fillStyle = 'rgba(255,255,255,0.03)';
                 ctx.font = '13px system-ui';
-                ctx.fillText('Нажми на кнопки внизу', w / 2, centerY + 68);
+                ctx.fillText('Нажми на кнопки внизу', w / 2, h / 2 + 24);
             }
 
             stars.forEach((star, idx) => {
@@ -1563,9 +1665,9 @@
             const data = getDayData(currentDateStr);
             if (!data.stars) data.stars = [];
             const centerX = canvas.width / 2,
-                centerY = canvas.height * 0.15;
+                centerY = canvas.height * 0.25;
             const x = centerX + (Math.random() - 0.5) * canvas.width * 0.6;
-            const y = centerY + (Math.random() - 0.5) * canvas.height * 0.15;
+            const y = centerY + (Math.random() - 0.5) * canvas.height * 0.2;
             const newStar = { x, y, note, date: currentDateStr };
             data.stars.push(newStar);
             stars = data.stars;
@@ -1614,13 +1716,12 @@
                 if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 40) { found = star; break; }
             }
             if (found) { openNoteEditor('star', found, null); return; }
-            if (selectedEmotions.length > 0 && y > canvas.height * 0.1 && y < canvas.height * 0.6) {
+            if (selectedEmotions.length > 0 && y > canvas.height * 0.25 && y < canvas.height * 0.75) {
                 let closestEmotion = null,
                     closestDist = Infinity;
-                const centerY = canvas.height * 0.30;
                 selectedEmotions.forEach((emotionId, index) => {
-                    const offset = (index - (selectedEmotions.length - 1) / 2) * 40;
-                    const dist = Math.abs(y - (centerY + offset));
+                    const offset = (index - (selectedEmotions.length - 1) / 2) * 12;
+                    const dist = Math.abs(y - (canvas.height / 2 + offset));
                     if (dist < closestDist) { closestDist = dist;
                         closestEmotion = emotionId; }
                 });
