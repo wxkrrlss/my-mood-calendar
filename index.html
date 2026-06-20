@@ -27,7 +27,6 @@
             overflow-y: auto;
             position: relative;
         }
-        /* Космический фон для календаря */
         body::before {
             content: '';
             position: fixed;
@@ -68,7 +67,6 @@
             100% { opacity: 0.4; transform: scale(0.98); }
         }
 
-        /* ===== КАЛЕНДАРЬ ===== */
         .calendar-wrapper {
             position: relative;
             background: rgba(10, 10, 18, 0.85);
@@ -290,11 +288,12 @@
             height: 100%;
             z-index: 999;
             pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
-        #bgCanvas.active {
             opacity: 1;
+            transition: opacity 0.8s ease;
+            background: #0a0a12;
+        }
+        #bgCanvas.hidden {
+            opacity: 0;
         }
 
         #waveContainer {
@@ -329,7 +328,6 @@
             z-index: 10;
         }
 
-        /* Верхняя панель */
         .top-bar {
             position: fixed;
             top: 16px;
@@ -400,7 +398,7 @@
             -webkit-user-select: none;
         }
 
-        /* Описания состояний */
+        /* ===== ОПИСАНИЯ СОСТОЯНИЙ — КОМПАКТНЫЕ, ЗА ВОЛНАМИ ===== */
         .state-descriptions {
             position: fixed;
             top: 50%;
@@ -409,35 +407,37 @@
             z-index: 1003;
             pointer-events: none;
             text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 15px;
-            font-weight: 400;
-            line-height: 1.8;
-            text-shadow: 0 0 40px rgba(0,0,0,0.9), 0 0 80px rgba(0,0,0,0.5);
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 11px;
+            font-weight: 300;
+            line-height: 1.6;
+            text-shadow: 0 0 30px rgba(0,0,0,0.8);
             opacity: 0;
             transition: opacity 0.8s ease;
             user-select: none;
             -webkit-user-select: none;
-            max-width: 80%;
+            max-width: 70%;
+            letter-spacing: 0.3px;
         }
         .state-descriptions.active {
-            opacity: 0.9;
+            opacity: 0.5;
         }
         .state-descriptions .state-item {
             display: inline-block;
-            margin: 4px 12px;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(4px);
-            padding: 2px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
+            margin: 2px 8px;
+            background: rgba(0,0,0,0.15);
+            backdrop-filter: blur(2px);
+            padding: 1px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.02);
         }
         .state-descriptions .state-symbol {
-            margin-right: 4px;
+            margin-right: 2px;
+            font-size: 12px;
         }
         .state-descriptions .state-desc {
-            font-size: 12px;
-            opacity: 0.8;
+            font-size: 9px;
+            opacity: 0.6;
         }
 
         /* ===== ВЫБОР ОЦЕНКИ ===== */
@@ -646,7 +646,6 @@
         .star-counter { font-size: 12px; color: rgba(255,255,255,0.15); }
         .star-hint { font-size: 10px; color: rgba(255,255,255,0.08); text-align: center; margin-top: -2px; }
 
-        /* ===== РЕДАКТОР ===== */
         .note-editor {
             display: none;
             position: fixed;
@@ -733,7 +732,6 @@
         }
         .note-editor-save:hover { background: rgba(100,150,255,0.15); }
 
-        /* ===== ИНСТРУКЦИЯ ===== */
         .help-modal {
             display: none;
             position: fixed;
@@ -807,8 +805,9 @@
             .close-btn, .back-btn { width: 36px; height: 36px; font-size: 16px; }
             .wave-date { font-size: 14px; padding: 4px 12px; top: 60px; }
             .top-bar { top: 12px; left: 12px; right: 12px; }
-            .state-descriptions { font-size: 13px; }
-            .state-descriptions .state-desc { font-size: 10px; }
+            .state-descriptions { font-size: 9px; max-width: 80%; }
+            .state-descriptions .state-desc { font-size: 7px; }
+            .state-descriptions .state-item { margin: 1px 4px; padding: 1px 6px; }
         }
     </style>
 </head>
@@ -852,13 +851,13 @@
         <canvas id="waveCanvas"></canvas>
 
         <div class="state-descriptions" id="stateDescriptions">
-            <div><span class="state-item"><span class="state-symbol">🌊</span> Поток — день прошёл на одном дыхании</span></div>
-            <div><span class="state-item"><span class="state-symbol">☀️</span> Свет — день был тёплым и радостным</span></div>
-            <div><span class="state-item"><span class="state-symbol">🏠</span> Уют — чувствовала себя в безопасности</span></div>
-            <div><span class="state-item"><span class="state-symbol">🌙</span> Тень — день был тяжёлым или грустным</span></div>
-            <div><span class="state-item"><span class="state-symbol">⚡</span> Искра — случилось что-то яркое и неожиданное</span></div>
-            <div><span class="state-item"><span class="state-symbol">🌿</span> Тишина — спокойный, но не пустой день</span></div>
-            <div><span class="state-item"><span class="state-symbol">🌫️</span> Туман — день прошёл как в дымке</span></div>
+            <div><span class="state-item"><span class="state-symbol">🌊</span>Поток <span class="state-desc">день прошёл на одном дыхании</span></span></div>
+            <div><span class="state-item"><span class="state-symbol">☀️</span>Свет <span class="state-desc">день был тёплым и радостным</span></span></div>
+            <div><span class="state-item"><span class="state-symbol">🏠</span>Уют <span class="state-desc">чувствовала себя в безопасности</span></span></div>
+            <div><span class="state-item"><span class="state-symbol">🌙</span>Тень <span class="state-desc">день был тяжёлым или грустным</span></span></div>
+            <div><span class="state-item"><span class="state-symbol">⚡</span>Искра <span class="state-desc">случилось что-то яркое и неожиданное</span></span></div>
+            <div><span class="state-item"><span class="state-symbol">🌿</span>Тишина <span class="state-desc">спокойный, но не пустой день</span></span></div>
+            <div><span class="state-item"><span class="state-symbol">🌫️</span>Туман <span class="state-desc">день прошёл как в дымке</span></span></div>
         </div>
 
         <div id="moodSelector">
@@ -965,16 +964,147 @@
             } catch (e) {}
         }
 
+        // Звуки фонов
+        let bgSoundNodes = [];
+
+        function stopBgSounds() {
+            bgSoundNodes.forEach(n => {
+                try { n.stop(); } catch (e) {}
+            });
+            bgSoundNodes = [];
+        }
+
+        function playRainSound() {
+            try {
+                initAudio();
+                const bufferSize = audioCtx.sampleRate * 2;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * 0.15 * (1 - i / bufferSize);
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
+                noise.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start();
+                noise.loop = true;
+                bgSoundNodes.push(noise);
+
+                // Фильтр для эффекта дождя
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.value = 800;
+                noise.connect(filter);
+                filter.connect(gain);
+                bgSoundNodes.push(noise);
+            } catch (e) {}
+        }
+
+        function playWindSound() {
+            try {
+                initAudio();
+                const bufferSize = audioCtx.sampleRate * 3;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * 0.08 * (1 - i / bufferSize);
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
+                noise.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start();
+                noise.loop = true;
+                bgSoundNodes.push(noise);
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 300;
+                noise.connect(filter);
+                filter.connect(gain);
+                bgSoundNodes.push(noise);
+            } catch (e) {}
+        }
+
+        function playFlowerSound() {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.value = 600;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.8);
+                bgSoundNodes.push(osc);
+
+                const osc2 = audioCtx.createOscillator();
+                osc2.type = 'sine';
+                osc2.frequency.value = 900;
+                const gain2 = audioCtx.createGain();
+                gain2.gain.setValueAtTime(0.02, audioCtx.currentTime + 0.2);
+                gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start(audioCtx.currentTime + 0.2);
+                osc2.stop(audioCtx.currentTime + 1);
+                bgSoundNodes.push(osc2);
+            } catch (e) {}
+        }
+
+        function playCrystalStarSound() {
+            try {
+                initAudio();
+                const freqs = [1200, 1500, 1800, 2100, 2400];
+                freqs.forEach((f, i) => {
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.value = f;
+                    const gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.03 * (1 - i * 0.1), audioCtx.currentTime + i * 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.05 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + i * 0.05);
+                    osc.stop(audioCtx.currentTime + i * 0.05 + 0.3);
+                    bgSoundNodes.push(osc);
+                });
+            } catch (e) {}
+        }
+
+        function playAmbientSound() {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.value = 200;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1.5);
+                bgSoundNodes.push(osc);
+            } catch (e) {}
+        }
+
         function soundClick() { playTone(600, 0.06, 'sine', 0.03); }
         function soundConfirm() {
             playTone(800, 0.08, 'sine', 0.04);
             setTimeout(() => playTone(1000, 0.06, 'sine', 0.03), 100);
         }
-        function soundStarAdd() {
-            playTone(1200, 0.1, 'sine', 0.05);
-            setTimeout(() => playTone(1500, 0.08, 'sine', 0.04), 120);
-            setTimeout(() => playTone(1800, 0.06, 'sine', 0.03), 240);
-        }
+        function soundStarAdd() { playCrystalStarSound(); }
         function soundStarDelete() {
             playTone(2000, 0.08, 'sine', 0.06);
             setTimeout(() => playTone(1600, 0.06, 'sine', 0.05), 80);
@@ -1116,12 +1246,11 @@
         }
 
         // =================================================================
-        // 5. ФОНОВЫЙ ХОЛСТ (реалистичные эффекты)
+        // 5. ФОНОВЫЙ ХОЛСТ + ЗВУКИ
         // =================================================================
         let bgCanvas, bgCtx;
         let bgAnimId = null;
         let currentMood = 0;
-        // Массивы частиц
         let rainDrops = [];
         let rainDrops2 = [];
         let glassDrops = [];
@@ -1135,6 +1264,8 @@
             bgCtx = bgCanvas.getContext('2d');
             resizeBgCanvas();
             window.addEventListener('resize', resizeBgCanvas);
+            // По умолчанию показываем тёмный фон
+            bgCanvas.classList.remove('hidden');
         }
 
         function resizeBgCanvas() {
@@ -1217,7 +1348,6 @@
                 bgCtx.arc(drop.x, drop.y, drop.radius, 0, Math.PI * 2);
                 bgCtx.fillStyle = grad;
                 bgCtx.fill();
-                // Блик на капле
                 bgCtx.beginPath();
                 bgCtx.arc(drop.x - drop.radius * 0.3, drop.y - drop.radius * 0.3, drop.radius * 0.2, 0, Math.PI * 2);
                 bgCtx.fillStyle = 'rgba(255,255,255,0.6)';
@@ -1261,42 +1391,56 @@
             }
         }
 
+        // Цветы — без пульсации, реалистичные
         function generateFlowers(count) {
             for (let i = 0; i < count; i++) {
                 flowers.push({
                     x: Math.random() * bgCanvas.width,
                     y: Math.random() * bgCanvas.height,
-                    size: 20 + Math.random() * 40,
+                    size: 25 + Math.random() * 45,
                     angle: Math.random() * Math.PI * 2,
                     petalCount: 5 + Math.floor(Math.random() * 3),
-                    phase: Math.random() * Math.PI * 2,
-                    speed: 0.005 + Math.random() * 0.01,
+                    speed: 0.001 + Math.random() * 0.003,
+                    rotationSpeed: (Math.random() - 0.5) * 0.002,
                 });
             }
         }
 
         function drawFlowers(time) {
             for (let flower of flowers) {
-                const bloom = 0.5 + 0.5 * Math.sin(time * flower.speed + flower.phase);
-                const size = flower.size * (0.7 + 0.3 * bloom);
+                const size = flower.size;
                 bgCtx.save();
                 bgCtx.translate(flower.x, flower.y);
-                bgCtx.rotate(flower.angle);
+                bgCtx.rotate(flower.angle + time * flower.rotationSpeed);
                 const petalCount = flower.petalCount;
                 for (let i = 0; i < petalCount; i++) {
-                    const angle = (i / petalCount) * Math.PI * 2;
+                    const angle = (i / petalCount) * Math.PI * 2 + time * flower.speed;
                     bgCtx.save();
                     bgCtx.rotate(angle);
                     bgCtx.beginPath();
-                    bgCtx.ellipse(size * 0.3, 0, size * 0.3, size * 0.6, 0, 0, Math.PI * 2);
-                    const grad = bgCtx.createRadialGradient(0, 0, 0, 0, 0, size * 0.6);
-                    grad.addColorStop(0, '#ff6a8a');
-                    grad.addColorStop(0.5, '#d84a6a');
-                    grad.addColorStop(1, '#8a2a4a');
+                    bgCtx.ellipse(size * 0.25, 0, size * 0.25, size * 0.55, 0, 0, Math.PI * 2);
+                    const grad = bgCtx.createRadialGradient(0, 0, 0, 0, 0, size * 0.55);
+                    const colors = [
+                        ['#ff8a9a', '#d84a6a', '#8a2a4a'],
+                        ['#ff6a8a', '#d44a6a', '#8a2a4a'],
+                        ['#ff9aaa', '#e05a7a', '#9a2a5a']
+                    ];
+                    const palette = colors[i % colors.length];
+                    grad.addColorStop(0, palette[0]);
+                    grad.addColorStop(0.5, palette[1]);
+                    grad.addColorStop(1, palette[2]);
                     bgCtx.fillStyle = grad;
                     bgCtx.fill();
                     bgCtx.restore();
                 }
+                // Сердцевина цветка
+                bgCtx.beginPath();
+                bgCtx.arc(0, 0, size * 0.08, 0, Math.PI * 2);
+                const centerGrad = bgCtx.createRadialGradient(0, 0, 0, 0, 0, size * 0.08);
+                centerGrad.addColorStop(0, '#ffd700');
+                centerGrad.addColorStop(1, '#ff8a00');
+                bgCtx.fillStyle = centerGrad;
+                bgCtx.fill();
                 bgCtx.restore();
             }
         }
@@ -1343,12 +1487,11 @@
             bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
 
             if (currentMood === 0) {
-                bgCtx.fillStyle = 'rgba(10,10,18,0)';
+                bgCtx.fillStyle = '#0a0a12';
                 bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
                 return;
             }
 
-            // Заливка фона
             switch (currentMood) {
                 case 1:
                     bgCtx.fillStyle = '#0a0a1a';
@@ -1402,7 +1545,6 @@
                     break;
             }
 
-            // Рисуем блики для всех фонов (кроме 0)
             if (currentMood !== 0) {
                 updateFlareParticles();
                 drawFlareParticles();
@@ -1414,13 +1556,39 @@
                 cancelAnimationFrame(bgAnimId);
                 bgAnimId = null;
             }
+            stopBgSounds();
+
             currentMood = mood;
             const bgCanvasEl = document.getElementById('bgCanvas');
+
+            // Всегда показываем фон, даже если mood === 0
+            bgCanvasEl.classList.remove('hidden');
+
             if (mood === 0) {
-                bgCanvasEl.classList.remove('active');
+                bgCanvasEl.style.opacity = '1';
                 return;
             }
-            bgCanvasEl.classList.add('active');
+
+            // Запускаем звуки
+            switch (mood) {
+                case 1:
+                    playRainSound();
+                    break;
+                case 2:
+                    playRainSound();
+                    break;
+                case 3:
+                    playWindSound();
+                    break;
+                case 4:
+                    playFlowerSound();
+                    setTimeout(() => playFlowerSound(), 500);
+                    setTimeout(() => playFlowerSound(), 1000);
+                    break;
+                case 5:
+                    playAmbientSound();
+                    break;
+            }
 
             // Очищаем массивы и генерируем новые эффекты
             rainDrops = [];
@@ -1447,11 +1615,11 @@
                     generateFlareParticles(6);
                     break;
                 case 4:
-                    generateFlowers(12);
+                    generateFlowers(15);
                     generateFlareParticles(12);
                     break;
                 case 5:
-                    generateFlareParticles(20);
+                    generateFlareParticles(25);
                     break;
             }
 
@@ -1481,6 +1649,7 @@
             ];
             document.getElementById('waveDate').textContent = `${parts[2]} ${months[parts[1]-1]} ${parts[0]}`;
 
+            // Показываем описания состояний (за волнами)
             document.getElementById('stateDescriptions').classList.add('active');
 
             // Сброс состояний волн
@@ -1746,33 +1915,75 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
-            // Звёзды
+            // ХРУСТАЛЬНЫЕ ЗВЁЗДЫ
             stars.forEach((star, idx) => {
+                const time = Date.now() / 1000;
                 const twinkle = 0.6 + Math.sin(time * 1.8 + idx * 2.3) * 0.4;
                 const size = 14 + Math.sin(time * 1.2 + idx * 1.7) * 3;
-                const glowGrad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, size * 12);
-                glowGrad.addColorStop(0, `rgba(255,255,255,${0.3 * twinkle})`);
-                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.2 * twinkle})`);
+
+                // Свечение (хрустальное)
+                const glowGrad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, size * 14);
+                glowGrad.addColorStop(0, `rgba(255,255,255,${0.25 * twinkle})`);
+                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.15 * twinkle})`);
+                glowGrad.addColorStop(0.5, `rgba(180,210,255,${0.05 * twinkle})`);
                 glowGrad.addColorStop(1, 'rgba(255,255,255,0)');
                 ctx.fillStyle = glowGrad;
-                ctx.fillRect(star.x - size * 12, star.y - size * 12, size * 24, size * 24);
+                ctx.fillRect(star.x - size * 14, star.y - size * 14, size * 28, size * 28);
+
+                // Рисуем хрустальную звезду (сложная форма)
+                ctx.save();
+                ctx.translate(star.x, star.y);
+                ctx.rotate(time * 0.05 + idx);
+
+                // Основные лучи
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const length = size * (1 + 0.3 * Math.sin(time * 0.5 + i + idx));
+                    ctx.save();
+                    ctx.rotate(angle);
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    const grad2 = ctx.createLinearGradient(0, 0, 0, length);
+                    grad2.addColorStop(0, `rgba(255,255,255,${0.9 * twinkle})`);
+                    grad2.addColorStop(0.5, `rgba(200,230,255,${0.5 * twinkle})`);
+                    grad2.addColorStop(1, 'rgba(200,230,255,0)');
+                    ctx.strokeStyle = grad2;
+                    ctx.lineWidth = 2 + Math.sin(time * 0.3 + i) * 0.5;
+                    ctx.shadowBlur = 40;
+                    ctx.shadowColor = 'rgba(200,230,255,0.6)';
+                    ctx.lineTo(0, -length);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                // Блик в центре
                 ctx.beginPath();
-                drawStar(ctx, star.x, star.y, 5, size, size * 0.4);
-                ctx.fillStyle = `rgba(255,255,255,${0.9 + 0.1 * twinkle})`;
-                ctx.shadowBlur = 80;
-                ctx.shadowColor = 'rgba(200,230,255,0.8)';
+                ctx.arc(0, 0, size * 0.15, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,255,255,${0.8 + 0.2 * twinkle})`;
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = 'rgba(200,230,255,0.9)';
                 ctx.fill();
                 ctx.shadowBlur = 0;
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, size * 0.3, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255,255,240,${0.7 + 0.3 * twinkle})`;
-                ctx.fill();
+
+                // Дополнительные искры
+                for (let i = 0; i < 3; i++) {
+                    const a = Math.random() * Math.PI * 2;
+                    const d = size * (0.5 + Math.random() * 0.5);
+                    ctx.beginPath();
+                    ctx.arc(Math.cos(a) * d, Math.sin(a) * d, 1 + Math.random() * 2, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255,255,255,${0.2 + 0.3 * twinkle})`;
+                    ctx.fill();
+                }
+
+                ctx.restore();
+
+                // Подпись звезды
                 if (star.note) {
                     ctx.fillStyle = 'rgba(255,255,255,0.12)';
                     ctx.font = '11px system-ui';
                     ctx.textAlign = 'center';
                     const displayNote = star.note.length > 15 ? star.note.slice(0, 15) + '…' : star.note;
-                    ctx.fillText(displayNote, star.x, star.y + size + 24);
+                    ctx.fillText(displayNote, star.x, star.y + size + 28);
                 }
             });
 
@@ -1781,20 +1992,8 @@
             animationId = requestAnimationFrame(animateWaves);
         }
 
-        function drawStar(ctx, cx, cy, spikes, outerR, innerR) {
-            let rot = -Math.PI / 2;
-            const step = Math.PI / spikes;
-            ctx.moveTo(cx + outerR * Math.cos(rot), cy + outerR * Math.sin(rot));
-            for (let i = 1; i <= spikes * 2; i++) {
-                const r = i % 2 === 0 ? outerR : innerR;
-                const angle = rot + i * step;
-                ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
-            }
-            ctx.closePath();
-        }
-
         // =================================================================
-        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ
+        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ (ХРУСТАЛЬНОЕ)
         // =================================================================
         function updateStarCounter() {
             document.getElementById('starCounter').textContent = `⭐ ${stars.length}`;
@@ -1821,42 +2020,46 @@
             saveData();
             updateStarCounter();
             renderCalendar();
-            createMagicAppearance(x, y);
+            createCrystalAppearance(x, y);
             document.getElementById('noteInput').value = '';
             data.note = '';
             saveData();
         });
 
-        function createMagicAppearance(x, y) {
+        function createCrystalAppearance(x, y) {
+            // Хрустальная вспышка
             const flash = document.createElement('div');
             flash.style.cssText = `
-                position: fixed; left: ${x-60}px; top: ${y-60}px;
-                width: 120px; height: 120px; border-radius: 50%;
-                background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(200,230,255,0.5) 30%, rgba(180,210,255,0.2) 60%, transparent 80%);
+                position: fixed; left: ${x-80}px; top: ${y-80}px;
+                width: 160px; height: 160px; border-radius: 50%;
+                background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(200,230,255,0.5) 30%, rgba(180,210,255,0.2) 60%, transparent 80%);
                 pointer-events: none; z-index: 2000;
                 transform: scale(0);
-                animation: magicFlash 0.8s ease-out forwards;
+                animation: crystalFlash 0.8s ease-out forwards;
             `;
             document.body.appendChild(flash);
             setTimeout(() => flash.remove(), 900);
 
-            for (let i = 0; i < 30; i++) {
+            // Хрустальные искры
+            for (let i = 0; i < 40; i++) {
                 const spark = document.createElement('div');
                 const angle = Math.random() * Math.PI * 2;
-                const dist = 80 + Math.random() * 120;
+                const dist = 60 + Math.random() * 140;
                 const dx = Math.cos(angle) * dist;
                 const dy = Math.sin(angle) * dist;
-                const size = 3 + Math.random() * 5;
-                const color = `hsl(${200 + Math.random()*40}, 80%, ${70 + Math.random()*30}%)`;
+                const size = 2 + Math.random() * 5;
+                const hue = 190 + Math.random() * 40;
+                const color = `hsl(${hue}, 80%, ${80 + Math.random() * 20}%)`;
                 spark.style.cssText = `
                     position: fixed; left: ${x}px; top: ${y}px;
                     width: ${size}px; height: ${size}px;
                     border-radius: 50%;
                     background: ${color};
-                    box-shadow: 0 0 10px ${color};
+                    box-shadow: 0 0 15px ${color};
                     pointer-events: none; z-index: 2000;
-                    transition: all 0.8s ease-out;
+                    transition: all 0.8s cubic-bezier(0.2, 0.9, 0.4, 1);
                     opacity: 1;
+                    transform: scale(1);
                 `;
                 document.body.appendChild(spark);
                 requestAnimationFrame(() => {
@@ -1869,27 +2072,27 @@
 
         const styleFlash = document.createElement('style');
         styleFlash.textContent = `
-            @keyframes magicFlash {
+            @keyframes crystalFlash {
                 0% { transform: scale(0); opacity: 1; }
-                50% { transform: scale(2); opacity: 0.8; }
-                100% { transform: scale(3); opacity: 0; }
+                50% { transform: scale(2.5); opacity: 0.8; }
+                100% { transform: scale(4); opacity: 0; }
             }
         `;
         document.head.appendChild(styleFlash);
 
         // =================================================================
-        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ
+        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ (ХРУСТАЛЬНОЕ)
         // =================================================================
         function deleteStar(star) {
             soundStarDelete();
-            const numParticles = 40;
+            const numParticles = 60;
             for (let i = 0; i < numParticles; i++) {
                 const particle = document.createElement('div');
                 const angle = Math.random() * Math.PI * 2;
-                const speed = 80 + Math.random() * 200;
+                const speed = 60 + Math.random() * 250;
                 const dx = Math.cos(angle) * speed;
                 const dy = Math.sin(angle) * speed;
-                const size = 4 + Math.random() * 8;
+                const size = 2 + Math.random() * 6;
                 const hue = 190 + Math.random() * 40;
                 const color = `hsl(${hue}, 80%, ${70 + Math.random() * 30}%)`;
                 particle.style.cssText = `
@@ -1897,18 +2100,22 @@
                     width: ${size}px; height: ${size}px;
                     border-radius: 50%;
                     background: ${color};
-                    box-shadow: 0 0 12px ${color};
+                    box-shadow: 0 0 15px ${color};
                     pointer-events: none; z-index: 2000;
-                    transition: all 0.8s cubic-bezier(0.2, 0.9, 0.4, 1);
+                    transition: all 0.9s cubic-bezier(0.15, 0.9, 0.3, 1);
                     opacity: 1;
                     transform: scale(1);
                 `;
                 document.body.appendChild(particle);
+                // Добавляем немного случайной формы (квадратные осколки)
+                if (Math.random() > 0.5) {
+                    particle.style.borderRadius = '2px';
+                }
                 requestAnimationFrame(() => {
-                    particle.style.transform = `translate(${dx}px, ${dy}px) scale(0)`;
+                    particle.style.transform = `translate(${dx}px, ${dy}px) scale(0) rotate(${Math.random()*360}deg)`;
                     particle.style.opacity = '0';
                 });
-                setTimeout(() => particle.remove(), 900);
+                setTimeout(() => particle.remove(), 1000);
             }
 
             const data = getDayData(currentDateStr);
