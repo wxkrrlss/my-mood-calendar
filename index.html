@@ -2,747 +2,1186 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Хрустальный дневник</title>
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
-
         body {
-            background: #0b0b12;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            color: #eaeef2;
+            background: #0b0e1a;
+            color: white;
+            overflow: hidden;
             height: 100vh;
-            overflow: hidden;
-            touch-action: pan-x pan-y;
-        }
-
-        /* --- космический фон --- */
-        #space-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at 30% 40%, #131b2b, #07080e);
-            z-index: 0;
-            pointer-events: none;
-        }
-        #space-bg::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 70% 80%, rgba(60, 110, 180, 0.08), transparent 60%),
-                        radial-gradient(circle at 20% 20%, rgba(200, 180, 255, 0.05), transparent 50%);
-            pointer-events: none;
-        }
-
-        /* --- главный контейнер (слой календаря + холст) --- */
-        #app {
+            width: 100vw;
             position: relative;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 12px 12px 0;
-            max-width: 460px;
-            margin: 0 auto;
+            touch-action: manipulation;
         }
-
-        /* --- календарь (главный экран) --- */
-        #calendar-view {
-            flex: 1;
+        /* Календарь */
+        #calendar {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            padding: 20px 16px 30px;
+            background: radial-gradient(ellipse at 30% 20%, #1a1f33, #0b0e1a 70%);
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(6px);
-            background: rgba(12, 16, 28, 0.55);
-            border-radius: 32px;
-            padding: 16px 12px 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            transition: opacity 0.3s ease;
+            overflow-y: auto;
+            z-index: 10;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        #calendar.hidden {
+            opacity: 0;
+            transform: scale(1.02);
+            pointer-events: none;
+        }
+        /* Северное сияние + звёзды (фон) */
+        #aurora {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
             overflow: hidden;
+            z-index: 0;
         }
-
-        .cal-header {
+        .aurora-band {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.25;
+            animation: auroraMove 18s infinite alternate ease-in-out;
+        }
+        @keyframes auroraMove {
+            0% { transform: translateX(-20%) scale(1); }
+            100% { transform: translateX(20%) scale(1.2); }
+        }
+        .star {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            100% { opacity: 0.9; }
+        }
+        /* Шапка календаря */
+        .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
-            padding: 0 6px;
+            padding: 6px 0 10px;
+            position: relative;
+            z-index: 2;
         }
-        .cal-header .month-year {
+        .calendar-title {
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+        .help-btn {
+            font-size: 24px;
+            background: rgba(255,255,255,0.08);
+            width: 44px; height: 44px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .help-btn:active { transform: scale(0.92); }
+        /* Навигация */
+        .nav-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0 4px;
+            z-index: 2;
+            position: relative;
+        }
+        .nav-arrow {
+            font-size: 32px;
+            padding: 0 12px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: 0.2s;
+            line-height: 1;
+        }
+        .nav-arrow:active { opacity: 1; transform: scale(0.9); }
+        .month-label {
             font-size: 20px;
             font-weight: 500;
             letter-spacing: 0.5px;
-            color: #d6deea;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.6);
-        }
-        .cal-header .stats {
-            display: flex;
-            gap: 14px;
-            font-size: 15px;
-            background: rgba(0,0,0,0.3);
-            padding: 6px 14px;
-            border-radius: 40px;
-            backdrop-filter: blur(2px);
-            border: 1px solid rgba(255,255,255,0.06);
-        }
-        .cal-header .stats span {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
         }
-
-        .cal-nav {
+        .month-stats {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        .cal-nav button {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: #bcc9e0;
-            width: 44px;
-            height: 44px;
+            gap: 12px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.06);
+            padding: 2px 14px;
             border-radius: 30px;
-            font-size: 22px;
-            cursor: pointer;
-            transition: 0.2s;
             backdrop-filter: blur(4px);
         }
-        .cal-nav button:active { background: rgba(255,255,255,0.15); }
-
-        .weekdays {
+        .days-of-week {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             text-align: center;
-            font-size: 12px;
-            color: #7c8aa8;
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            margin: 12px 0 6px;
             letter-spacing: 0.3px;
-            margin-bottom: 4px;
-            padding: 0 2px;
+            z-index: 2;
+            position: relative;
         }
-
-        .days-grid {
+        .grid-days {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            flex: 1;
-            align-content: start;
-            padding: 2px 0;
+            gap: 6px;
+            z-index: 2;
+            position: relative;
         }
-
         .day-cell {
             aspect-ratio: 1/1;
-            background: rgba(255,255,255,0.02);
             border-radius: 14px;
+            background: rgba(255,255,255,0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
-            font-weight: 400;
-            color: #b8c7e0;
+            font-size: 18px;
+            font-weight: 500;
             transition: 0.15s;
+            cursor: pointer;
             position: relative;
+            color: rgba(255,255,255,0.7);
             border: 1px solid transparent;
-            cursor: default;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            min-height: 44px;
+            min-height: 52px;
         }
         .day-cell.today {
-            border-color: #5f8aff;
-            box-shadow: 0 0 16px #3f6eff66;
+            border-color: #5b9aff;
+            box-shadow: 0 0 20px rgba(70, 130, 255, 0.4);
+        }
+        .day-cell.future {
+            opacity: 0.2;
+            pointer-events: none;
         }
         .day-cell .mini-waves {
             display: flex;
-            gap: 3px;
-            margin-top: 2px;
-            height: 8px;
+            gap: 2px;
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 4px;
             align-items: flex-end;
         }
-        .day-cell .mini-waves span {
-            width: 4px;
-            height: 6px;
+        .mini-wave {
+            width: 5px;
             border-radius: 4px;
-            background: #4f6a9e;
-            opacity: 0.5;
+            animation: wavePulse 1.4s infinite alternate ease-in-out;
         }
-        .day-cell .star-icon {
+        @keyframes wavePulse {
+            0% { height: 2px; opacity: 0.6; }
+            100% { height: 6px; opacity: 1; }
+        }
+        .day-star {
             position: absolute;
             top: 2px;
-            right: 5px;
+            right: 4px;
             font-size: 12px;
-            color: #f6d06b;
-            text-shadow: 0 0 12px #f6b83d;
+            color: #f7d44a;
+            text-shadow: 0 0 10px #f7d44a;
         }
-        .day-cell .audio-icon {
+        .day-audio-icon {
             position: absolute;
             bottom: 2px;
-            right: 5px;
-            font-size: 10px;
-            color: #8ab3ff;
+            left: 4px;
+            font-size: 12px;
+            opacity: 0.8;
         }
-        .day-cell.empty { background: transparent; box-shadow: none; }
-
-        /* --- холст (оценка дня) --- */
-        #canvas-view {
+        /* Холст */
+        #canvas-container {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            background: rgba(6, 8, 18, 0.85);
-            backdrop-filter: blur(12px);
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 20;
+            background: #0b0e1a;
             display: none;
             flex-direction: column;
-            padding: 20px 16px 20px;
-            border-radius: 0;
-            overflow-y: auto;
-            transition: opacity 0.25s;
+            align-items: center;
+            justify-content: flex-start;
+            overflow: hidden;
+            transition: opacity 0.5s ease;
         }
-        #canvas-view.open {
+        #canvas-container.active {
             display: flex;
         }
+        #bgCanvas, #waveCanvas, #starCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        #starCanvas { pointer-events: auto; z-index: 5; }
+        #waveCanvas { z-index: 3; }
+        #bgCanvas { z-index: 1; }
 
-        .canvas-header {
+        .canvas-ui {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            padding: 16px 20px;
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            pointer-events: none;
+        }
+        .canvas-ui > * { pointer-events: auto; }
+
+        .canvas-top-bar {
+            display: flex;
+            width: 100%;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            padding: 0 4px;
+            padding: 4px 0 14px;
         }
-        .canvas-header .date-badge {
+        .canvas-top-bar .date-display {
             font-size: 20px;
-            font-weight: 500;
-            background: rgba(255,255,255,0.04);
+            font-weight: 400;
+            background: rgba(255,255,255,0.08);
             padding: 6px 20px;
             border-radius: 40px;
-            backdrop-filter: blur(2px);
-            border: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.05);
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 12px rgba(0,0,0,0.5);
+            transition: 0.2s;
+            cursor: default;
         }
-        .canvas-header .close-btn {
-            background: rgba(255,255,255,0.05);
-            border: none;
-            color: #b0c4e8;
+        .canvas-top-bar .close-btn, .canvas-top-bar .back-btn {
             font-size: 28px;
-            padding: 0 14px;
+            background: rgba(255,255,255,0.06);
+            width: 48px; height: 48px;
             border-radius: 30px;
-            cursor: pointer;
-        }
-
-        .rating-row {
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin: 8px 0 16px;
-        }
-        .rating-btn {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.02);
-            color: #c8d6f0;
-            font-size: 22px;
-            font-weight: 500;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.08);
             transition: 0.2s;
             cursor: pointer;
         }
-        .rating-btn.selected {
-            border-color: #aac3ff;
-            box-shadow: 0 0 24px #4f7eff66;
-            background: rgba(80, 140, 255, 0.15);
-        }
+        .canvas-top-bar .back-btn { display: none; }
+        .canvas-top-bar .back-btn.visible { display: flex; }
+        .canvas-top-bar .close-btn:active, .canvas-top-bar .back-btn:active { transform: scale(0.9); }
 
+        /* Оценка */
+        .rating-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            gap: 24px;
+            width: 100%;
+        }
+        .rating-prompt {
+            font-size: 18px;
+            opacity: 0.7;
+            text-align: center;
+            letter-spacing: 0.3px;
+            font-weight: 300;
+        }
+        .rating-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .rating-btn {
+            width: 58px; height: 58px;
+            border-radius: 40px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 26px;
+            font-weight: 500;
+            color: white;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .rating-btn.selected {
+            border-color: white;
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+        .rating-btn:active { transform: scale(0.92); }
+        .confirm-btn {
+            padding: 14px 44px;
+            border-radius: 60px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 18px;
+            color: white;
+            backdrop-filter: blur(8px);
+            transition: 0.3s;
+            cursor: pointer;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .confirm-btn.active {
+            opacity: 1;
+            pointer-events: auto;
+            background: rgba(255,255,255,0.2);
+        }
+        .confirm-btn:active { transform: scale(0.96); }
+
+        /* Состояния */
+        .states-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 16px;
+            gap: 12px;
+            animation: fadeUp 0.5s ease;
+        }
+        .states-section.active { display: flex; }
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(18px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
         .states-grid {
             display: flex;
             flex-wrap: wrap;
+            gap: 10px;
             justify-content: center;
-            gap: 8px;
-            margin: 10px 0 8px;
+            max-width: 400px;
         }
         .state-btn {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            padding: 6px 14px;
+            padding: 8px 16px;
             border-radius: 40px;
-            color: #c8daf0;
-            font-size: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            font-size: 15px;
             display: flex;
             align-items: center;
             gap: 6px;
             backdrop-filter: blur(4px);
-            transition: 0.15s;
+            transition: 0.2s;
             cursor: pointer;
+            color: rgba(255,255,255,0.7);
         }
         .state-btn.active {
-            background: rgba(100, 180, 255, 0.15);
-            border-color: #6a9eff;
-            box-shadow: 0 0 18px #3f7eff44;
+            background: rgba(255,255,255,0.15);
+            border-color: currentColor;
+            box-shadow: 0 0 20px rgba(255,255,255,0.05);
+            color: white;
+        }
+        .state-btn:active { transform: scale(0.94); }
+
+        /* Заметки + звёзды */
+        .notes-section {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            max-width: 400px;
+            margin-top: 16px;
+            gap: 12px;
+            animation: fadeUp 0.5s ease;
+        }
+        .notes-section.active { display: flex; }
+        .note-input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: white;
+            font-size: 16px;
+            backdrop-filter: blur(4px);
+            outline: none;
+            resize: vertical;
+            min-height: 56px;
+        }
+        .note-input::placeholder { color: rgba(255,255,255,0.3); }
+        .action-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            padding: 10px 20px;
+            border-radius: 40px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: white;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .action-btn:active { transform: scale(0.94); }
+        .star-counter {
+            font-size: 18px;
+            opacity: 0.7;
+            margin-left: 4px;
         }
 
-        .comment-area {
-            margin: 12px 0 10px;
-            background: rgba(0,0,0,0.25);
-            border-radius: 24px;
-            padding: 10px 16px;
+        /* Модалки */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: rgba(20,24,40,0.9);
+            border-radius: 40px;
+            padding: 30px 24px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            color: white;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-box h3 { font-size: 22px; margin-bottom: 16px; }
+        .modal-box p { opacity: 0.8; line-height: 1.6; font-size: 15px; }
+        .modal-close {
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 40px;
+            text-align: center;
+            cursor: pointer;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .comment-area textarea {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: #dde6f5;
-            font-size: 15px;
-            resize: none;
-            outline: none;
-            min-height: 56px;
-            font-family: inherit;
-        }
+        .modal-close:active { transform: scale(0.96); }
+        .modal-box .help-text { font-size: 14px; opacity: 0.7; margin-top: 12px; }
 
-        .star-section {
-            display: flex;
+        /* Сброс / туман */
+        .fog-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(200,220,255,0.2);
+            backdrop-filter: blur(20px);
+            z-index: 50;
+            display: none;
             align-items: center;
-            gap: 12px;
-            margin: 8px 0 10px;
-            flex-wrap: wrap;
-        }
-        .star-btn {
-            background: rgba(255,215,0,0.08);
-            border: 1px solid rgba(255,215,0,0.2);
-            padding: 6px 20px;
-            border-radius: 40px;
-            color: #f5d76e;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .star-btn:active { background: rgba(255,215,0,0.2); }
-
-        .audio-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 6px 0 10px;
-        }
-        .audio-controls button {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            padding: 6px 16px;
-            border-radius: 30px;
-            color: #b4c8ec;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .save-day-btn {
-            background: linear-gradient(135deg, #3a6eff, #6f4eff);
-            border: none;
-            padding: 14px;
-            border-radius: 60px;
-            color: white;
-            font-weight: 600;
-            font-size: 18px;
-            margin-top: 12px;
-            cursor: pointer;
-            box-shadow: 0 8px 30px rgba(60, 100, 255, 0.3);
-            transition: 0.2s;
-        }
-        .save-day-btn:active { opacity: 0.7; transform: scale(0.97); }
-
-        /* --- волны на холсте (имитация) --- */
-        .wave-preview {
-            display: flex;
             justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin: 4px 0 12px;
-            min-height: 28px;
+            color: white;
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 2px;
         }
-        .wave-chip {
-            background: rgba(100, 200, 255, 0.08);
-            padding: 4px 16px;
-            border-radius: 40px;
-            border: 1px solid rgba(100, 200, 255, 0.15);
-            font-size: 14px;
-            color: #b0d0f5;
-        }
-
-        /* --- адаптив --- */
-        @media (max-width: 400px) {
-            .rating-btn { width: 44px; height: 44px; font-size: 18px; }
-            .day-cell { font-size: 13px; min-height: 38px; }
-        }
-
-        /* утилиты */
-        .hidden { display: none !important; }
-        .flex-center { display: flex; align-items: center; justify-content: center; }
-        .gap-2 { gap: 8px; }
-
-        /* звуковой индикатор */
-        .sound-indicator {
-            font-size: 12px;
-            color: #7a8bb0;
-            padding: 4px 12px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 30px;
+        .fog-overlay.active { display: flex; }
+        /* адаптив */
+        @media (max-width: 420px) {
+            .day-cell { font-size: 15px; min-height: 44px; }
+            .rating-btn { width: 50px; height: 50px; font-size: 22px; }
         }
     </style>
 </head>
 <body>
-    <div id="space-bg"></div>
-    <div id="app">
+    <div id="aurora"></div>
+    <div id="calendar">
+        <div class="calendar-header">
+            <div class="calendar-title">Мой дневник</div>
+            <div class="help-btn" id="helpBtn">?</div>
+        </div>
+        <div class="nav-row">
+            <span class="nav-arrow" id="prevMonth">‹</span>
+            <span class="month-label" id="monthLabel">Январь 2026 <span class="month-stats" id="monthStats"></span></span>
+            <span class="nav-arrow" id="nextMonth">›</span>
+        </div>
+        <div class="days-of-week">
+            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+        </div>
+        <div class="grid-days" id="daysGrid"></div>
+    </div>
 
-        <!-- КАЛЕНДАРЬ -->
-        <div id="calendar-view">
-            <div class="cal-header">
-                <div class="month-year" id="monthYear">Март 2026</div>
-                <div class="stats">
-                    <span>⭐ <span id="avgScore">—</span></span>
-                    <span>🔥 <span id="streakCount">0</span></span>
+    <!-- Холст -->
+    <div id="canvas-container">
+        <canvas id="bgCanvas"></canvas>
+        <canvas id="waveCanvas"></canvas>
+        <canvas id="starCanvas"></canvas>
+        <div class="fog-overlay" id="fogOverlay">🌀</div>
+        <div class="canvas-ui">
+            <div class="canvas-top-bar">
+                <div class="back-btn" id="backToRatingBtn">←</div>
+                <div class="date-display" id="dateDisplay">12 января</div>
+                <div class="close-btn" id="closeCanvasBtn">✕</div>
+            </div>
+            <!-- Рейтинг -->
+            <div class="rating-section" id="ratingSection">
+                <div class="rating-prompt">Оцените ваш сегодняшний день по шкале от 1 до 5</div>
+                <div class="rating-buttons" id="ratingButtons">
+                    <div class="rating-btn" data-val="1">1</div>
+                    <div class="rating-btn" data-val="2">2</div>
+                    <div class="rating-btn" data-val="3">3</div>
+                    <div class="rating-btn" data-val="4">4</div>
+                    <div class="rating-btn" data-val="5">5</div>
+                </div>
+                <div class="confirm-btn" id="confirmRatingBtn">Подтвердить</div>
+            </div>
+            <!-- Состояния -->
+            <div class="states-section" id="statesSection">
+                <div class="states-grid" id="statesGrid"></div>
+            </div>
+            <!-- Заметки + звезды -->
+            <div class="notes-section" id="notesSection">
+                <textarea class="note-input" id="noteInput" placeholder="Опиши события дня..."></textarea>
+                <div class="action-row">
+                    <div class="action-btn" id="addStarBtn">⭐ Добавить звезду</div>
+                    <span class="star-counter" id="starCounter">⭐ 0</span>
+                    <div class="action-btn" id="addMusicBtn">🎵 Добавить музыку</div>
                 </div>
             </div>
-            <div class="cal-nav">
-                <button id="prevMonth">‹</button>
-                <button id="nextMonth">›</button>
-            </div>
-            <div class="weekdays">
-                <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
-            </div>
-            <div class="days-grid" id="daysGrid"></div>
-            <div style="text-align:center;font-size:12px;color:#5a6f92;padding-top:6px;">✦ долгое нажатие на день — редактировать</div>
         </div>
+    </div>
 
-        <!-- ХОЛСТ (оценка дня) -->
-        <div id="canvas-view">
-            <div class="canvas-header">
-                <div class="date-badge" id="canvasDate">12 мар 2026</div>
-                <button class="close-btn" id="closeCanvas">✕</button>
-            </div>
-
-            <div class="rating-row" id="ratingRow">
-                <button class="rating-btn" data-val="1">1</button>
-                <button class="rating-btn" data-val="2">2</button>
-                <button class="rating-btn" data-val="3">3</button>
-                <button class="rating-btn" data-val="4">4</button>
-                <button class="rating-btn" data-val="5">5</button>
-            </div>
-
-            <div class="wave-preview" id="wavePreview"></div>
-
-            <div class="states-grid" id="statesGrid">
-                <button class="state-btn" data-state="Поток">🌊 Поток</button>
-                <button class="state-btn" data-state="Свет">☀️ Свет</button>
-                <button class="state-btn" data-state="Уют">🏠 Уют</button>
-                <button class="state-btn" data-state="Тень">🌙 Тень</button>
-                <button class="state-btn" data-state="Искра">⚡ Искра</button>
-                <button class="state-btn" data-state="Тишина">🌿 Тишина</button>
-                <button class="state-btn" data-state="Туман">🌫️ Туман</button>
-            </div>
-
-            <div class="comment-area">
-                <textarea id="dayComment" placeholder="Заметка дня..."></textarea>
-            </div>
-
-            <div class="star-section">
-                <button class="star-btn" id="addStarBtn">✦ Добавить звезду</button>
-                <span style="font-size:14px;color:#9ab0d8;" id="starCountDisplay">⭐ 0</span>
-                <span class="sound-indicator">🔊 фон</span>
-            </div>
-
-            <div class="audio-controls">
-                <button id="musicBtn">🎵 Добавить музыку</button>
-                <button id="clearAudioBtn">✕ Убрать аудио</button>
-            </div>
-
-            <button class="save-day-btn" id="saveDayBtn">💎 Сохранить день</button>
+    <!-- Модалка помощи -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal-box">
+            <h3>📖 Как пользоваться</h3>
+            <div class="help-text">1. Оцени день — выбери число от 1 до 5. Фон будет меняться. Нажми «Подтвердить».</div>
+            <div class="help-text">2. Выбери состояния — до 4-х штук, которые описывают твой день.</div>
+            <div class="help-text">3. Напиши комментарий — опиши события дня.</div>
+            <div class="help-text">4. Добавь звезду — нажми кнопку, чтобы отметить особенный момент.</div>
+            <div class="help-text">⭐ Чтобы увидеть заметку — нажми на звезду или волну.</div>
+            <div class="help-text">🗑️ Чтобы удалить звезду — зажми её на 2 секунды.</div>
+            <div class="help-text">🔄 Чтобы вернуться к оценке — нажми стрелку ←.</div>
+            <div class="help-text">🗑️ Чтобы сбросить день — зажми дату в центре вверху на 2 секунды.</div>
+            <div class="modal-close" id="closeHelp">Закрыть</div>
         </div>
     </div>
 
     <script>
         (function(){
-            // ---- DATA LAYER ----
-            const STORAGE_KEY = 'crystal_diary_data';
-            let diaryData = {};
+            // ---- Инициализация Telegram ----
+            const tg = window.Telegram?.WebApp;
+            if (tg) { tg.expand(); tg.enableClosingConfirmation(); }
 
-            function loadData() {
-                try {
-                    const raw = localStorage.getItem(STORAGE_KEY);
-                    if (raw) diaryData = JSON.parse(raw);
-                    else diaryData = {};
-                } catch(e) { diaryData = {}; }
-            }
-            function saveData() {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(diaryData));
-            }
+            // ---- Данные ----
+            const STATE_COLORS = {
+                'Поток': '#4dd0e1', 'Свет': '#ffca28', 'Уют': '#ffab91',
+                'Тень': '#90caf9', 'Искра': '#ce93d8', 'Тишина': '#81c784',
+                'Туман': '#b0bec5'
+            };
+            const STATE_ICONS = {
+                'Поток': '🌊', 'Свет': '☀️', 'Уют': '🏠',
+                'Тень': '🌙', 'Искра': '⚡', 'Тишина': '🌿', 'Туман': '🌫️'
+            };
+            const STATE_DESC = {
+                'Поток': 'день прошёл на одном дыхании',
+                'Свет': 'день был тёплым и радостным',
+                'Уют': 'чувствовала себя в безопасности',
+                'Тень': 'день был тяжёлым или грустным',
+                'Искра': 'случилось что-то яркое и неожиданное',
+                'Тишина': 'спокойный, но не пустой день',
+                'Туман': 'день прошёл как в дымке'
+            };
+            const STATE_NAMES = Object.keys(STATE_COLORS);
 
-            // ---- STATE ----
             let currentDate = new Date();
-            let currentYear = currentDate.getFullYear();
-            let currentMonth = currentDate.getMonth();
-            let selectedDay = null; // { year, month, day }
+            let selectedDate = new Date(); // день на холсте
+            let selectedRating = null;
+            let selectedStates = [];
+            let starsData = []; // массив {x,y,note?}
+            let dayNote = '';
+            let dayMusic = null;
 
-            // для холста
-            let canvasRating = 0;
-            let canvasStates = [];
-            let canvasComment = '';
-            let canvasStars = 0;
-            let canvasAudio = null; // просто строка-метка
-
-            // DOM
-            const daysGrid = document.getElementById('daysGrid');
-            const monthYear = document.getElementById('monthYear');
-            const avgScore = document.getElementById('avgScore');
-            const streakCount = document.getElementById('streakCount');
-            const canvasView = document.getElementById('canvas-view');
-            const canvasDate = document.getElementById('canvasDate');
-            const ratingRow = document.getElementById('ratingRow');
-            const statesGrid = document.getElementById('statesGrid');
-            const wavePreview = document.getElementById('wavePreview');
-            const dayComment = document.getElementById('dayComment');
-            const starCountDisplay = document.getElementById('starCountDisplay');
-            const addStarBtn = document.getElementById('addStarBtn');
-            const saveDayBtn = document.getElementById('saveDayBtn');
-            const closeCanvasBtn = document.getElementById('closeCanvas');
-            const musicBtn = document.getElementById('musicBtn');
-            const clearAudioBtn = document.getElementById('clearAudioBtn');
-
-            // ---- helpers ----
-            function getDayKey(year, month, day) { return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`; }
-
-            function getDayData(year, month, day) {
-                const key = getDayKey(year, month, day);
-                return diaryData[key] || null;
+            // ---- Хранилище ----
+            function getData() {
+                try { return JSON.parse(localStorage.getItem('crystal_diary')) || {}; } catch(e){ return {}; }
+            }
+            function saveData(data) {
+                localStorage.setItem('crystal_diary', JSON.stringify(data));
+            }
+            function getDayData(dateStr) {
+                const d = getData();
+                return d[dateStr] || null;
+            }
+            function setDayData(dateStr, obj) {
+                const d = getData();
+                d[dateStr] = obj;
+                saveData(d);
             }
 
-            function setDayData(year, month, day, data) {
-                const key = getDayKey(year, month, day);
-                diaryData[key] = data;
-                saveData();
+            function dateStr(d) {
+                return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');
             }
 
-            function getMonthData(year, month) {
-                const result = {};
-                const daysInMonth = new Date(year, month+1, 0).getDate();
-                for (let d=1; d<=daysInMonth; d++) {
-                    const key = getDayKey(year, month, d);
-                    if (diaryData[key]) result[d] = diaryData[key];
-                }
-                return result;
-            }
-
-            // ---- рендер календаря ----
+            // ---- Рендер календаря ----
             function renderCalendar() {
-                const year = currentYear, month = currentMonth;
-                const firstDay = new Date(year, month, 1).getDay(); // 0=вск
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                const firstDay = new Date(year, month, 1).getDay(); // 0=вс
                 const daysInMonth = new Date(year, month+1, 0).getDate();
                 const today = new Date();
-                const todayYear = today.getFullYear(), todayMonth = today.getMonth(), todayDay = today.getDate();
+                const todayStr = dateStr(today);
 
-                let html = '';
-                // пустые ячейки до первого дня (пн=0)
-                let startOffset = (firstDay === 0) ? 6 : firstDay - 1;
-                for (let i=0; i<startOffset; i++) {
-                    html += `<div class="day-cell empty"></div>`;
-                }
-
-                const monthData = getMonthData(year, month);
-                let totalScore = 0, countScore = 0, streak = 0;
-
+                const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+                document.getElementById('monthLabel').innerHTML = `${monthNames[month]} ${year} <span class="month-stats" id="monthStats"></span>`;
+                // статистика
+                const allData = getData();
+                let sum=0, count=0, streak=0;
+                const monthKey = `${year}-${(month+1).toString().padStart(2,'0')}`;
                 for (let d=1; d<=daysInMonth; d++) {
-                    const data = monthData[d];
-                    let rating = data?.rating || 0;
-                    let states = data?.states || [];
-                    let hasStar = data?.stars > 0;
-                    let hasAudio = data?.audio ? true : false;
-                    let isToday = (year === todayYear && month === todayMonth && d === todayDay);
-
-                    // цвет шкалы
-                    let bgColor = 'transparent';
-                    if (rating === 1) bgColor = '#1a1a24';
-                    else if (rating === 2) bgColor = '#2d2f3a';
-                    else if (rating === 3) bgColor = '#44485a';
-                    else if (rating === 4) bgColor = '#6a6f84';
-                    else if (rating === 5) bgColor = '#b0b8d0';
-
-                    if (rating > 0) totalScore += rating, countScore++;
-
-                    // стрик (простой подсчёт)
-                    if (isToday || (data && data.rating > 0)) streak++;
-
-                    html += `<div class="day-cell ${isToday ? 'today' : ''}" style="background:${bgColor};" data-day="${d}">`;
-                    html += `<span>${d}</span>`;
-                    if (states.length > 0) {
-                        html += `<div class="mini-waves">`;
-                        states.slice(0,3).forEach(s => {
-                            const color = ['#7ab0ff','#6fcf97','#f2c94a','#bb6bd9','#ff8a8a','#7fdbff','#b0b0b0'][Math.floor(Math.random()*7)];
-                            html += `<span style="background:${color};"></span>`;
-                        });
-                        html += `</div>`;
+                    const ds = `${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+                    if (allData[ds] && allData[ds].rating) {
+                        sum += allData[ds].rating;
+                        count++;
                     }
-                    if (hasStar) html += `<div class="star-icon">✦</div>`;
-                    if (hasAudio) html += `<div class="audio-icon">🎵</div>`;
-                    html += `</div>`;
                 }
+                const avg = count ? (sum/count).toFixed(1) : '';
+                // стрик (с сегодня назад)
+                let streakCount = 0;
+                let check = new Date(today);
+                while (true) {
+                    const ds = dateStr(check);
+                    if (allData[ds] && allData[ds].rating) { streakCount++; check.setDate(check.getDate()-1); }
+                    else break;
+                }
+                const statsEl = document.getElementById('monthStats');
+                if (avg) statsEl.innerHTML = `★ ${avg}  🔥 ${streakCount}`;
+                else statsEl.innerHTML = `🔥 ${streakCount}`;
 
-                daysGrid.innerHTML = html;
-                monthYear.textContent = `${new Date(year, month).toLocaleString('ru', {month:'long', year:'numeric'})}`;
-                avgScore.textContent = countScore > 0 ? (totalScore/countScore).toFixed(1) : '—';
-                streakCount.textContent = streak;
+                const grid = document.getElementById('daysGrid');
+                grid.innerHTML = '';
+                // заполняем пустые ячейки до первого дня
+                const startOffset = firstDay === 0 ? 6 : firstDay-1;
+                for (let i=0; i<startOffset; i++) {
+                    const empty = document.createElement('div');
+                    empty.className = 'day-cell';
+                    empty.style.background = 'transparent';
+                    empty.style.pointerEvents = 'none';
+                    grid.appendChild(empty);
+                }
+                for (let d=1; d<=daysInMonth; d++) {
+                    const ds = `${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+                    const cell = document.createElement('div');
+                    cell.className = 'day-cell';
+                    cell.textContent = d;
+                    const isToday = ds === todayStr;
+                    if (isToday) cell.classList.add('today');
+                    const isFuture = new Date(year, month, d) > new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    if (isFuture) cell.classList.add('future');
 
-                // обработка кликов по дням
-                document.querySelectorAll('.day-cell:not(.empty)').forEach(el => {
-                    el.addEventListener('click', function(e) {
-                        const day = parseInt(this.dataset.day);
-                        openDayEditor(year, month, day);
+                    const dayData = allData[ds];
+                    if (dayData && dayData.rating) {
+                        const brightness = 5 - (dayData.rating-1); // 1->5 => black, 5->1 white
+                        const gray = Math.round(55 + brightness * 40);
+                        cell.style.background = `rgb(${gray},${gray},${gray})`;
+                        cell.style.color = gray > 140 ? '#111' : '#f0f0f0';
+                        // мини-волны
+                        if (dayData.states && dayData.states.length) {
+                            const waves = document.createElement('div');
+                            waves.className = 'mini-waves';
+                            dayData.states.slice(0,4).forEach(st => {
+                                const w = document.createElement('div');
+                                w.className = 'mini-wave';
+                                w.style.background = STATE_COLORS[st] || '#888';
+                                w.style.animationDelay = (Math.random()*0.5)+'s';
+                                waves.appendChild(w);
+                            });
+                            cell.appendChild(waves);
+                        }
+                        // звезда
+                        if (dayData.stars && dayData.stars.length) {
+                            const starIcon = document.createElement('span');
+                            starIcon.className = 'day-star';
+                            starIcon.textContent = '✦';
+                            cell.appendChild(starIcon);
+                        }
+                        // аудио
+                        if (dayData.music) {
+                            const audioIcon = document.createElement('span');
+                            audioIcon.className = 'day-audio-icon';
+                            audioIcon.textContent = '🎵';
+                            cell.appendChild(audioIcon);
+                        }
+                    } else {
+                        cell.style.background = 'rgba(255,255,255,0.03)';
+                        cell.style.color = 'rgba(255,255,255,0.3)';
+                    }
+                    // Клик по дню
+                    cell.addEventListener('click', (e) => {
+                        if (isFuture) {
+                            tg?.showPopup({ message: 'Этот день ещё не наступил 😊', buttons: [{type:'ok'}] });
+                            return;
+                        }
+                        const dObj = new Date(year, month, d);
+                        openDay(dObj);
                     });
-                    // долгое нажатие для редактирования (уже открывает)
-                });
-            }
-
-            // ---- открыть холст ----
-            function openDayEditor(year, month, day) {
-                selectedDay = { year, month, day };
-                const data = getDayData(year, month, day) || {};
-                canvasRating = data.rating || 0;
-                canvasStates = data.states || [];
-                canvasComment = data.comment || '';
-                canvasStars = data.stars || 0;
-                canvasAudio = data.audio || null;
-
-                canvasDate.textContent = `${day} ${new Date(year, month).toLocaleString('ru', {month:'short'})} ${year}`;
-
-                // обновить UI
-                updateCanvasUI();
-                canvasView.classList.add('open');
-            }
-
-            function updateCanvasUI() {
-                // рейтинг
-                document.querySelectorAll('.rating-btn').forEach(btn => {
-                    const val = parseInt(btn.dataset.val);
-                    btn.classList.toggle('selected', val === canvasRating);
-                });
-                // состояния
-                document.querySelectorAll('.state-btn').forEach(btn => {
-                    const state = btn.dataset.state;
-                    btn.classList.toggle('active', canvasStates.includes(state));
-                });
-                // комментарий
-                dayComment.value = canvasComment;
-                // звёзды
-                starCountDisplay.textContent = `⭐ ${canvasStars}`;
-                // волны
-                wavePreview.innerHTML = canvasStates.map(s => `<span class="wave-chip">${s}</span>`).join('');
-            }
-
-            // ---- сохранение дня ----
-            function saveCurrentDay() {
-                if (!selectedDay) return;
-                const { year, month, day } = selectedDay;
-                const data = {
-                    rating: canvasRating,
-                    states: canvasStates,
-                    comment: canvasComment,
-                    stars: canvasStars,
-                    audio: canvasAudio
-                };
-                setDayData(year, month, day, data);
-                renderCalendar();
-                canvasView.classList.remove('open');
-            }
-
-            // ---- события UI ----
-            // рейтинг
-            ratingRow.addEventListener('click', (e) => {
-                const btn = e.target.closest('.rating-btn');
-                if (!btn) return;
-                canvasRating = parseInt(btn.dataset.val);
-                updateCanvasUI();
-            });
-
-            // состояния (макс 4)
-            statesGrid.addEventListener('click', (e) => {
-                const btn = e.target.closest('.state-btn');
-                if (!btn) return;
-                const state = btn.dataset.state;
-                if (canvasStates.includes(state)) {
-                    canvasStates = canvasStates.filter(s => s !== state);
-                } else {
-                    if (canvasStates.length >= 4) return;
-                    canvasStates.push(state);
+                    // долгое нажатие для редактирования (уже есть открытие)
+                    grid.appendChild(cell);
                 }
-                updateCanvasUI();
+            }
+
+            // ---- Открыть день (холст) ----
+            function openDay(dateObj) {
+                selectedDate = new Date(dateObj);
+                const ds = dateStr(selectedDate);
+                const data = getDayData(ds) || {};
+                selectedRating = data.rating || null;
+                selectedStates = data.states || [];
+                starsData = data.stars || [];
+                dayNote = data.note || '';
+                dayMusic = data.music || null;
+
+                document.getElementById('calendar').classList.add('hidden');
+                const container = document.getElementById('canvas-container');
+                container.classList.add('active');
+                // обновляем дату
+                const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+                document.getElementById('dateDisplay').textContent = `${selectedDate.getDate()} ${months[selectedDate.getMonth()]}`;
+                // сброс UI
+                resetCanvasUI();
+                if (selectedRating) {
+                    // показать состояния и заметки
+                    showStatesAndNotes();
+                    highlightRating(selectedRating);
+                    renderStatesSelection();
+                    renderStars();
+                    document.getElementById('noteInput').value = dayNote || '';
+                    document.getElementById('starCounter').textContent = `⭐ ${starsData.length}`;
+                    // запустить фоновый эффект
+                    applyRatingEffect(selectedRating);
+                    // звук фона (упрощённо - заглушка)
+                } else {
+                    document.getElementById('ratingSection').style.display = 'flex';
+                    document.getElementById('statesSection').classList.remove('active');
+                    document.getElementById('notesSection').classList.remove('active');
+                    document.getElementById('backToRatingBtn').classList.remove('visible');
+                    // нейтральный фон
+                    clearCanvasEffects();
+                }
+                // долгое нажатие на дату -> сброс
+                const dateDisplay = document.getElementById('dateDisplay');
+                let holdTimer;
+                dateDisplay.addEventListener('pointerdown', () => {
+                    holdTimer = setTimeout(() => {
+                        tg?.showPopup({
+                            title: '🗑️ Сбросить день?',
+                            message: 'Точно сбросить все данные за этот день?',
+                            buttons: [
+                                { id: 'cancel', type: 'cancel' },
+                                { id: 'confirm', type: 'destructive', text: 'Подтвердить' }
+                            ]
+                        }, (btnId) => {
+                            if (btnId === 'confirm') {
+                                resetDay();
+                            }
+                        });
+                    }, 800);
+                });
+                dateDisplay.addEventListener('pointerup', () => clearTimeout(holdTimer));
+                dateDisplay.addEventListener('pointerleave', () => clearTimeout(holdTimer));
+            }
+
+            function resetDay() {
+                const ds = dateStr(selectedDate);
+                const d = getData();
+                delete d[ds];
+                saveData(d);
+                // анимация тумана
+                const fog = document.getElementById('fogOverlay');
+                fog.classList.add('active');
+                setTimeout(() => {
+                    fog.classList.remove('active');
+                    closeCanvas();
+                }, 1200);
+            }
+
+            function resetCanvasUI() {
+                document.getElementById('ratingSection').style.display = 'flex';
+                document.getElementById('statesSection').classList.remove('active');
+                document.getElementById('notesSection').classList.remove('active');
+                document.getElementById('backToRatingBtn').classList.remove('visible');
+                document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+                document.getElementById('confirmRatingBtn').classList.remove('active');
+                clearCanvasEffects();
+            }
+
+            function highlightRating(val) {
+                document.querySelectorAll('.rating-btn').forEach(b => {
+                    if (parseInt(b.dataset.val) === val) b.classList.add('selected');
+                });
+                document.getElementById('confirmRatingBtn').classList.add('active');
+            }
+
+            function showStatesAndNotes() {
+                document.getElementById('ratingSection').style.display = 'none';
+                document.getElementById('statesSection').classList.add('active');
+                document.getElementById('notesSection').classList.add('active');
+                document.getElementById('backToRatingBtn').classList.add('visible');
+                renderStatesSelection();
+                // показать волны
+                drawWaves(selectedStates);
+            }
+
+            function renderStatesSelection() {
+                const grid = document.getElementById('statesGrid');
+                grid.innerHTML = '';
+                STATE_NAMES.forEach(name => {
+                    const btn = document.createElement('div');
+                    btn.className = 'state-btn';
+                    if (selectedStates.includes(name)) btn.classList.add('active');
+                    btn.innerHTML = `${STATE_ICONS[name]} ${name}`;
+                    btn.style.color = STATE_COLORS[name];
+                    btn.addEventListener('click', () => {
+                        if (selectedStates.includes(name)) {
+                            selectedStates = selectedStates.filter(s => s !== name);
+                        } else {
+                            if (selectedStates.length >= 4) {
+                                tg?.showPopup({ message: 'Можно выбрать максимум 4 состояния ✨', buttons: [{type:'ok'}] });
+                                return;
+                            }
+                            selectedStates.push(name);
+                        }
+                        renderStatesSelection();
+                        drawWaves(selectedStates);
+                        saveCurrentDay();
+                    });
+                    grid.appendChild(btn);
+                });
+            }
+
+            // ---- Волны ----
+            function drawWaves(states) {
+                const canvas = document.getElementById('waveCanvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                if (!states.length) return;
+                const w = canvas.width, h = canvas.height;
+                states.forEach((st, idx) => {
+                    const color = STATE_COLORS[st] || '#888';
+                    const baseY = h * 0.35 + idx * 25;
+                    ctx.beginPath();
+                    for (let x=0; x<w; x+=2) {
+                        const y = baseY + Math.sin(x*0.02 + Date.now()*0.001 + idx*2) * 12
+                                 + Math.sin(x*0.01 + Date.now()*0.0015 + idx) * 8;
+                        if (x===0) ctx.moveTo(x,y);
+                        else ctx.lineTo(x,y);
+                    }
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 3;
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = 20;
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                    // дополнительная прозрачная
+                    ctx.beginPath();
+                    for (let x=0; x<w; x+=3) {
+                        const y2 = baseY-8 + Math.sin(x*0.025 + Date.now()*0.0012 + idx*1.7) * 14;
+                        if (x===0) ctx.moveTo(x,y2);
+                        else ctx.lineTo(x,y2);
+                    }
+                    ctx.strokeStyle = color + '40';
+                    ctx.lineWidth = 8;
+                    ctx.stroke();
+                });
+                requestAnimationFrame(() => drawWaves(states));
+            }
+
+            // ---- Звёзды ----
+            function renderStars() {
+                const canvas = document.getElementById('starCanvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                starsData.forEach((s, idx) => {
+                    drawStar(ctx, s.x, s.y, 16, 8, 5, '#ffe68f', '#fffbe6');
+                });
+                // анимация мерцания
+                requestAnimationFrame(() => renderStars());
+            }
+
+            function drawStar(ctx, cx, cy, outerR, innerR, points, color1, color2) {
+                ctx.beginPath();
+                for (let i=0; i<points*2; i++) {
+                    const r = i%2===0 ? outerR : innerR;
+                    const angle = (i * Math.PI) / points - Math.PI/2 + Date.now()*0.0005;
+                    const x = cx + Math.cos(angle) * r;
+                    const y = cy + Math.sin(angle) * r;
+                    if (i===0) ctx.moveTo(x,y);
+                    else ctx.lineTo(x,y);
+                }
+                ctx.closePath();
+                const grad = ctx.createRadialGradient(cx-4, cy-4, 2, cx, cy, outerR+6);
+                grad.addColorStop(0, color2);
+                grad.addColorStop(1, color1);
+                ctx.fillStyle = grad;
+                ctx.shadowColor = '#aaccff';
+                ctx.shadowBlur = 25;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            function addStar() {
+                if (starsData.length >= 7) {
+                    tg?.showPopup({ message: 'Максимум 7 звёзд ✨', buttons: [{type:'ok'}] });
+                    return;
+                }
+                const canvas = document.getElementById('starCanvas');
+                let x, y, valid;
+                let attempts=0;
+                do {
+                    x = 60 + Math.random() * (canvas.width-120);
+                    y = 60 + Math.random() * (canvas.height*0.6);
+                    valid = true;
+                    for (const s of starsData) {
+                        if (Math.hypot(s.x-x, s.y-y) < 100) valid = false;
+                    }
+                    attempts++;
+                } while (!valid && attempts<50);
+                starsData.push({ x, y });
+                document.getElementById('starCounter').textContent = `⭐ ${starsData.length}`;
+                saveCurrentDay();
+                // звук хрусталя (имитация)
+                playSound('crystal');
+                // анимация вспышки
+            }
+
+            function removeStar(index) {
+                starsData.splice(index, 1);
+                document.getElementById('starCounter').textContent = `⭐ ${starsData.length}`;
+                saveCurrentDay();
+                playSound('break');
+            }
+
+            // ---- Звуки (заглушка) ----
+            function playSound(type) {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    if (type === 'crystal') {
+                        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime+0.1);
+                        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+0.3);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime+0.3);
+                    } else if (type === 'break') {
+                        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime+0.2);
+                        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+0.3);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime+0.3);
+                    }
+                } catch(e) {}
+            }
+
+            // ---- Сохранение ----
+            function saveCurrentDay() {
+                const ds = dateStr(selectedDate);
+                const data = {
+                    rating: selectedRating,
+                    states: selectedStates,
+                    stars: starsData,
+                    note: document.getElementById('noteInput').value || '',
+                    music: dayMusic
+                };
+                setDayData(ds, data);
+            }
+
+            // ---- Эффекты фона (оценка) ----
+            function applyRatingEffect(val) {
+                const canvas = document.getElementById('bgCanvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                const w = canvas.width, h = canvas.height;
+                // простые цветные размытые пятна
+                const colors = ['#1a2a4a','#3a5a7a','#8a9a5a','#b06a5a','#f0d0a0'];
+                const c = colors[val-1] || '#2a2a3a';
+                ctx.fillStyle = c;
+                ctx.fillRect(0,0,w,h);
+                // добавим капли/эффекты
+                if (val === 1) {
+                    for (let i=0; i<60; i++) {
+                        ctx.beginPath();
+                        ctx.moveTo(Math.random()*w, Math.random()*h);
+                        ctx.lineTo(Math.random()*w, Math.random()*h+20);
+                        ctx.strokeStyle = 'rgba(200,220,255,0.15)';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                } else if (val === 5) {
+                    // радужные пятна
+                    for (let i=0; i<8; i++) {
+                        const grd = ctx.createRadialGradient(Math.random()*w, Math.random()*h, 10, Math.random()*w, Math.random()*h, 120);
+                        grd.addColorStop(0, `hsla(${Math.random()*360},70%,70%,0.2)`);
+                        grd.addColorStop(1, 'transparent');
+                        ctx.fillStyle = grd;
+                        ctx.fillRect(0,0,w,h);
+                    }
+                }
+                // TODO: полноценные эффекты с анимацией (упрощённо)
+            }
+            function clearCanvasEffects() {
+                const canvas = document.getElementById('bgCanvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                ctx.fillStyle = '#0b0e1a';
+                ctx.fillRect(0,0,canvas.width,canvas.height);
+            }
+
+            // ---- Закрыть холст ----
+            function closeCanvas() {
+                document.getElementById('canvas-container').classList.remove('active');
+                document.getElementById('calendar').classList.remove('hidden');
+                renderCalendar();
+                // остановить звуки
+            }
+
+            // ---- Обработчики ----
+            document.getElementById('closeCanvasBtn').addEventListener('click', () => {
+                saveCurrentDay();
+                closeCanvas();
             });
 
-            // комментарий
-            dayComment.addEventListener('input', () => {
-                canvasComment = dayComment.value;
+            document.getElementById('backToRatingBtn').addEventListener('click', () => {
+                // вернуться к оценке, сохранив состояния
+                document.getElementById('ratingSection').style.display = 'flex';
+                document.getElementById('statesSection').classList.remove('active');
+                document.getElementById('notesSection').classList.remove('active');
+                document.getElementById('backToRatingBtn').classList.remove('visible');
+                selectedRating = null;
+                document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+                document.getElementById('confirmRatingBtn').classList.remove('active');
+                clearCanvasEffects();
+                // сохраняем без рейтинга?
+                const ds = dateStr(selectedDate);
+                const data = getDayData(ds) || {};
+                data.states = selectedStates;
+                data.stars = starsData;
+                data.note = document.getElementById('noteInput').value;
+                setDayData(ds, data);
             });
 
-            // звезда
-            addStarBtn.addEventListener('click', () => {
-                if (canvasStars >= 7) return;
-                canvasStars++;
-                updateCanvasUI();
-                // имитация звука + анимация (просто вибрация)
-                if (navigator.vibrate) navigator.vibrate(30);
+            // Выбор оценки
+            document.querySelectorAll('.rating-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedRating = parseInt(btn.dataset.val);
+                    document.getElementById('confirmRatingBtn').classList.add('active');
+                    applyRatingEffect(selectedRating);
+                    playSound('crystal');
+                });
             });
 
-            // аудио (имитация)
-            musicBtn.addEventListener('click', () => {
-                canvasAudio = '🎵 Трек (Яндекс/загрузка)';
-                updateCanvasUI();
-            });
-            clearAudioBtn.addEventListener('click', () => {
-                canvasAudio = null;
-                updateCanvasUI();
+            document.getElementById('confirmRatingBtn').addEventListener('click', () => {
+                if (!selectedRating) return;
+                showStatesAndNotes();
+                saveCurrentDay();
+                // приглушить звук (имитация)
             });
 
-            // сохранить
-            saveDayBtn.addEventListener('click', saveCurrentDay);
+            // Добавить звезду
+            document.getElementById('addStarBtn').addEventListener('click', addStar);
 
-            // закрыть
-            closeCanvasBtn.addEventListener('click', () => {
-                canvasView.classList.remove('open');
+            // Долгое нажатие на звезду для удаления
+            document.getElementById('starCanvas').addEventListener('pointerdown', (e) => {
+                const rect = e.target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                for (let i=starsData.length-1; i>=0; i--) {
+                    const s = starsData[i];
+                    if (Math.hypot(s.x-x, s.y-y) < 25) {
+                        let hold = setTimeout(() => {
+                            removeStar(i);
+                        }, 800);
+                        const cancel = () => { clearTimeout(hold); };
+                        document.addEventListener('pointerup', cancel, {once:true});
+                        document.addEventListener('pointerleave', cancel, {once:true});
+                        break;
+                    }
+                }
             });
 
-            // навигация
+            // Навигация
             document.getElementById('prevMonth').addEventListener('click', () => {
-                currentMonth--;
-                if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+                currentDate.setMonth(currentDate.getMonth()-1);
                 renderCalendar();
             });
             document.getElementById('nextMonth').addEventListener('click', () => {
-                currentMonth++;
-                if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+                currentDate.setMonth(currentDate.getMonth()+1);
                 renderCalendar();
             });
+            // свайп
+            let startX=0;
+            document.getElementById('calendar').addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+            document.getElementById('calendar').addEventListener('touchend', e => {
+                const dx = e.changedTouches[0].clientX - startX;
+                if (Math.abs(dx)>50) {
+                    if (dx<0) currentDate.setMonth(currentDate.getMonth()+1);
+                    else currentDate.setMonth(currentDate.getMonth()-1);
+                    renderCalendar();
+                }
+            });
 
-            // ---- инициализация ----
-            loadData();
+            // Помощь
+            document.getElementById('helpBtn').addEventListener('click', () => {
+                document.getElementById('helpModal').classList.add('active');
+            });
+            document.getElementById('closeHelp').addEventListener('click', () => {
+                document.getElementById('helpModal').classList.remove('active');
+            });
+
+            // Инициализация
             renderCalendar();
+            clearCanvasEffects();
 
-            // если сегодня нет данных — можно открыть сегодняшний день (опционально)
-            // но по концепту пользователь сам выбирает день
+            // Обработка resize
+            window.addEventListener('resize', () => {
+                if (document.getElementById('canvas-container').classList.contains('active')) {
+                    // перерисовать фоны
+                }
+            });
 
-            // звуковой фон (имитация) — просто индикатор
-            console.log('🔊 Звуковая система активна (реалистичные петли)');
+            // ---- Заглушка для музыки ----
+            document.getElementById('addMusicBtn').addEventListener('click', () => {
+                tg?.showPopup({ message: '🎵 Функция музыки будет доступна в следующей версии', buttons: [{type:'ok'}] });
+            });
 
-            // Добавим космическую магию: звёзды на фоне (просто css)
         })();
     </script>
 </body>
