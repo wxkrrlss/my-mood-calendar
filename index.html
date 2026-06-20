@@ -2,1187 +2,2489 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Хрустальный дневник</title>
-    <!-- Telegram WebApp -->
-    <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none;
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            background: #0b0e1a;
-            color: white;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            position: relative;
-            touch-action: manipulation;
-        }
-        /* Календарь */
-        #calendar {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            padding: 20px 16px 30px;
-            background: radial-gradient(ellipse at 30% 20%, #1a1f33, #0b0e1a 70%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #05050a;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            padding: 16px;
+            color: #e0e0e8;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            overflow-x: hidden;
             overflow-y: auto;
-            z-index: 10;
-            transition: opacity 0.6s ease, transform 0.6s ease;
+            position: relative;
         }
-        #calendar.hidden {
-            opacity: 0;
-            transform: scale(1.02);
+        /* ===== КОСМИЧЕСКИЙ ФОН ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(180, 100, 255, 0.06) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 60%, rgba(100, 200, 255, 0.05) 0%, transparent 40%);
+            animation: nebula 40s ease-in-out infinite alternate;
             pointer-events: none;
-        }
-        /* Северное сияние + звёзды (фон) */
-        #aurora {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none;
-            overflow: hidden;
             z-index: 0;
         }
-        .aurora-band {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(70px);
-            opacity: 0.25;
-            animation: auroraMove 18s infinite alternate ease-in-out;
+        @keyframes nebula {
+            0% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 0.5; }
+            33% { transform: translate(5%, -3%) scale(1.1) rotate(2deg); opacity: 0.9; }
+            66% { transform: translate(-4%, 5%) scale(0.9) rotate(-1.5deg); opacity: 0.6; }
+            100% { transform: translate(3%, -2%) scale(1.05) rotate(1deg); opacity: 0.8; }
         }
-        @keyframes auroraMove {
-            0% { transform: translateX(-20%) scale(1); }
-            100% { transform: translateX(20%) scale(1.2); }
-        }
-        .star {
-            position: absolute;
-            width: 2px; height: 2px;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite alternate;
-        }
-        @keyframes twinkle {
-            0% { opacity: 0.2; }
-            100% { opacity: 0.9; }
-        }
-        /* Шапка календаря */
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0 10px;
-            position: relative;
-            z-index: 2;
-        }
-        .calendar-title {
-            font-size: 26px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
-        }
-        .help-btn {
-            font-size: 24px;
-            background: rgba(255,255,255,0.08);
-            width: 44px; height: 44px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .help-btn:active { transform: scale(0.92); }
-        /* Навигация */
-        .nav-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0 4px;
-            z-index: 2;
-            position: relative;
-        }
-        .nav-arrow {
-            font-size: 32px;
-            padding: 0 12px;
-            cursor: pointer;
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
+                radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,0.3), transparent);
+            background-size: 350px 350px;
             opacity: 0.7;
-            transition: 0.2s;
-            line-height: 1;
+            animation: starField 12s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
         }
-        .nav-arrow:active { opacity: 1; transform: scale(0.9); }
-        .month-label {
-            font-size: 20px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
+        @keyframes starField {
+            0% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+            100% { opacity: 0.4; transform: scale(0.98); }
+        }
+        /* ===== КАЛЕНДАРЬ ===== */
+        .calendar-wrapper {
+            position: relative;
+            background: rgba(10, 10, 18, 0.85);
+            backdrop-filter: blur(16px);
+            border-radius: 32px;
+            padding: 5px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 8px 60px rgba(0,0,0,0.8), inset 0 0 80px rgba(100,150,255,0.02);
+            overflow: hidden;
+            z-index: 1;
+            margin-bottom: 20px;
+        }
+        .calendar-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 20% 30%, rgba(140,180,255,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 60%, rgba(200,150,255,0.08) 0%, transparent 50%);
+            animation: northernLights 25s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes northernLights {
+            0% { transform: translate(0,0) scale(1); opacity: 0.5; }
+            25% { transform: translate(5%, -4%) scale(1.06); opacity: 1; }
+            50% { transform: translate(-4%, 6%) scale(0.94); opacity: 0.7; }
+            75% { transform: translate(3%, -2%) scale(1.02); opacity: 0.9; }
+            100% { transform: translate(-2%, 4%) scale(0.98); opacity: 0.6; }
+        }
+        .calendar-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(2px 2px at 15% 25%, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 65% 15%, rgba(255,255,255,0.6), transparent);
+            background-size: 250px 250px;
+            opacity: 0.8;
+            animation: starTwinkle 10s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes starTwinkle {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.9; }
+            100% { opacity: 0.4; }
+        }
+        .calendar {
+            position: relative;
+            z-index: 1;
+            background: rgba(16,16,26,0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 16px;
+        }
+        .header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            margin-bottom: 4px;
+            padding: 0 4px;
         }
-        .month-stats {
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f0f0f8;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 30px rgba(100,150,255,0.1);
+        }
+        .header-actions {
             display: flex;
             gap: 12px;
-            font-size: 16px;
-            background: rgba(255,255,255,0.06);
-            padding: 2px 14px;
-            border-radius: 30px;
-            backdrop-filter: blur(4px);
         }
-        .days-of-week {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            font-size: 13px;
-            color: rgba(255,255,255,0.5);
-            margin: 12px 0 6px;
-            letter-spacing: 0.3px;
-            z-index: 2;
-            position: relative;
-        }
-        .grid-days {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-            z-index: 2;
-            position: relative;
-        }
-        .day-cell {
-            aspect-ratio: 1/1;
-            border-radius: 14px;
-            background: rgba(255,255,255,0.05);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        .help-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.15);
             font-size: 18px;
-            font-weight: 500;
-            transition: 0.15s;
             cursor: pointer;
-            position: relative;
-            color: rgba(255,255,255,0.7);
-            border: 1px solid transparent;
-            min-height: 52px;
+            transition: 0.3s;
+            padding: 4px 8px;
+            border-radius: 8px;
         }
-        .day-cell.today {
-            border-color: #5b9aff;
-            box-shadow: 0 0 20px rgba(70, 130, 255, 0.4);
+        .help-btn:hover { color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
+        .subheader {
+            font-size: 11px;
+            color: rgba(255,255,255,0.15);
+            margin-bottom: 14px;
+            padding: 0 4px;
+            letter-spacing: 0.5px;
         }
-        .day-cell.future {
-            opacity: 0.2;
-            pointer-events: none;
-        }
-        .day-cell .mini-waves {
+        .month-nav {
             display: flex;
-            gap: 2px;
-            position: absolute;
-            bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 4px;
-            align-items: flex-end;
-        }
-        .mini-wave {
-            width: 5px;
-            border-radius: 4px;
-            animation: wavePulse 1.4s infinite alternate ease-in-out;
-        }
-        @keyframes wavePulse {
-            0% { height: 2px; opacity: 0.6; }
-            100% { height: 6px; opacity: 1; }
-        }
-        .day-star {
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            font-size: 12px;
-            color: #f7d44a;
-            text-shadow: 0 0 10px #f7d44a;
-        }
-        .day-audio-icon {
-            position: absolute;
-            bottom: 2px;
-            left: 4px;
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        /* Холст */
-        #canvas-container {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 20;
-            background: #0b0e1a;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            overflow: hidden;
-            transition: opacity 0.5s ease;
-        }
-        #canvas-container.active {
-            display: flex;
-        }
-        #bgCanvas, #waveCanvas, #starCanvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-        }
-        #starCanvas { pointer-events: auto; z-index: 5; }
-        #waveCanvas { z-index: 3; }
-        #bgCanvas { z-index: 1; }
-
-        .canvas-ui {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            pointer-events: none;
-        }
-        .canvas-ui > * { pointer-events: auto; }
-
-        .canvas-top-bar {
-            display: flex;
-            width: 100%;
             justify-content: space-between;
             align-items: center;
             padding: 4px 0 14px;
         }
-        .canvas-top-bar .date-display {
+        .month-nav button {
+            background: rgba(255,255,255,0.04);
+            border: none;
             font-size: 20px;
-            font-weight: 400;
-            background: rgba(255,255,255,0.08);
-            padding: 6px 20px;
-            border-radius: 40px;
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.05);
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 12px rgba(0,0,0,0.5);
-            transition: 0.2s;
-            cursor: default;
-        }
-        .canvas-top-bar .close-btn, .canvas-top-bar .back-btn {
-            font-size: 28px;
-            background: rgba(255,255,255,0.06);
-            width: 48px; height: 48px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.08);
-            transition: 0.2s;
             cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 12px;
+            transition: 0.3s;
+            color: rgba(255,255,255,0.3);
         }
-        .canvas-top-bar .back-btn { display: none; }
-        .canvas-top-bar .back-btn.visible { display: flex; }
-        .canvas-top-bar .close-btn:active, .canvas-top-bar .back-btn:active { transform: scale(0.9); }
-
-        /* Оценка */
-        .rating-section {
+        .month-nav button:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .month-nav .month-year {
+            font-size: 17px;
+            font-weight: 600;
+            color: #f0f0f8;
+            text-shadow: 0 0 20px rgba(100,150,255,0.05);
+        }
+        .month-nav .month-avg {
+            font-size: 13px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.2);
+            margin-left: 8px;
+        }
+        .month-nav .streak {
+            font-size: 13px;
+            font-weight: 400;
+            color: rgba(255,200,100,0.6);
+            margin-left: 8px;
+        }
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7,1fr);
+            text-align: center;
+            font-size: 10px;
+            color: rgba(255,255,255,0.15);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7,1fr);
+            gap: 5px;
+        }
+        .day {
+            aspect-ratio: 1;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.2,0.9,0.4,1);
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 30px;
-            gap: 24px;
-            width: 100%;
-        }
-        .rating-prompt {
-            font-size: 18px;
-            opacity: 0.7;
-            text-align: center;
-            letter-spacing: 0.3px;
-            font-weight: 300;
-        }
-        .rating-buttons {
-            display: flex;
-            gap: 12px;
             justify-content: center;
-            flex-wrap: wrap;
-        }
-        .rating-btn {
-            width: 58px; height: 58px;
-            border-radius: 40px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            font-size: 26px;
             font-weight: 500;
-            color: white;
-            backdrop-filter: blur(4px);
-            transition: 0.2s;
+            font-size: 14px;
+            color: #b0b0c0;
+            border: 1.5px solid transparent;
+            position: relative;
+            min-height: 38px;
+            background: rgba(255,255,255,0.02);
+        }
+        .day:active { transform: scale(0.92); }
+        .day:hover { transform: scale(1.04); z-index: 2; background: rgba(255,255,255,0.05); }
+        .day.empty { background: transparent !important; cursor: default; border-color: transparent !important; }
+        .day.empty:hover { transform: none; background: transparent !important; }
+        /* Чёрно-белая шкала */
+        .day.mood-1 { background: #0a0a0a; color: #e8e8f0; border-color: #1a1a1a; }
+        .day.mood-2 { background: #2a2a2a; color: #e0e0e0; border-color: #3a3a3a; }
+        .day.mood-3 { background: #5a5a5a; color: #f0f0f0; border-color: #6a6a6a; }
+        .day.mood-4 { background: #9a9a9a; color: #1a1a1a; border-color: #aaaaaa; }
+        .day.mood-5 { background: #d0d0d0; color: #1a1a1a; border-color: #e0e0e0; }
+        .day.today { border-color: #7a9eff; border-width: 2px; box-shadow: 0 0 30px rgba(100,150,255,0.15); }
+        .day.future { opacity: 0.15; cursor: not-allowed; }
+        .day.future:hover { transform: none; background: rgba(255,255,255,0.02); }
+        .day .day-number { font-size: 14px; font-weight: 500; position: relative; z-index: 2; }
+        .day .star-indicator {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            font-size: 10px;
+            color: #ffd700;
+            text-shadow: 0 0 16px rgba(255,215,0,0.6);
+            z-index: 2;
+        }
+        .day .music-indicator {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 10px;
+            color: rgba(255,200,200,0.6);
+            z-index: 2;
+        }
+        .day-wave-container {
+            position: absolute;
+            bottom: 0px;
+            left: 0;
+            right: 0;
+            height: 8px;
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            z-index: 1;
+            opacity: 0.8;
+        }
+        .mini-wave {
+            width: 2px;
+            border-radius: 2px;
+            animation: miniWaveAnim 2s ease-in-out infinite alternate;
+        }
+        .mini-wave:nth-child(odd) { animation-delay: 0.3s; }
+        @keyframes miniWaveAnim {
+            0% { height: 2px; transform: translateY(0); opacity: 0.5; }
+            100% { height: 6px; transform: translateY(-2px); opacity: 1; }
+        }
+        /* ===== ХОЛСТЫ ===== */
+        #bgCanvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        #bgCanvas.active {
+            opacity: 1;
+        }
+        #waveContainer {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            background: transparent;
+            transition: opacity 0.6s ease;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        #waveContainer.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #waveCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            position: relative;
+            z-index: 10;
+        }
+        /* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
+        .top-bar {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            z-index: 1001;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+        }
+        .top-bar>* { pointer-events: auto; }
+        .back-btn {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.4);
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .back-btn.visible { display: flex; }
+        .close-btn {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.4);
+            font-size: 18px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 1002;
         }
-        .rating-btn.selected {
-            border-color: white;
-            box-shadow: 0 0 30px rgba(255,255,255,0.2);
-            transform: scale(1.05);
-        }
-        .rating-btn:active { transform: scale(0.92); }
-        .confirm-btn {
-            padding: 14px 44px;
-            border-radius: 60px;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.2);
-            font-size: 18px;
-            color: white;
+        .close-btn:hover { background: rgba(255,255,255,0.08); transform: rotate(90deg); color: #fff; }
+        .wave-date {
+            position: fixed;
+            top: 68px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            color: rgba(255,255,255,0.3);
+            font-size: 16px;
+            font-weight: 500;
+            text-shadow: 0 2px 30px rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.2);
             backdrop-filter: blur(8px);
-            transition: 0.3s;
-            cursor: pointer;
-            opacity: 0.3;
+            padding: 4px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.03);
+            cursor: default;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /* ===== ОПИСАНИЯ СОСТОЯНИЙ ===== */
+        .state-descriptions {
+            position: fixed;
+            top: 48%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1003;
             pointer-events: none;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            font-weight: 300;
+            line-height: 1.6;
+            text-shadow: 0 0 30px rgba(0,0,0,0.9);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            max-width: 70%;
         }
-        .confirm-btn.active {
-            opacity: 1;
-            pointer-events: auto;
-            background: rgba(255,255,255,0.2);
+        .state-descriptions.active {
+            opacity: 0.7;
         }
-        .confirm-btn:active { transform: scale(0.96); }
-
-        /* Состояния */
-        .states-section {
+        .state-descriptions .state-item {
+            display: inline-block;
+            margin: 2px 6px;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(2px);
+            padding: 1px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.03);
+            font-size: 11px;
+        }
+        .state-descriptions .state-symbol { margin-right: 3px; font-size: 13px; }
+        .state-descriptions .state-desc { font-size: 10px; opacity: 0.6; }
+        /* ===== ВЫБОР ОЦЕНКИ ===== */
+        #moodSelector {
+            position: fixed;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(24px);
+            border-radius: 24px;
+            padding: 14px 20px;
             display: none;
             flex-direction: column;
             align-items: center;
-            width: 100%;
-            margin-top: 16px;
+            gap: 10px;
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: 0 8px 60px rgba(0,0,0,0.6);
+            max-width: 92%;
+            opacity: 0;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translateX(-50%) translateY(20px) scale(0.95);
+        }
+        #moodSelector.active {
+            display: flex;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+        .mood-select-label {
+            color: rgba(255,255,255,0.3);
+            font-size: 12px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .mood-select-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+        .mood-select-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1);
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(4px);
+            flex-shrink: 0;
+        }
+        .mood-select-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.08); }
+        .mood-select-btn.selected {
+            border-color: #7a9eff;
+            box-shadow: 0 0 30px rgba(100,150,255,0.15);
+            transform: scale(1.05);
+            background: rgba(255,255,255,0.08);
+        }
+        .mood-select-btn[data-mood="1"] { color: #5a6a9a; }
+        .mood-select-btn[data-mood="2"] { color: #6a8aba; }
+        .mood-select-btn[data-mood="3"] { color: #6aaa7a; }
+        .mood-select-btn[data-mood="4"] { color: #d4aa5a; }
+        .mood-select-btn[data-mood="5"] { color: #f0c8a0; }
+        .mood-confirm-btn {
+            padding: 6px 28px;
+            border-radius: 18px;
+            border: none;
+            background: rgba(100,150,255,0.1);
+            color: #7a9eff;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 4px;
+        }
+        .mood-confirm-btn:hover { background: rgba(100,150,255,0.2); }
+        .mood-confirm-btn:disabled { opacity: 0.15; cursor: not-allowed; }
+        /* ===== ПАНЕЛЬ СОСТОЯНИЙ ===== */
+        #bottomPanel {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1001;
+            display: none;
+            flex-direction: column;
+            align-items: center;
             gap: 12px;
-            animation: fadeUp 0.5s ease;
+            max-width: 92%;
+            width: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translateX(-50%) translateY(20px) scale(0.95);
         }
-        .states-section.active { display: flex; }
-        @keyframes fadeUp {
-            0% { opacity: 0; transform: translateY(18px); }
-            100% { opacity: 1; transform: translateY(0); }
+        #bottomPanel.active {
+            display: flex;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
         }
-        .states-grid {
+        .states-label {
+            color: rgba(255,255,255,0.25);
+            font-size: 12px;
+            text-align: center;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            animation: fadeFromFog 1s ease;
+        }
+        @keyframes fadeFromFog {
+            0% { opacity: 0; transform: scale(0.95); filter: blur(6px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+        #statePanel {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 10px 14px;
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 6px;
             justify-content: center;
-            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+            width: 100%;
+            animation: fadeFromFog 1.2s ease;
         }
         .state-btn {
-            padding: 8px 16px;
-            border-radius: 40px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            font-size: 15px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            border: 1.5px solid transparent;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.25;
+            background: rgba(255,255,255,0.02);
+            color: #fff;
+            white-space: nowrap;
+        }
+        .state-btn:hover { opacity: 0.5; transform: scale(1.04); }
+        .state-btn.selected {
+            opacity: 1;
+            transform: scale(1.04);
+            border-color: currentColor;
+            box-shadow: 0 0 30px currentColor;
+            background: rgba(255,255,255,0.04);
+        }
+        #noteSection {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            animation: fadeFromFog 1.4s ease;
+        }
+        #noteInput {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.04);
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(8px);
+            color: #d0d0d8;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 44px;
+            transition: 0.3s;
+            outline: none;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        #noteInput:focus { border-color: rgba(255,255,255,0.08); background: rgba(0,0,0,0.3); }
+        #noteInput::placeholder { color: rgba(255,255,255,0.1); }
+        .actions-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        #starBtn {
+            padding: 6px 18px;
+            border-radius: 20px;
+            border: 1.5px solid rgba(255,215,0,0.08);
+            background: rgba(255,215,0,0.02);
+            color: #ffd700;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             gap: 6px;
-            backdrop-filter: blur(4px);
-            transition: 0.2s;
+            flex: 1;
+        }
+        #starBtn:hover { background: rgba(255,215,0,0.06); border-color: rgba(255,215,0,0.2); transform: scale(1.02); }
+        #musicBtn {
+            padding: 6px 18px;
+            border-radius: 20px;
+            border: 1.5px solid rgba(200,200,255,0.08);
+            background: rgba(200,200,255,0.02);
+            color: #aac;
+            font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
-            color: rgba(255,255,255,0.7);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
         }
-        .state-btn.active {
-            background: rgba(255,255,255,0.15);
-            border-color: currentColor;
-            box-shadow: 0 0 20px rgba(255,255,255,0.05);
-            color: white;
-        }
-        .state-btn:active { transform: scale(0.94); }
-
-        /* Заметки + звёзды */
-        .notes-section {
+        #musicBtn:hover { background: rgba(200,200,255,0.06); border-color: rgba(200,200,255,0.2); transform: scale(1.02); }
+        .star-counter { font-size: 12px; color: rgba(255,255,255,0.15); }
+        .star-hint { font-size: 10px; color: rgba(255,255,255,0.08); text-align: center; margin-top: -2px; }
+        /* ===== РЕДАКТОР ===== */
+        .note-editor {
             display: none;
-            flex-direction: column;
-            width: 100%;
-            max-width: 400px;
-            margin-top: 16px;
-            gap: 12px;
-            animation: fadeUp 0.5s ease;
-        }
-        .notes-section.active { display: flex; }
-        .note-input {
-            width: 100%;
-            padding: 14px 18px;
-            border-radius: 30px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: white;
-            font-size: 16px;
-            backdrop-filter: blur(4px);
-            outline: none;
-            resize: vertical;
-            min-height: 56px;
-        }
-        .note-input::placeholder { color: rgba(255,255,255,0.3); }
-        .action-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .action-btn {
-            padding: 10px 20px;
-            border-radius: 40px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: white;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(4px);
-            transition: 0.2s;
-            cursor: pointer;
-        }
-        .action-btn:active { transform: scale(0.94); }
-        .star-counter {
-            font-size: 18px;
-            opacity: 0.7;
-            margin-left: 4px;
-        }
-
-        /* Модалки */
-        .modal-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2000;
             background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-            display: none;
+            backdrop-filter: blur(24px);
             align-items: center;
             justify-content: center;
-            padding: 30px;
+            padding: 24px;
         }
-        .modal-overlay.active { display: flex; }
-        .modal-box {
-            background: rgba(20,24,40,0.9);
-            border-radius: 40px;
-            padding: 30px 24px;
-            max-width: 400px;
-            width: 100%;
-            border: 1px solid rgba(255,255,255,0.06);
+        .note-editor.active { display: flex; }
+        .note-editor-content {
+            background: rgba(12,12,20,0.95);
             backdrop-filter: blur(20px);
-            color: white;
+            border-radius: 28px;
+            padding: 24px 20px;
+            max-width: 360px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
+            transition: border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+        .note-editor-content.wave-color {
+            border-color: var(--wave-color, rgba(255,255,255,0.05));
+            box-shadow: 0 0 60px var(--wave-glow, rgba(255,255,255,0.02));
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .note-editor-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .note-editor-back {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            font-size: 22px;
+            cursor: pointer;
+            transition: 0.3s;
+            padding: 4px;
+        }
+        .note-editor-back:hover { color: rgba(255,255,255,0.6); }
+        .note-editor-title { color: #f0f0f8; font-size: 16px; font-weight: 500; }
+        .note-editor-textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.04);
+            background: rgba(0,0,0,0.2);
+            color: #d0d0d8;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            max-height: 300px;
+            outline: none;
+            transition: 0.3s;
+            line-height: 1.5;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        .note-editor-textarea:focus { border-color: rgba(255,255,255,0.08); background: rgba(0,0,0,0.3); }
+        .note-editor-save {
+            width: 100%;
+            padding: 10px;
+            border-radius: 16px;
+            border: none;
+            background: rgba(100,150,255,0.08);
+            color: #7a9eff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        .note-editor-save:hover { background: rgba(100,150,255,0.15); }
+        /* ===== ИНСТРУКЦИЯ ===== */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 3000;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(24px);
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .help-modal.active { display: flex; }
+        .help-content {
+            background: rgba(12,12,20,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 24px 20px;
+            max-width: 360px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
             max-height: 80vh;
             overflow-y: auto;
+            user-select: text;
+            -webkit-user-select: text;
         }
-        .modal-box h3 { font-size: 22px; margin-bottom: 16px; }
-        .modal-box p { opacity: 0.8; line-height: 1.6; font-size: 15px; }
-        .modal-close {
-            margin-top: 20px;
-            padding: 12px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 40px;
-            text-align: center;
+        .help-content h3 { color: #f0f0f8; font-size: 18px; margin-bottom: 12px; text-align: center; }
+        .help-content p { color: rgba(255,255,255,0.4); font-size: 13px; line-height: 1.6; margin-bottom: 8px; }
+        .help-close {
+            width: 100%;
+            padding: 10px;
+            border-radius: 16px;
+            border: none;
+            background: rgba(255,255,255,0.03);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+            margin-top: 12px;
         }
-        .modal-close:active { transform: scale(0.96); }
-        .modal-box .help-text { font-size: 14px; opacity: 0.7; margin-top: 12px; }
-
-        /* Сброс / туман */
+        .help-close:hover { background: rgba(255,255,255,0.06); }
         .fog-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(200,220,255,0.2);
-            backdrop-filter: blur(20px);
-            z-index: 50;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            font-weight: 300;
-            letter-spacing: 2px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1500;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, rgba(150,200,255,0.3) 0%, rgba(100,150,200,0.15) 30%, rgba(50,80,120,0.05) 60%, transparent 80%);
+            opacity: 0;
+            transition: opacity 1.2s ease;
         }
-        .fog-overlay.active { display: flex; }
-        /* адаптив */
-        @media (max-width: 420px) {
-            .day-cell { font-size: 15px; min-height: 44px; }
-            .rating-btn { width: 50px; height: 50px; font-size: 22px; }
+        .fog-overlay.active { opacity: 1; }
+        /* ===== АДАПТИВ ===== */
+        @media (max-width: 400px) {
+            .day { font-size: 12px; min-height: 34px; border-radius: 12px; }
+            .calendar { padding: 12px; }
+            .state-btn { font-size: 11px; padding: 3px 10px; }
+            #statePanel { padding: 8px 10px; gap: 4px; }
+            .header-title { font-size: 18px; }
+            .mood-select-btn { width: 34px; height: 34px; font-size: 12px; }
+            .mood-select-buttons { gap: 5px; }
+            #moodSelector { padding: 10px 14px; bottom: 160px; }
+            .close-btn, .back-btn { width: 36px; height: 36px; font-size: 16px; }
+            .wave-date { font-size: 14px; padding: 4px 12px; top: 60px; }
+            .top-bar { top: 12px; left: 12px; right: 12px; }
+            .state-descriptions { font-size: 10px; max-width: 80%; }
+            .state-descriptions .state-item { font-size: 9px; padding: 1px 6px; }
+            .state-descriptions .state-desc { font-size: 8px; }
         }
     </style>
 </head>
 <body>
-    <div id="aurora"></div>
-    <div id="calendar">
-        <div class="calendar-header">
-            <div class="calendar-title">Мой дневник</div>
-            <div class="help-btn" id="helpBtn">?</div>
+
+    <!-- ===== КАЛЕНДАРЬ ===== -->
+    <div class="calendar-wrapper">
+        <div class="calendar">
+            <div class="header">
+                <span class="header-title">Мой дневник</span>
+                <div class="header-actions">
+                    <button class="help-btn" id="helpBtn">?</button>
+                </div>
+            </div>
+            <div class="subheader">Нажми на день, чтобы вспомнить</div>
+            <div class="month-nav">
+                <button id="prevMonth">‹</button>
+                <span class="month-year" id="monthYear">Январь 2026</span>
+                <span class="month-avg" id="monthAvg"></span>
+                <span class="streak" id="streakDisplay"></span>
+                <button id="nextMonth">›</button>
+            </div>
+            <div class="weekdays">
+                <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+            </div>
+            <div class="days-grid" id="daysGrid"></div>
         </div>
-        <div class="nav-row">
-            <span class="nav-arrow" id="prevMonth">‹</span>
-            <span class="month-label" id="monthLabel">Январь 2026 <span class="month-stats" id="monthStats"></span></span>
-            <span class="nav-arrow" id="nextMonth">›</span>
-        </div>
-        <div class="days-of-week">
-            <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
-        </div>
-        <div class="grid-days" id="daysGrid"></div>
     </div>
 
-    <!-- Холст -->
-    <div id="canvas-container">
-        <canvas id="bgCanvas"></canvas>
+    <!-- ===== ФОНОВЫЙ ХОЛСТ ===== -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- ===== ОСНОВНОЙ ХОЛСТ ===== -->
+    <div id="waveContainer">
+        <div class="fog-overlay" id="fogOverlay"></div>
+
+        <div class="top-bar">
+            <button class="back-btn" id="backBtn">←</button>
+            <div></div>
+            <div class="right-buttons">
+                <button class="close-btn" id="closeWaves">✕</button>
+            </div>
+        </div>
+        <div class="wave-date" id="waveDate">12 января</div>
         <canvas id="waveCanvas"></canvas>
-        <canvas id="starCanvas"></canvas>
-        <div class="fog-overlay" id="fogOverlay">🌀</div>
-        <div class="canvas-ui">
-            <div class="canvas-top-bar">
-                <div class="back-btn" id="backToRatingBtn">←</div>
-                <div class="date-display" id="dateDisplay">12 января</div>
-                <div class="close-btn" id="closeCanvasBtn">✕</div>
+
+        <!-- Описания состояний -->
+        <div class="state-descriptions" id="stateDescriptions">
+            <span class="state-item"><span class="state-symbol">🌊</span> Поток — день прошёл на одном дыхании</span>
+            <span class="state-item"><span class="state-symbol">☀️</span> Свет — день был тёплым и радостным</span>
+            <span class="state-item"><span class="state-symbol">🏠</span> Уют — чувствовала себя в безопасности</span>
+            <span class="state-item"><span class="state-symbol">🌙</span> Тень — день был тяжёлым или грустным</span>
+            <span class="state-item"><span class="state-symbol">⚡</span> Искра — случилось что-то яркое и неожиданное</span>
+            <span class="state-item"><span class="state-symbol">🌿</span> Тишина — спокойный, но не пустой день</span>
+            <span class="state-item"><span class="state-symbol">🌫️</span> Туман — день прошёл как в дымке</span>
+        </div>
+
+        <!-- Выбор оценки -->
+        <div id="moodSelector">
+            <div class="mood-select-label">Оцените ваш сегодняшний день по шкале от 1 до 5</div>
+            <div class="mood-select-buttons">
+                <button class="mood-select-btn" data-mood="1">1</button>
+                <button class="mood-select-btn" data-mood="2">2</button>
+                <button class="mood-select-btn" data-mood="3">3</button>
+                <button class="mood-select-btn" data-mood="4">4</button>
+                <button class="mood-select-btn" data-mood="5">5</button>
             </div>
-            <!-- Рейтинг -->
-            <div class="rating-section" id="ratingSection">
-                <div class="rating-prompt">Оцените ваш сегодняшний день по шкале от 1 до 5</div>
-                <div class="rating-buttons" id="ratingButtons">
-                    <div class="rating-btn" data-val="1">1</div>
-                    <div class="rating-btn" data-val="2">2</div>
-                    <div class="rating-btn" data-val="3">3</div>
-                    <div class="rating-btn" data-val="4">4</div>
-                    <div class="rating-btn" data-val="5">5</div>
+            <button class="mood-confirm-btn" id="moodConfirmBtn" disabled>Подтвердить</button>
+        </div>
+
+        <!-- Панель состояний -->
+        <div id="bottomPanel">
+            <div class="states-label">Какое состояние лучше всего описывает ваш день? (выбери до 4-х)</div>
+            <div id="statePanel"></div>
+            <div id="noteSection">
+                <input type="text" id="noteInput" placeholder="Опиши события дня...">
+                <div class="actions-row">
+                    <button id="starBtn">⭐ Добавить звезду</button>
+                    <button id="musicBtn">🎵 Добавить музыку</button>
                 </div>
-                <div class="confirm-btn" id="confirmRatingBtn">Подтвердить</div>
-            </div>
-            <!-- Состояния -->
-            <div class="states-section" id="statesSection">
-                <div class="states-grid" id="statesGrid"></div>
-            </div>
-            <!-- Заметки + звезды -->
-            <div class="notes-section" id="notesSection">
-                <textarea class="note-input" id="noteInput" placeholder="Опиши события дня..."></textarea>
-                <div class="action-row">
-                    <div class="action-btn" id="addStarBtn">⭐ Добавить звезду</div>
-                    <span class="star-counter" id="starCounter">⭐ 0</span>
-                    <div class="action-btn" id="addMusicBtn">🎵 Добавить музыку</div>
-                </div>
+                <span class="star-counter" id="starCounter">⭐ 0</span>
+                <div class="star-hint">Звезда — особенный момент дня</div>
             </div>
         </div>
     </div>
 
-    <!-- Модалка помощи -->
-    <div class="modal-overlay" id="helpModal">
-        <div class="modal-box">
+    <!-- ===== РЕДАКТОР ЗАМЕТКИ ===== -->
+    <div class="note-editor" id="noteEditor">
+        <div class="note-editor-content" id="noteEditorContent">
+            <div class="note-editor-header">
+                <button class="note-editor-back" id="noteEditorBack">‹</button>
+                <span class="note-editor-title" id="noteEditorTitle">Заметка</span>
+            </div>
+            <textarea class="note-editor-textarea" id="noteEditorTextarea" placeholder="Напиши что-нибудь..."></textarea>
+            <button class="note-editor-save" id="noteEditorSave">Сохранить</button>
+        </div>
+    </div>
+
+    <!-- ===== ИНСТРУКЦИЯ ===== -->
+    <div class="help-modal" id="helpModal">
+        <div class="help-content">
             <h3>📖 Как пользоваться</h3>
-            <div class="help-text">1. Оцени день — выбери число от 1 до 5. Фон будет меняться. Нажми «Подтвердить».</div>
-            <div class="help-text">2. Выбери состояния — до 4-х штук, которые описывают твой день.</div>
-            <div class="help-text">3. Напиши комментарий — опиши события дня.</div>
-            <div class="help-text">4. Добавь звезду — нажми кнопку, чтобы отметить особенный момент.</div>
-            <div class="help-text">⭐ Чтобы увидеть заметку — нажми на звезду или волну.</div>
-            <div class="help-text">🗑️ Чтобы удалить звезду — зажми её на 2 секунды.</div>
-            <div class="help-text">🔄 Чтобы вернуться к оценке — нажми стрелку ←.</div>
-            <div class="help-text">🗑️ Чтобы сбросить день — зажми дату в центре вверху на 2 секунды.</div>
-            <div class="modal-close" id="closeHelp">Закрыть</div>
+            <p><b>1. Оцени день</b> — выбери число от 1 до 5. Фон будет меняться. Нажми «Подтвердить».</p>
+            <p><b>2. Выбери состояния</b> — до 4-х штук, которые описывают твой день.</p>
+            <p><b>3. Напиши комментарий</b> — опиши события дня.</p>
+            <p><b>4. Добавь звезду</b> — нажми кнопку, чтобы отметить особенный момент.</p>
+            <p><b>⭐ Чтобы увидеть заметку</b> — нажми на звезду или волну.</p>
+            <p><b>🗑️ Чтобы удалить звезду</b> — зажми её на 2 секунды.</p>
+            <p><b>🔄 Чтобы вернуться к оценке</b> — нажми стрелку ←.</p>
+            <p><b>🗑️ Чтобы сбросить день</b> — зажми дату в центре вверху на 2 секунды.</p>
+            <button class="help-close" id="helpClose">Понятно!</button>
         </div>
     </div>
 
     <script>
-        (function(){
-            // ---- Инициализация Telegram ----
-            const tg = window.Telegram?.WebApp;
-            if (tg) { tg.expand(); tg.enableClosingConfirmation(); }
+        // =================================================================
+        // 1. КОНСТАНТЫ И НАСТРОЙКИ
+        // =================================================================
+        const STATES = [
+            { id: 'поток', label: '🌊 Поток', color: '#4dd0e1', desc: 'день прошёл на одном дыхании' },
+            { id: 'свет', label: '☀️ Свет', color: '#ffca28', desc: 'день был тёплым и радостным' },
+            { id: 'уют', label: '🏠 Уют', color: '#ffab91', desc: 'чувствовала себя в безопасности' },
+            { id: 'тень', label: '🌙 Тень', color: '#90caf9', desc: 'день был тяжёлым или грустным' },
+            { id: 'искра', label: '⚡ Искра', color: '#ce93d8', desc: 'случилось что-то яркое и неожиданное' },
+            { id: 'тишина', label: '🌿 Тишина', color: '#81c784', desc: 'спокойный, но не пустой день' },
+            { id: 'туман', label: '🌫️ Туман', color: '#b0bec5', desc: 'день прошёл как в дымке' }
+        ];
 
-            // ---- Данные ----
-            const STATE_COLORS = {
-                'Поток': '#4dd0e1', 'Свет': '#ffca28', 'Уют': '#ffab91',
-                'Тень': '#90caf9', 'Искра': '#ce93d8', 'Тишина': '#81c784',
-                'Туман': '#b0bec5'
-            };
-            const STATE_ICONS = {
-                'Поток': '🌊', 'Свет': '☀️', 'Уют': '🏠',
-                'Тень': '🌙', 'Искра': '⚡', 'Тишина': '🌿', 'Туман': '🌫️'
-            };
-            const STATE_DESC = {
-                'Поток': 'день прошёл на одном дыхании',
-                'Свет': 'день был тёплым и радостным',
-                'Уют': 'чувствовала себя в безопасности',
-                'Тень': 'день был тяжёлым или грустным',
-                'Искра': 'случилось что-то яркое и неожиданное',
-                'Тишина': 'спокойный, но не пустой день',
-                'Туман': 'день прошёл как в дымке'
-            };
-            const STATE_NAMES = Object.keys(STATE_COLORS);
+        let moodData = {};
+        let currentDate = new Date();
+        let currentMonth = currentDate.getMonth();
+        let currentYear = currentDate.getFullYear();
+        let currentDateStr = null;
+        let selectedStates = [];
+        let stars = [];
+        let canvas, ctx, animationId;
+        let selectedMood = 0;
+        const MAX_STARS = 7;
+        let isResetInProgress = false;
+        let waveStates = {};
 
-            let currentDate = new Date();
-            let selectedDate = new Date(); // день на холсте
-            let selectedRating = null;
-            let selectedStates = [];
-            let starsData = []; // массив {x,y,note?}
-            let dayNote = '';
-            let dayMusic = null;
+        // =================================================================
+        // 2. ЗВУКИ
+        // =================================================================
+        let audioCtx = null;
+        let currentSoundNodes = [];
+        let ambientGain = null;
+        let ambientSource = null;
+        let isAmbientPlaying = false;
 
-            // ---- Хранилище ----
-            function getData() {
-                try { return JSON.parse(localStorage.getItem('crystal_diary')) || {}; } catch(e){ return {}; }
-            }
-            function saveData(data) {
-                localStorage.setItem('crystal_diary', JSON.stringify(data));
-            }
-            function getDayData(dateStr) {
-                const d = getData();
-                return d[dateStr] || null;
-            }
-            function setDayData(dateStr, obj) {
-                const d = getData();
-                d[dateStr] = obj;
-                saveData(d);
-            }
+        function initAudio() {
+            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+        }
 
-            function dateStr(d) {
-                return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');
-            }
+        function stopAllSounds() {
+            currentSoundNodes.forEach(node => { try { node.stop(); } catch (e) {} });
+            currentSoundNodes = [];
+            if (ambientSource) { try { ambientSource.stop(); } catch (e) {} }
+            ambientSource = null;
+            isAmbientPlaying = false;
+        }
 
-            // ---- Рендер календаря ----
-            function renderCalendar() {
-                const year = currentDate.getFullYear();
-                const month = currentDate.getMonth();
-                const firstDay = new Date(year, month, 1).getDay(); // 0=вс
-                const daysInMonth = new Date(year, month+1, 0).getDate();
-                const today = new Date();
-                const todayStr = dateStr(today);
+        function createAmbientSound(type) {
+            stopAllSounds();
+            initAudio();
+            try {
+                let bufferSize = audioCtx.sampleRate * 2;
+                let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                let data = buffer.getChannelData(0);
 
-                const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-                document.getElementById('monthLabel').innerHTML = `${monthNames[month]} ${year} <span class="month-stats" id="monthStats"></span>`;
-                // статистика
-                const allData = getData();
-                let sum=0, count=0, streak=0;
-                const monthKey = `${year}-${(month+1).toString().padStart(2,'0')}`;
-                for (let d=1; d<=daysInMonth; d++) {
-                    const ds = `${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-                    if (allData[ds] && allData[ds].rating) {
-                        sum += allData[ds].rating;
-                        count++;
-                    }
-                }
-                const avg = count ? (sum/count).toFixed(1) : '';
-                // стрик (с сегодня назад)
-                let streakCount = 0;
-                let check = new Date(today);
-                while (true) {
-                    const ds = dateStr(check);
-                    if (allData[ds] && allData[ds].rating) { streakCount++; check.setDate(check.getDate()-1); }
-                    else break;
-                }
-                const statsEl = document.getElementById('monthStats');
-                if (avg) statsEl.innerHTML = `★ ${avg}  🔥 ${streakCount}`;
-                else statsEl.innerHTML = `🔥 ${streakCount}`;
-
-                const grid = document.getElementById('daysGrid');
-                grid.innerHTML = '';
-                // заполняем пустые ячейки до первого дня
-                const startOffset = firstDay === 0 ? 6 : firstDay-1;
-                for (let i=0; i<startOffset; i++) {
-                    const empty = document.createElement('div');
-                    empty.className = 'day-cell';
-                    empty.style.background = 'transparent';
-                    empty.style.pointerEvents = 'none';
-                    grid.appendChild(empty);
-                }
-                for (let d=1; d<=daysInMonth; d++) {
-                    const ds = `${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-                    const cell = document.createElement('div');
-                    cell.className = 'day-cell';
-                    cell.textContent = d;
-                    const isToday = ds === todayStr;
-                    if (isToday) cell.classList.add('today');
-                    const isFuture = new Date(year, month, d) > new Date(today.getFullYear(), today.getMonth(), today.getDate());
-                    if (isFuture) cell.classList.add('future');
-
-                    const dayData = allData[ds];
-                    if (dayData && dayData.rating) {
-                        const brightness = 5 - (dayData.rating-1); // 1->5 => black, 5->1 white
-                        const gray = Math.round(55 + brightness * 40);
-                        cell.style.background = `rgb(${gray},${gray},${gray})`;
-                        cell.style.color = gray > 140 ? '#111' : '#f0f0f0';
-                        // мини-волны
-                        if (dayData.states && dayData.states.length) {
-                            const waves = document.createElement('div');
-                            waves.className = 'mini-waves';
-                            dayData.states.slice(0,4).forEach(st => {
-                                const w = document.createElement('div');
-                                w.className = 'mini-wave';
-                                w.style.background = STATE_COLORS[st] || '#888';
-                                w.style.animationDelay = (Math.random()*0.5)+'s';
-                                waves.appendChild(w);
-                            });
-                            cell.appendChild(waves);
-                        }
-                        // звезда
-                        if (dayData.stars && dayData.stars.length) {
-                            const starIcon = document.createElement('span');
-                            starIcon.className = 'day-star';
-                            starIcon.textContent = '✦';
-                            cell.appendChild(starIcon);
-                        }
-                        // аудио
-                        if (dayData.music) {
-                            const audioIcon = document.createElement('span');
-                            audioIcon.className = 'day-audio-icon';
-                            audioIcon.textContent = '🎵';
-                            cell.appendChild(audioIcon);
-                        }
-                    } else {
-                        cell.style.background = 'rgba(255,255,255,0.03)';
-                        cell.style.color = 'rgba(255,255,255,0.3)';
-                    }
-                    // Клик по дню
-                    cell.addEventListener('click', (e) => {
-                        if (isFuture) {
-                            tg?.showPopup({ message: 'Этот день ещё не наступил 😊', buttons: [{type:'ok'}] });
-                            return;
-                        }
-                        const dObj = new Date(year, month, d);
-                        openDay(dObj);
-                    });
-                    // долгое нажатие для редактирования (уже есть открытие)
-                    grid.appendChild(cell);
-                }
-            }
-
-            // ---- Открыть день (холст) ----
-            function openDay(dateObj) {
-                selectedDate = new Date(dateObj);
-                const ds = dateStr(selectedDate);
-                const data = getDayData(ds) || {};
-                selectedRating = data.rating || null;
-                selectedStates = data.states || [];
-                starsData = data.stars || [];
-                dayNote = data.note || '';
-                dayMusic = data.music || null;
-
-                document.getElementById('calendar').classList.add('hidden');
-                const container = document.getElementById('canvas-container');
-                container.classList.add('active');
-                // обновляем дату
-                const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-                document.getElementById('dateDisplay').textContent = `${selectedDate.getDate()} ${months[selectedDate.getMonth()]}`;
-                // сброс UI
-                resetCanvasUI();
-                if (selectedRating) {
-                    // показать состояния и заметки
-                    showStatesAndNotes();
-                    highlightRating(selectedRating);
-                    renderStatesSelection();
-                    renderStars();
-                    document.getElementById('noteInput').value = dayNote || '';
-                    document.getElementById('starCounter').textContent = `⭐ ${starsData.length}`;
-                    // запустить фоновый эффект
-                    applyRatingEffect(selectedRating);
-                    // звук фона (упрощённо - заглушка)
-                } else {
-                    document.getElementById('ratingSection').style.display = 'flex';
-                    document.getElementById('statesSection').classList.remove('active');
-                    document.getElementById('notesSection').classList.remove('active');
-                    document.getElementById('backToRatingBtn').classList.remove('visible');
-                    // нейтральный фон
-                    clearCanvasEffects();
-                }
-                // долгое нажатие на дату -> сброс
-                const dateDisplay = document.getElementById('dateDisplay');
-                let holdTimer;
-                dateDisplay.addEventListener('pointerdown', () => {
-                    holdTimer = setTimeout(() => {
-                        tg?.showPopup({
-                            title: '🗑️ Сбросить день?',
-                            message: 'Точно сбросить все данные за этот день?',
-                            buttons: [
-                                { id: 'cancel', type: 'cancel' },
-                                { id: 'confirm', type: 'destructive', text: 'Подтвердить' }
-                            ]
-                        }, (btnId) => {
-                            if (btnId === 'confirm') {
-                                resetDay();
+                switch (type) {
+                    case 1: // Гроза — дождь + гром
+                        for (let i = 0; i < bufferSize; i++) {
+                            data[i] = (Math.random() * 2 - 1) * 0.4 * (1 - i / bufferSize) * (0.8 + 0.2 * Math.sin(i * 0.01));
+                            if (Math.random() < 0.001) {
+                                data[i] += (Math.random() * 2 - 1) * 0.6 * (1 - i / bufferSize);
                             }
-                        });
-                    }, 800);
-                });
-                dateDisplay.addEventListener('pointerup', () => clearTimeout(holdTimer));
-                dateDisplay.addEventListener('pointerleave', () => clearTimeout(holdTimer));
-            }
-
-            function resetDay() {
-                const ds = dateStr(selectedDate);
-                const d = getData();
-                delete d[ds];
-                saveData(d);
-                // анимация тумана
-                const fog = document.getElementById('fogOverlay');
-                fog.classList.add('active');
-                setTimeout(() => {
-                    fog.classList.remove('active');
-                    closeCanvas();
-                }, 1200);
-            }
-
-            function resetCanvasUI() {
-                document.getElementById('ratingSection').style.display = 'flex';
-                document.getElementById('statesSection').classList.remove('active');
-                document.getElementById('notesSection').classList.remove('active');
-                document.getElementById('backToRatingBtn').classList.remove('visible');
-                document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
-                document.getElementById('confirmRatingBtn').classList.remove('active');
-                clearCanvasEffects();
-            }
-
-            function highlightRating(val) {
-                document.querySelectorAll('.rating-btn').forEach(b => {
-                    if (parseInt(b.dataset.val) === val) b.classList.add('selected');
-                });
-                document.getElementById('confirmRatingBtn').classList.add('active');
-            }
-
-            function showStatesAndNotes() {
-                document.getElementById('ratingSection').style.display = 'none';
-                document.getElementById('statesSection').classList.add('active');
-                document.getElementById('notesSection').classList.add('active');
-                document.getElementById('backToRatingBtn').classList.add('visible');
-                renderStatesSelection();
-                // показать волны
-                drawWaves(selectedStates);
-            }
-
-            function renderStatesSelection() {
-                const grid = document.getElementById('statesGrid');
-                grid.innerHTML = '';
-                STATE_NAMES.forEach(name => {
-                    const btn = document.createElement('div');
-                    btn.className = 'state-btn';
-                    if (selectedStates.includes(name)) btn.classList.add('active');
-                    btn.innerHTML = `${STATE_ICONS[name]} ${name}`;
-                    btn.style.color = STATE_COLORS[name];
-                    btn.addEventListener('click', () => {
-                        if (selectedStates.includes(name)) {
-                            selectedStates = selectedStates.filter(s => s !== name);
-                        } else {
-                            if (selectedStates.length >= 4) {
-                                tg?.showPopup({ message: 'Можно выбрать максимум 4 состояния ✨', buttons: [{type:'ok'}] });
-                                return;
-                            }
-                            selectedStates.push(name);
                         }
-                        renderStatesSelection();
-                        drawWaves(selectedStates);
-                        saveCurrentDay();
-                    });
-                    grid.appendChild(btn);
-                });
-            }
-
-            // ---- Волны ----
-            function drawWaves(states) {
-                const canvas = document.getElementById('waveCanvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                ctx.clearRect(0,0,canvas.width,canvas.height);
-                if (!states.length) return;
-                const w = canvas.width, h = canvas.height;
-                states.forEach((st, idx) => {
-                    const color = STATE_COLORS[st] || '#888';
-                    const baseY = h * 0.35 + idx * 25;
-                    ctx.beginPath();
-                    for (let x=0; x<w; x+=2) {
-                        const y = baseY + Math.sin(x*0.02 + Date.now()*0.001 + idx*2) * 12
-                                 + Math.sin(x*0.01 + Date.now()*0.0015 + idx) * 8;
-                        if (x===0) ctx.moveTo(x,y);
-                        else ctx.lineTo(x,y);
-                    }
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = 3;
-                    ctx.shadowColor = color;
-                    ctx.shadowBlur = 20;
-                    ctx.stroke();
-                    ctx.shadowBlur = 0;
-                    // дополнительная прозрачная
-                    ctx.beginPath();
-                    for (let x=0; x<w; x+=3) {
-                        const y2 = baseY-8 + Math.sin(x*0.025 + Date.now()*0.0012 + idx*1.7) * 14;
-                        if (x===0) ctx.moveTo(x,y2);
-                        else ctx.lineTo(x,y2);
-                    }
-                    ctx.strokeStyle = color + '40';
-                    ctx.lineWidth = 8;
-                    ctx.stroke();
-                });
-                requestAnimationFrame(() => drawWaves(states));
-            }
-
-            // ---- Звёзды ----
-            function renderStars() {
-                const canvas = document.getElementById('starCanvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                ctx.clearRect(0,0,canvas.width,canvas.height);
-                starsData.forEach((s, idx) => {
-                    drawStar(ctx, s.x, s.y, 16, 8, 5, '#ffe68f', '#fffbe6');
-                });
-                // анимация мерцания
-                requestAnimationFrame(() => renderStars());
-            }
-
-            function drawStar(ctx, cx, cy, outerR, innerR, points, color1, color2) {
-                ctx.beginPath();
-                for (let i=0; i<points*2; i++) {
-                    const r = i%2===0 ? outerR : innerR;
-                    const angle = (i * Math.PI) / points - Math.PI/2 + Date.now()*0.0005;
-                    const x = cx + Math.cos(angle) * r;
-                    const y = cy + Math.sin(angle) * r;
-                    if (i===0) ctx.moveTo(x,y);
-                    else ctx.lineTo(x,y);
+                        break;
+                    case 2: // Лёгкий дождь + ветер
+                        for (let i = 0; i < bufferSize; i++) {
+                            data[i] = (Math.random() * 2 - 1) * 0.15 * (1 - i / bufferSize) * (0.9 + 0.1 * Math.sin(i *
+                            0.005));
+                            data[i] += Math.sin(i * 0.0005) * 0.05 * (1 - i / bufferSize);
+                        }
+                        break;
+                    case 3: // Ветер (медитативный)
+                        for (let i = 0; i < bufferSize; i++) {
+                            data[i] = (Math.random() * 2 - 1) * 0.08 * (1 - i / bufferSize);
+                            data[i] += Math.sin(i * 0.0002 + 0.5) * 0.04 * (1 - i / bufferSize);
+                        }
+                        break;
+                    case 4: // Шуршание цветов
+                        for (let i = 0; i < bufferSize; i++) {
+                            data[i] = (Math.random() * 2 - 1) * 0.06 * (1 - i / bufferSize) * (0.7 + 0.3 * Math.sin(i *
+                            0.01));
+                            data[i] += Math.sin(i * 0.001 + 0.3) * 0.02 * (1 - i / bufferSize);
+                        }
+                        break;
+                    case 5: // Райские тона + хрусталь
+                        for (let i = 0; i < bufferSize; i++) {
+                            data[i] = Math.sin(i * 0.002 + 0.1) * 0.04 * (1 - i / bufferSize);
+                            data[i] += Math.sin(i * 0.003 + 0.7) * 0.03 * (1 - i / bufferSize);
+                            data[i] += Math.sin(i * 0.001 + 1.2) * 0.02 * (1 - i / bufferSize);
+                            data[i] += (Math.random() * 2 - 1) * 0.02 * (1 - i / bufferSize);
+                        }
+                        break;
                 }
-                ctx.closePath();
-                const grad = ctx.createRadialGradient(cx-4, cy-4, 2, cx, cy, outerR+6);
-                grad.addColorStop(0, color2);
-                grad.addColorStop(1, color1);
-                ctx.fillStyle = grad;
-                ctx.shadowColor = '#aaccff';
-                ctx.shadowBlur = 25;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
 
-            function addStar() {
-                if (starsData.length >= 7) {
-                    tg?.showPopup({ message: 'Максимум 7 звёзд ✨', buttons: [{type:'ok'}] });
-                    return;
-                }
-                const canvas = document.getElementById('starCanvas');
-                let x, y, valid;
-                let attempts=0;
-                do {
-                    x = 60 + Math.random() * (canvas.width-120);
-                    y = 60 + Math.random() * (canvas.height*0.6);
-                    valid = true;
-                    for (const s of starsData) {
-                        if (Math.hypot(s.x-x, s.y-y) < 100) valid = false;
-                    }
-                    attempts++;
-                } while (!valid && attempts<50);
-                starsData.push({ x, y });
-                document.getElementById('starCounter').textContent = `⭐ ${starsData.length}`;
-                saveCurrentDay();
-                // звук хрусталя (имитация)
-                playSound('crystal');
-                // анимация вспышки
-            }
+                ambientSource = audioCtx.createBufferSource();
+                ambientSource.buffer = buffer;
+                ambientSource.loop = true;
 
-            function removeStar(index) {
-                starsData.splice(index, 1);
-                document.getElementById('starCounter').textContent = `⭐ ${starsData.length}`;
-                saveCurrentDay();
-                playSound('break');
-            }
+                ambientGain = audioCtx.createGain();
+                ambientGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
 
-            // ---- Звуки (заглушка) ----
-            function playSound(type) {
+                ambientSource.connect(ambientGain);
+                ambientGain.connect(audioCtx.destination);
+                ambientSource.start();
+                isAmbientPlaying = true;
+                currentSoundNodes.push(ambientSource);
+
+            } catch (e) {}
+        }
+
+        function setAmbientVolume(volume) {
+            if (ambientGain) {
                 try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    ambientGain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                } catch (e) {}
+            }
+        }
+
+        function playCrystalSound() {
+            initAudio();
+            try {
+                for (let i = 0; i < 5; i++) {
                     const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200 + Math.random() * 400, audioCtx.currentTime + i * 0.03);
+                    osc.frequency.exponentialRampToValueAtTime(400 + Math.random() * 300, audioCtx.currentTime + 0.25 + i *
+                        0.03);
                     const gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.06, audioCtx.currentTime + i * 0.03);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25 + i * 0.03);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
-                    if (type === 'crystal') {
-                        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                        osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime+0.1);
-                        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+0.3);
-                        osc.start();
-                        osc.stop(audioCtx.currentTime+0.3);
-                    } else if (type === 'break') {
-                        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime+0.2);
-                        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+0.3);
-                        osc.start();
-                        osc.stop(audioCtx.currentTime+0.3);
-                    }
-                } catch(e) {}
-            }
-
-            // ---- Сохранение ----
-            function saveCurrentDay() {
-                const ds = dateStr(selectedDate);
-                const data = {
-                    rating: selectedRating,
-                    states: selectedStates,
-                    stars: starsData,
-                    note: document.getElementById('noteInput').value || '',
-                    music: dayMusic
-                };
-                setDayData(ds, data);
-            }
-
-            // ---- Эффекты фона (оценка) ----
-            function applyRatingEffect(val) {
-                const canvas = document.getElementById('bgCanvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                const w = canvas.width, h = canvas.height;
-                // простые цветные размытые пятна
-                const colors = ['#1a2a4a','#3a5a7a','#8a9a5a','#b06a5a','#f0d0a0'];
-                const c = colors[val-1] || '#2a2a3a';
-                ctx.fillStyle = c;
-                ctx.fillRect(0,0,w,h);
-                // добавим капли/эффекты
-                if (val === 1) {
-                    for (let i=0; i<60; i++) {
-                        ctx.beginPath();
-                        ctx.moveTo(Math.random()*w, Math.random()*h);
-                        ctx.lineTo(Math.random()*w, Math.random()*h+20);
-                        ctx.strokeStyle = 'rgba(200,220,255,0.15)';
-                        ctx.lineWidth = 2;
-                        ctx.stroke();
-                    }
-                } else if (val === 5) {
-                    // радужные пятна
-                    for (let i=0; i<8; i++) {
-                        const grd = ctx.createRadialGradient(Math.random()*w, Math.random()*h, 10, Math.random()*w, Math.random()*h, 120);
-                        grd.addColorStop(0, `hsla(${Math.random()*360},70%,70%,0.2)`);
-                        grd.addColorStop(1, 'transparent');
-                        ctx.fillStyle = grd;
-                        ctx.fillRect(0,0,w,h);
-                    }
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25 + i * 0.03);
+                    currentSoundNodes.push(osc);
                 }
-                // TODO: полноценные эффекты с анимацией (упрощённо)
-            }
-            function clearCanvasEffects() {
-                const canvas = document.getElementById('bgCanvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                ctx.fillStyle = '#0b0e1a';
-                ctx.fillRect(0,0,canvas.width,canvas.height);
-            }
+                // Шум осколков
+                const bufferSize = audioCtx.sampleRate * 0.15;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * 0.05 * (1 - i / bufferSize);
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const gain2 = audioCtx.createGain();
+                gain2.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+                noise.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                noise.start();
+                noise.stop(audioCtx.currentTime + 0.15);
+                currentSoundNodes.push(noise);
+            } catch (e) {}
+        }
 
-            // ---- Закрыть холст ----
-            function closeCanvas() {
-                document.getElementById('canvas-container').classList.remove('active');
-                document.getElementById('calendar').classList.remove('hidden');
-                renderCalendar();
-                // остановить звуки
-            }
+        function playStarAddSound() {
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.2);
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+                currentSoundNodes.push(osc);
+            } catch (e) {}
+        }
 
-            // ---- Обработчики ----
-            document.getElementById('closeCanvasBtn').addEventListener('click', () => {
-                saveCurrentDay();
-                closeCanvas();
+        function soundClick() {
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.05);
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+                currentSoundNodes.push(osc);
+            } catch (e) {}
+        }
+
+        function soundConfirm() {
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.08);
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+                currentSoundNodes.push(osc);
+                setTimeout(() => {
+                    const osc2 = audioCtx.createOscillator();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(1200, audioCtx.currentTime);
+                    osc2.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.06);
+                    const gain2 = audioCtx.createGain();
+                    gain2.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start();
+                    osc2.stop(audioCtx.currentTime + 0.06);
+                    currentSoundNodes.push(osc2);
+                }, 100);
+            } catch (e) {}
+        }
+
+        function soundReset() {
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.4);
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+                currentSoundNodes.push(osc);
+            } catch (e) {}
+        }
+
+        // =================================================================
+        // 3. РАБОТА С ДАННЫМИ
+        // =================================================================
+        function loadData() {
+            try { const raw = localStorage.getItem('mood_diary_data');
+                if (raw) moodData = JSON.parse(raw); } catch (e) { moodData = {}; }
+        }
+
+        function saveData() {
+            try { localStorage.setItem('mood_diary_data', JSON.stringify(moodData)); } catch (e) {}
+        }
+
+        function getDayData(dateStr) {
+            if (!moodData[dateStr]) moodData[dateStr] = { mood: 0, states: [], stars: [], note: '', stateNotes: {},
+                music: null };
+            return moodData[dateStr];
+        }
+
+        function isToday(dateStr) {
+            const today = new Date();
+            const ts = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today
+                .getDate()).padStart(2, '0');
+            return dateStr === ts;
+        }
+
+        function isFuture(dateStr) {
+            const today = new Date();
+            const ts = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today
+                .getDate()).padStart(2, '0');
+            return dateStr > ts;
+        }
+
+        function getMonthAvg(year, month) {
+            let total = 0,
+                count = 0;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            for (let d = 1; d <= daysInMonth; d++) {
+                const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const data = getDayData(ds);
+                if (data.mood > 0) { total += data.mood;
+                    count++; }
+            }
+            return count > 0 ? (total / count).toFixed(1) : null;
+        }
+
+        function getStreak() {
+            let streak = 0;
+            const today = new Date();
+            let checkDate = new Date(today);
+            while (true) {
+                const ds = checkDate.getFullYear() + '-' + String(checkDate.getMonth() + 1).padStart(2, '0') + '-' + String(
+                    checkDate.getDate()).padStart(2, '0');
+                const data = getDayData(ds);
+                if (data.mood > 0) {
+                    streak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            return streak;
+        }
+
+        // =================================================================
+        // 4. КАЛЕНДАРЬ
+        // =================================================================
+        function renderMiniWaves(container, states) {
+            container.innerHTML = '';
+            if (!states || states.length === 0) return;
+            const colors = states.map(id => {
+                const st = STATES.find(s => s.id === id);
+                return st ? st.color : '#888';
             });
-
-            document.getElementById('backToRatingBtn').addEventListener('click', () => {
-                // вернуться к оценке, сохранив состояния
-                document.getElementById('ratingSection').style.display = 'flex';
-                document.getElementById('statesSection').classList.remove('active');
-                document.getElementById('notesSection').classList.remove('active');
-                document.getElementById('backToRatingBtn').classList.remove('visible');
-                selectedRating = null;
-                document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
-                document.getElementById('confirmRatingBtn').classList.remove('active');
-                clearCanvasEffects();
-                // сохраняем без рейтинга?
-                const ds = dateStr(selectedDate);
-                const data = getDayData(ds) || {};
-                data.states = selectedStates;
-                data.stars = starsData;
-                data.note = document.getElementById('noteInput').value;
-                setDayData(ds, data);
+            colors.forEach(color => {
+                const wave = document.createElement('div');
+                wave.className = 'mini-wave';
+                wave.style.background = color;
+                wave.style.boxShadow = `0 0 8px ${color}`;
+                container.appendChild(wave);
             });
+        }
 
-            // Выбор оценки
-            document.querySelectorAll('.rating-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    selectedRating = parseInt(btn.dataset.val);
-                    document.getElementById('confirmRatingBtn').classList.add('active');
-                    applyRatingEffect(selectedRating);
-                    playSound('crystal');
+        function renderCalendar() {
+            const grid = document.getElementById('daysGrid');
+            const monthYear = document.getElementById('monthYear');
+            const monthAvg = document.getElementById('monthAvg');
+            const streakDisplay = document.getElementById('streakDisplay');
+            const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь',
+                'Ноябрь', 'Декабрь'
+            ];
+            monthYear.textContent = months[currentMonth] + ' ' + currentYear;
+            const avg = getMonthAvg(currentYear, currentMonth);
+            monthAvg.textContent = avg ? `★ ${avg}` : '';
+            const streak = getStreak();
+            streakDisplay.textContent = streak > 1 ? `🔥 ${streak}` : '';
+
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const startDay = firstDay.getDay() || 7;
+            grid.innerHTML = '';
+
+            for (let i = 1; i < startDay; i++) {
+                const empty = document.createElement('div');
+                empty.className = 'day empty';
+                grid.appendChild(empty);
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const data = getDayData(dateStr);
+                const mood = data.mood || 0;
+                const dayEl = document.createElement('div');
+                dayEl.className = `day mood-${mood}`;
+                if (isToday(dateStr)) dayEl.classList.add('today');
+                if (isFuture(dateStr)) dayEl.classList.add('future');
+
+                const numSpan = document.createElement('span');
+                numSpan.className = 'day-number';
+                numSpan.textContent = d;
+                dayEl.appendChild(numSpan);
+
+                if (data.states && data.states.length > 0) {
+                    const waveContainer = document.createElement('div');
+                    waveContainer.className = 'day-wave-container';
+                    renderMiniWaves(waveContainer, data.states);
+                    dayEl.appendChild(waveContainer);
+                }
+                if (data.stars && data.stars.length > 0) {
+                    const starDot = document.createElement('span');
+                    starDot.className = 'star-indicator';
+                    starDot.textContent = '✦';
+                    dayEl.appendChild(starDot);
+                }
+                if (data.music) {
+                    const musicIcon = document.createElement('span');
+                    musicIcon.className = 'music-indicator';
+                    musicIcon.textContent = '🎵';
+                    dayEl.appendChild(musicIcon);
+                }
+
+                dayEl.addEventListener('click', (function(ds) {
+                    return function() {
+                        if (!isFuture(ds)) { soundClick();
+                            openDay(ds); } else alert('Этот день ещё не наступил 😊');
+                    };
+                })(dateStr));
+                grid.appendChild(dayEl);
+            }
+        }
+
+        // =================================================================
+        // 5. ФОНОВЫЙ ХОЛСТ (реалистичные эффекты)
+        // =================================================================
+        let bgCanvas, bgCtx;
+        let bgAnimId = null;
+        let currentMood = 0;
+        let rainDrops = [];
+        let rainDrops2 = [];
+        let glassDrops = [];
+        let clouds = [];
+        let flowers = [];
+        let flareParticles = [];
+        let lightningFlash = 0;
+
+        function initBgCanvas() {
+            bgCanvas = document.getElementById('bgCanvas');
+            bgCtx = bgCanvas.getContext('2d');
+            resizeBgCanvas();
+            window.addEventListener('resize', resizeBgCanvas);
+        }
+
+        function resizeBgCanvas() {
+            if (!bgCanvas) return;
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+        }
+
+        function generateRain(dropsArray, count, angle, speed, lengthRange, width) {
+            for (let i = 0; i < count; i++) {
+                dropsArray.push({
+                    x: Math.random() * bgCanvas.width,
+                    y: Math.random() * bgCanvas.height,
+                    speed: speed * (0.8 + Math.random() * 0.4),
+                    length: lengthRange[0] + Math.random() * (lengthRange[1] - lengthRange[0]),
+                    width: width || 1.5,
+                    angle: angle,
+                    opacity: 0.4 + Math.random() * 0.4,
                 });
+            }
+        }
+
+        function updateRain(dropsArray) {
+            for (let drop of dropsArray) {
+                drop.x += Math.sin(drop.angle) * drop.speed;
+                drop.y += Math.cos(drop.angle) * drop.speed;
+                if (drop.y > bgCanvas.height) {
+                    drop.y = -10;
+                    drop.x = Math.random() * bgCanvas.width;
+                }
+                if (drop.x < -10) drop.x = bgCanvas.width + 10;
+                if (drop.x > bgCanvas.width + 10) drop.x = -10;
+            }
+        }
+
+        function drawRain(dropsArray, color) {
+            bgCtx.save();
+            for (let drop of dropsArray) {
+                bgCtx.beginPath();
+                bgCtx.moveTo(drop.x, drop.y);
+                bgCtx.lineTo(drop.x + Math.sin(drop.angle) * drop.length, drop.y + Math.cos(drop.angle) * drop.length);
+                bgCtx.strokeStyle = color || 'rgba(180,200,255,0.6)';
+                bgCtx.lineWidth = drop.width;
+                bgCtx.globalAlpha = drop.opacity;
+                bgCtx.stroke();
+            }
+            bgCtx.restore();
+        }
+
+        function generateGlassDrops(count) {
+            for (let i = 0; i < count; i++) {
+                glassDrops.push({
+                    x: Math.random() * bgCanvas.width,
+                    y: Math.random() * bgCanvas.height,
+                    radius: 3 + Math.random() * 8,
+                    speed: 0.2 + Math.random() * 0.5,
+                    opacity: 0.3 + Math.random() * 0.3,
+                });
+            }
+        }
+
+        function updateGlassDrops() {
+            for (let drop of glassDrops) {
+                drop.y += drop.speed;
+                if (drop.y > bgCanvas.height) {
+                    drop.y = -10;
+                    drop.x = Math.random() * bgCanvas.width;
+                    drop.radius = 3 + Math.random() * 8;
+                }
+            }
+        }
+
+        function drawGlassDrops() {
+            for (let drop of glassDrops) {
+                const grad = bgCtx.createRadialGradient(drop.x, drop.y, 0, drop.x, drop.y, drop.radius);
+                grad.addColorStop(0, 'rgba(255,255,255,0.5)');
+                grad.addColorStop(0.5, 'rgba(200,220,255,0.2)');
+                grad.addColorStop(1, 'rgba(200,220,255,0)');
+                bgCtx.beginPath();
+                bgCtx.arc(drop.x, drop.y, drop.radius, 0, Math.PI * 2);
+                bgCtx.fillStyle = grad;
+                bgCtx.fill();
+                bgCtx.beginPath();
+                bgCtx.arc(drop.x - drop.radius * 0.3, drop.y - drop.radius * 0.3, drop.radius * 0.2, 0, Math.PI * 2);
+                bgCtx.fillStyle = 'rgba(255,255,255,0.6)';
+                bgCtx.fill();
+            }
+        }
+
+        function generateClouds(count) {
+            for (let i = 0; i < count; i++) {
+                clouds.push({
+                    x: Math.random() * bgCanvas.width,
+                    y: Math.random() * bgCanvas.height * 0.8,
+                    w: 100 + Math.random() * 200,
+                    h: 40 + Math.random() * 60,
+                    speed: 0.2 + Math.random() * 0.3,
+                    opacity: 0.5 + Math.random() * 0.3,
+                });
+            }
+        }
+
+        function updateClouds() {
+            for (let cloud of clouds) {
+                cloud.x += cloud.speed;
+                if (cloud.x > bgCanvas.width + cloud.w) cloud.x = -cloud.w;
+            }
+        }
+
+        function drawClouds() {
+            for (let cloud of clouds) {
+                bgCtx.save();
+                bgCtx.globalAlpha = cloud.opacity;
+                const gradient = bgCtx.createRadialGradient(cloud.x, cloud.y, 0, cloud.x, cloud.y, cloud.w);
+                gradient.addColorStop(0, 'rgba(255,255,255,0.8)');
+                gradient.addColorStop(0.7, 'rgba(255,255,255,0.3)');
+                gradient.addColorStop(1, 'rgba(255,255,255,0)');
+                bgCtx.beginPath();
+                bgCtx.ellipse(cloud.x, cloud.y, cloud.w, cloud.h, 0, 0, Math.PI * 2);
+                bgCtx.fillStyle = gradient;
+                bgCtx.fill();
+                bgCtx.restore();
+            }
+        }
+
+        function generateFlowers(count) {
+            for (let i = 0; i < count; i++) {
+                flowers.push({
+                    x: Math.random() * bgCanvas.width,
+                    y: Math.random() * bgCanvas.height,
+                    size: 25 + Math.random() * 45,
+                    angle: Math.random() * Math.PI * 2,
+                    petalCount: 5 + Math.floor(Math.random() * 3),
+                    phase: Math.random() * Math.PI * 2,
+                    speed: 0.003 + Math.random() * 0.005,
+                    color: ['#ff6a8a', '#d84a6a', '#ff8a9a', '#f06a8a', '#e85a7a'][Math.floor(Math.random() * 5)]
+                });
+            }
+        }
+
+        function drawFlowers(time) {
+            for (let flower of flowers) {
+                const bloom = 0.6 + 0.4 * Math.sin(time * flower.speed + flower.phase);
+                const size = flower.size * (0.75 + 0.25 * bloom);
+                bgCtx.save();
+                bgCtx.translate(flower.x, flower.y);
+                bgCtx.rotate(flower.angle);
+                const petalCount = flower.petalCount;
+                for (let i = 0; i < petalCount; i++) {
+                    const angle = (i / petalCount) * Math.PI * 2;
+                    bgCtx.save();
+                    bgCtx.rotate(angle);
+                    bgCtx.beginPath();
+                    bgCtx.ellipse(size * 0.3, 0, size * 0.25, size * 0.55, 0, 0, Math.PI * 2);
+                    const grad = bgCtx.createRadialGradient(0, 0, 0, 0, 0, size * 0.55);
+                    grad.addColorStop(0, flower.color);
+                    grad.addColorStop(0.5, flower.color);
+                    grad.addColorStop(1, '#5a1a2a');
+                    bgCtx.fillStyle = grad;
+                    bgCtx.fill();
+                    bgCtx.restore();
+                }
+                // Тычинка
+                bgCtx.beginPath();
+                bgCtx.arc(0, 0, size * 0.1, 0, Math.PI * 2);
+                bgCtx.fillStyle = '#ffd700';
+                bgCtx.fill();
+                bgCtx.restore();
+            }
+        }
+
+        function generateFlareParticles(count) {
+            for (let i = 0; i < count; i++) {
+                flareParticles.push({
+                    x: Math.random() * bgCanvas.width,
+                    y: Math.random() * bgCanvas.height,
+                    radius: 50 + Math.random() * 150,
+                    speedX: (Math.random() - 0.5) * 0.3,
+                    speedY: (Math.random() - 0.5) * 0.3,
+                    opacity: 0.1 + Math.random() * 0.25,
+                    color: `hsla(${200 + Math.random()*60}, 80%, 70%, 0.3)`,
+                });
+            }
+        }
+
+        function updateFlareParticles() {
+            for (let p of flareParticles) {
+                p.x += p.speedX;
+                p.y += p.speedY;
+                if (p.x < -p.radius) p.x = bgCanvas.width + p.radius;
+                if (p.x > bgCanvas.width + p.radius) p.x = -p.radius;
+                if (p.y < -p.radius) p.y = bgCanvas.height + p.radius;
+                if (p.y > bgCanvas.height + p.radius) p.y = -p.radius;
+            }
+        }
+
+        function drawFlareParticles() {
+            for (let p of flareParticles) {
+                const grad = bgCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+                grad.addColorStop(0, p.color);
+                grad.addColorStop(1, 'transparent');
+                bgCtx.beginPath();
+                bgCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                bgCtx.fillStyle = grad;
+                bgCtx.fill();
+            }
+        }
+
+        function renderBg(time) {
+            if (!bgCtx) return;
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+            if (currentMood === 0) {
+                bgCtx.fillStyle = 'rgba(10,10,18,0)';
+                bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+                return;
+            }
+
+            switch (currentMood) {
+                case 1:
+                    bgCtx.fillStyle = '#0a0a1a';
+                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+                    updateRain(rainDrops);
+                    drawRain(rainDrops, 'rgba(180,200,255,0.5)');
+                    updateGlassDrops();
+                    drawGlassDrops();
+                    if (Math.random() < 0.0005) lightningFlash = 0.8;
+                    if (lightningFlash > 0) {
+                        bgCtx.fillStyle = `rgba(200,220,255,${lightningFlash * 0.3})`;
+                        bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+                        lightningFlash *= 0.98;
+                    }
+                    break;
+                case 2:
+                    bgCtx.fillStyle = '#1a2a3a';
+                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+                    updateRain(rainDrops2);
+                    drawRain(rainDrops2, 'rgba(200,220,255,0.3)');
+                    updateGlassDrops();
+                    drawGlassDrops();
+                    break;
+                case 3:
+                    bgCtx.fillStyle = '#f5e6b0';
+                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+                    updateClouds();
+                    drawClouds();
+                    break;
+                case 4:
+                    bgCtx.fillStyle = '#7a2a4a';
+                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+                    drawFlowers(time);
+                    break;
+                case 5:
+                    bgCtx.fillStyle = '#8ac4d4';
+                    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+                    const grad = bgCtx.createConicGradient(0, bgCanvas.width / 2, bgCanvas.height * 0.8);
+                    grad.addColorStop(0, 'rgba(255,0,0,0.1)');
+                    grad.addColorStop(0.17, 'rgba(255,165,0,0.1)');
+                    grad.addColorStop(0.33, 'rgba(255,255,0,0.1)');
+                    grad.addColorStop(0.5, 'rgba(0,255,0,0.1)');
+                    grad.addColorStop(0.67, 'rgba(0,0,255,0.1)');
+                    grad.addColorStop(0.83, 'rgba(75,0,130,0.1)');
+                    grad.addColorStop(1, 'rgba(238,130,238,0.1)');
+                    bgCtx.beginPath();
+                    bgCtx.arc(bgCanvas.width / 2, bgCanvas.height * 0.8, Math.min(bgCanvas.width, bgCanvas.height) * 0.6, 0,
+                        Math.PI);
+                    bgCtx.fillStyle = grad;
+                    bgCtx.fill();
+                    break;
+            }
+
+            if (currentMood !== 0) {
+                updateFlareParticles();
+                drawFlareParticles();
+            }
+        }
+
+        function setMoodEffect(mood) {
+            if (bgAnimId) {
+                cancelAnimationFrame(bgAnimId);
+                bgAnimId = null;
+            }
+            currentMood = mood;
+            const bgCanvasEl = document.getElementById('bgCanvas');
+            if (mood === 0) {
+                bgCanvasEl.classList.remove('active');
+                stopAllSounds();
+                return;
+            }
+            bgCanvasEl.classList.add('active');
+
+            rainDrops = [];
+            rainDrops2 = [];
+            glassDrops = [];
+            clouds = [];
+            flowers = [];
+            flareParticles = [];
+            lightningFlash = 0;
+
+            switch (mood) {
+                case 1:
+                    generateRain(rainDrops, 180, 0.2, 8, [15, 30], 1.5);
+                    generateGlassDrops(15);
+                    generateFlareParticles(10);
+                    createAmbientSound(1);
+                    break;
+                case 2:
+                    generateRain(rainDrops2, 100, 0.4, 6, [12, 25], 1.2);
+                    generateGlassDrops(8);
+                    generateFlareParticles(8);
+                    createAmbientSound(2);
+                    break;
+                case 3:
+                    generateClouds(6);
+                    generateFlareParticles(6);
+                    createAmbientSound(3);
+                    break;
+                case 4:
+                    generateFlowers(15);
+                    generateFlareParticles(12);
+                    createAmbientSound(4);
+                    break;
+                case 5:
+                    generateFlareParticles(25);
+                    createAmbientSound(5);
+                    break;
+            }
+
+            function animateBg(time) {
+                renderBg(time);
+                bgAnimId = requestAnimationFrame(animateBg);
+            }
+            bgAnimId = requestAnimationFrame(animateBg);
+        }
+
+        // =================================================================
+        // 6. ОТКРЫТЬ ДЕНЬ
+        // =================================================================
+        function openDay(dateStr) {
+            currentDateStr = dateStr;
+            const data = getDayData(dateStr);
+            selectedStates = data.states ? [...data.states] : [];
+            stars = data.stars ? [...data.stars] : [];
+            selectedMood = data.mood || 0;
+
+            const container = document.getElementById('waveContainer');
+            container.classList.add('active');
+
+            const parts = dateStr.split('-');
+            const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября',
+                'ноября', 'декабря'
+            ];
+            document.getElementById('waveDate').textContent = `${parts[2]} ${months[parts[1]-1]} ${parts[0]}`;
+
+            document.getElementById('stateDescriptions').classList.add('active');
+
+            waveStates = {};
+            STATES.forEach(st => {
+                waveStates[st.id] = {
+                    currentAmp: 0,
+                    targetAmp: 0,
+                    currentAlpha: 0,
+                    targetAlpha: 0,
+                    offset: (Math.random() - 0.5) * 120
+                };
             });
 
-            document.getElementById('confirmRatingBtn').addEventListener('click', () => {
-                if (!selectedRating) return;
-                showStatesAndNotes();
-                saveCurrentDay();
-                // приглушить звук (имитация)
+            if (selectedMood > 0) {
+                setMoodEffect(selectedMood);
+                document.getElementById('moodSelector').classList.remove('active');
+                document.getElementById('backBtn').classList.add('visible');
+                document.getElementById('bottomPanel').classList.add('active');
+                document.getElementById('noteInput').value = data.note || '';
+                buildStatePanel();
+                updateStarCounter();
+                selectedStates.forEach(stId => setWaveTarget(stId, true));
+                // Звук становится тише после подтверждения
+                setTimeout(() => setAmbientVolume(0.08), 500);
+            } else {
+                document.getElementById('moodSelector').classList.add('active');
+                document.getElementById('bottomPanel').classList.remove('active');
+                document.getElementById('backBtn').classList.remove('visible');
+                document.getElementById('noteInput').value = data.note || '';
+                document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
+                document.getElementById('moodConfirmBtn').disabled = true;
+                setMoodEffect(0);
+                document.getElementById('stateDescriptions').classList.remove('active');
+            }
+
+            canvas = document.getElementById('waveCanvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            if (animationId) cancelAnimationFrame(animationId);
+            animateWaves();
+
+            try { if (window.Telegram && Telegram.WebApp) Telegram.WebApp.expand(); } catch (e) {}
+        }
+
+        function buildStatePanel() {
+            const panel = document.getElementById('statePanel');
+            panel.innerHTML = '';
+            STATES.forEach(st => {
+                const btn = document.createElement('button');
+                btn.className = 'state-btn';
+                btn.dataset.state = st.id;
+                btn.textContent = st.label;
+                btn.style.color = st.color;
+                if (selectedStates.includes(st.id)) btn.classList.add('selected');
+                btn.addEventListener('click', function() {
+                    soundClick();
+                    toggleState(st.id, this);
+                });
+                panel.appendChild(btn);
+            });
+        }
+
+        // =================================================================
+        // 7. ВЫБОР ОЦЕНКИ
+        // =================================================================
+        document.querySelectorAll('.mood-select-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                soundClick();
+                selectedMood = parseInt(this.dataset.mood);
+                document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('moodConfirmBtn').disabled = false;
+                setMoodEffect(selectedMood);
+                setAmbientVolume(0.15);
+            });
+        });
+
+        document.getElementById('moodConfirmBtn').addEventListener('click', function() {
+            if (selectedMood === 0) return;
+            soundConfirm();
+            if (currentDateStr) {
+                const data = getDayData(currentDateStr);
+                data.mood = selectedMood;
+                saveData();
+                renderCalendar();
+                showAdditions();
+                setTimeout(() => setAmbientVolume(0.08), 500);
+            }
+        });
+
+        function showAdditions() {
+            document.getElementById('moodSelector').classList.remove('active');
+            document.getElementById('backBtn').classList.add('visible');
+            buildStatePanel();
+            document.getElementById('bottomPanel').classList.add('active');
+            updateStarCounter();
+            selectedStates.forEach(stId => setWaveTarget(stId, true));
+        }
+
+        function goBackToMood() {
+            soundClick();
+            document.getElementById('bottomPanel').classList.remove('active');
+            document.getElementById('backBtn').classList.remove('visible');
+            document.getElementById('moodSelector').classList.add('active');
+            setMoodEffect(0);
+            document.getElementById('stateDescriptions').classList.remove('active');
+            document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.toggle('selected', parseInt(b
+                .dataset.mood) === selectedMood));
+            document.getElementById('moodConfirmBtn').disabled = selectedMood === 0;
+            STATES.forEach(st => setWaveTarget(st.id, false));
+            stopAllSounds();
+        }
+        document.getElementById('backBtn').addEventListener('click', goBackToMood);
+
+        // =================================================================
+        // 8. УПРАВЛЕНИЕ СОСТОЯНИЯМИ
+        // =================================================================
+        function toggleState(stateId, btn) {
+            const index = selectedStates.indexOf(stateId);
+            if (index > -1) {
+                selectedStates.splice(index, 1);
+                btn.classList.remove('selected');
+                setWaveTarget(stateId, false);
+            } else if (selectedStates.length < 4) {
+                selectedStates.push(stateId);
+                btn.classList.add('selected');
+                setWaveTarget(stateId, true);
+            } else {
+                alert('Можно выбрать максимум 4 состояния ✨');
+                return;
+            }
+            if (currentDateStr) {
+                const data = getDayData(currentDateStr);
+                data.states = [...selectedStates];
+                saveData();
+                renderCalendar();
+            }
+        }
+
+        // =================================================================
+        // 9. ВОЛНЫ
+        // =================================================================
+        function getWaveState(stateId) {
+            if (!waveStates[stateId]) {
+                waveStates[stateId] = {
+                    currentAmp: 0,
+                    targetAmp: 0,
+                    currentAlpha: 0,
+                    targetAlpha: 0,
+                    offset: (Math.random() - 0.5) * 120
+                };
+            }
+            return waveStates[stateId];
+        }
+
+        function setWaveTarget(stateId, active) {
+            const state = getWaveState(stateId);
+            if (active) {
+                state.targetAmp = 35 + Math.random() * 10;
+                state.targetAlpha = 0.7 + Math.random() * 0.2;
+            } else {
+                state.targetAmp = 0;
+                state.targetAlpha = 0;
+            }
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+
+        // =================================================================
+        // 10. АНИМАЦИЯ ВОЛН И ЗВЁЗД
+        // =================================================================
+        function animateWaves() {
+            if (!canvas || !ctx) return;
+            const w = canvas.width,
+                h = canvas.height,
+                time = Date.now() / 1000;
+            ctx.clearRect(0, 0, w, h);
+
+            let hasActive = false;
+            STATES.forEach((st, index) => {
+                const state = waveStates[st.id];
+                if (!state) return;
+                state.currentAmp += (state.targetAmp - state.currentAmp) * 0.06;
+                state.currentAlpha += (state.targetAlpha - state.currentAlpha) * 0.06;
+                if (Math.abs(state.currentAmp - state.targetAmp) < 0.01) state.currentAmp = state.targetAmp;
+                if (Math.abs(state.currentAlpha - state.targetAlpha) < 0.001) state.currentAlpha = state.targetAlpha;
+
+                const amp = state.currentAmp;
+                const alpha = state.currentAlpha;
+                if (amp < 0.5 || alpha < 0.01) return;
+                hasActive = true;
+
+                const color = st.color;
+                const offset = state.offset || 0;
+                const centerY = h * 0.4;
+                const freq = 0.014 + index * 0.003;
+                const speed = 0.9 + index * 0.1;
+
+                ctx.save();
+                const glowSize = 80 + Math.sin(time * 0.5 + index) * 20;
+                const grad = ctx.createRadialGradient(w / 2, centerY + offset, 0, w / 2, centerY + offset, glowSize);
+                grad.addColorStop(0, st.color + '20');
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+
+                ctx.beginPath();
+                ctx.moveTo(0, centerY + offset);
+                for (let x = 0; x <= w; x += 2) {
+                    const y = centerY + offset +
+                        Math.sin(x * freq + time * speed + index * 1.2) * amp +
+                        Math.sin(x * freq * 0.6 + time * 0.9 + index * 2.6) * amp * 0.5 +
+                        Math.sin(x * freq * 2.0 + time * 2.2 + index * 0.6) * amp * 0.25;
+                    ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 4 + Math.sin(time * 0.3 + index) * 1.2;
+                ctx.globalAlpha = alpha * (0.8 + Math.sin(time * 0.4 + index * 1.0) * 0.15);
+                ctx.shadowBlur = 60;
+                ctx.shadowColor = color;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, centerY + offset + 18 + Math.sin(time * 0.2 + index) * 10);
+                for (let x = 0; x <= w; x += 3) {
+                    const y = centerY + offset + 18 + Math.sin(time * 0.2 + index) * 10 +
+                        Math.sin(x * freq * 0.7 + time * 1.0 + index * 1.9) * amp * 0.6 +
+                        Math.sin(x * freq * 0.4 + time * 0.6 + index * 2.9) * amp * 0.3;
+                    ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2.5;
+                ctx.globalAlpha = alpha * 0.2;
+                ctx.shadowBlur = 40;
+                ctx.shadowColor = color;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, centerY + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 7);
+                for (let x = 0; x <= w; x += 4) {
+                    const y = centerY + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 7 +
+                        Math.sin(x * freq * 0.5 + time * 0.6 + index * 1.6) * amp * 0.35 +
+                        Math.sin(x * freq * 0.3 + time * 0.4 + index * 2.6) * amp * 0.12;
+                    ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = alpha * 0.08;
+                ctx.shadowBlur = 25;
+                ctx.shadowColor = color;
+                ctx.stroke();
+                ctx.restore();
             });
 
-            // Добавить звезду
-            document.getElementById('addStarBtn').addEventListener('click', addStar);
+            if (!hasActive && selectedStates.length === 0) {
+                ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                ctx.font = '16px system-ui';
+                ctx.textAlign = 'center';
+                ctx.fillText('Выбери состояния ↓', w / 2, h * 0.4 - 10);
+                ctx.fillStyle = 'rgba(255,255,255,0.02)';
+                ctx.font = '13px system-ui';
+                ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
+            }
 
-            // Долгое нажатие на звезду для удаления
-            document.getElementById('starCanvas').addEventListener('pointerdown', (e) => {
-                const rect = e.target.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                for (let i=starsData.length-1; i>=0; i--) {
-                    const s = starsData[i];
-                    if (Math.hypot(s.x-x, s.y-y) < 25) {
-                        let hold = setTimeout(() => {
-                            removeStar(i);
-                        }, 800);
-                        const cancel = () => { clearTimeout(hold); };
-                        document.addEventListener('pointerup', cancel, {once:true});
-                        document.addEventListener('pointerleave', cancel, {once:true});
-                        break;
+            // ХРУСТАЛЬНЫЕ ЗВЁЗДЫ
+            stars.forEach((star, idx) => {
+                const twinkle = 0.6 + Math.sin(time * 1.8 + idx * 2.3) * 0.4;
+                const size = 16 + Math.sin(time * 1.2 + idx * 1.7) * 4;
+
+                // Свечение
+                const glowGrad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, size * 14);
+                glowGrad.addColorStop(0, `rgba(255,255,255,${0.25 * twinkle})`);
+                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.15 * twinkle})`);
+                glowGrad.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.fillStyle = glowGrad;
+                ctx.fillRect(star.x - size * 14, star.y - size * 14, size * 28, size * 28);
+
+                // Звезда с углами
+                ctx.save();
+                ctx.translate(star.x, star.y);
+                ctx.rotate(time * 0.3 + idx);
+                ctx.beginPath();
+                const spikes = 5;
+                const outerR = size;
+                const innerR = size * 0.4;
+                for (let i = 0; i < spikes * 2; i++) {
+                    const radius = i % 2 === 0 ? outerR : innerR;
+                    const angle = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
+                    if (i === 0) ctx.moveTo(radius * Math.cos(angle), radius * Math.sin(angle));
+                    else ctx.lineTo(radius * Math.cos(angle), radius * Math.sin(angle));
+                }
+                ctx.closePath();
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.85 + 0.15 * twinkle})`;
+                ctx.shadowBlur = 80;
+                ctx.shadowColor = 'rgba(200,230,255,0.6)';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                const innerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.6);
+                innerGrad.addColorStop(0, `rgba(255,255,255,${0.8 + 0.2 * twinkle})`);
+                innerGrad.addColorStop(1, 'rgba(200,230,255,0)');
+                ctx.fillStyle = innerGrad;
+                ctx.beginPath();
+                ctx.arc(0, 0, size * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                // Подпись
+                if (star.note) {
+                    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                    ctx.font = '10px system-ui';
+                    ctx.textAlign = 'center';
+                    const displayNote = star.note.length > 15 ? star.note.slice(0, 15) + '…' : star.note;
+                    ctx.fillText(displayNote, star.x, star.y + size + 22);
+                }
+            });
+
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+            animationId = requestAnimationFrame(animateWaves);
+        }
+
+        // =================================================================
+        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ
+        // =================================================================
+        function updateStarCounter() {
+            document.getElementById('starCounter').textContent = `⭐ ${stars.length}`;
+        }
+
+        function getStarPositions() {
+            return stars.map(s => ({ x: s.x, y: s.y }));
+        }
+
+        function isPositionTooClose(x, y, existing, minDist = 100) {
+            for (let pos of existing) {
+                const dist = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
+                if (dist < minDist) return true;
+            }
+            return false;
+        }
+
+        document.getElementById('starBtn').addEventListener('click', function() {
+            if (!currentDateStr) return;
+            if (stars.length >= MAX_STARS) {
+                alert(`Можно добавить максимум ${MAX_STARS} звёзд ✨`);
+                return;
+            }
+            const note = document.getElementById('noteInput').value.trim();
+            if (!note) { alert('Напиши заметку для звезды ✨'); return; }
+            playStarAddSound();
+
+            const data = getDayData(currentDateStr);
+            if (!data.stars) data.stars = [];
+
+            // Вычисляем позицию для звезды (ближе к центру, не рядом с другими)
+            const existing = getStarPositions();
+            let attempts = 0;
+            let x, y;
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height * 0.3;
+            const rangeX = canvas.width * 0.3;
+            const rangeY = canvas.height * 0.2;
+            do {
+                x = centerX + (Math.random() - 0.5) * rangeX * 2;
+                y = centerY + (Math.random() - 0.5) * rangeY * 2;
+                attempts++;
+                // Ограничиваем область, чтобы звезда не появлялась у краёв и над кнопками
+                const margin = 80;
+                x = Math.max(margin, Math.min(canvas.width - margin, x));
+                y = Math.max(margin + 40, Math.min(canvas.height * 0.65, y));
+            } while (isPositionTooClose(x, y, existing) && attempts < 30);
+
+            const newStar = { x, y, note, date: currentDateStr };
+            data.stars.push(newStar);
+            stars = data.stars;
+            saveData();
+            updateStarCounter();
+            renderCalendar();
+            createMagicAppearance(x, y);
+            document.getElementById('noteInput').value = '';
+            data.note = '';
+            saveData();
+        });
+
+        function createMagicAppearance(x, y) {
+            // Вспышка
+            const flash = document.createElement('div');
+            flash.style.cssText = `
+                position: fixed; left: ${x-80}px; top: ${y-80}px;
+                width: 160px; height: 160px; border-radius: 50%;
+                background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(200,230,255,0.3) 40%, transparent 70%);
+                pointer-events: none; z-index: 2000;
+                transform: scale(0);
+                animation: magicFlash 0.8s ease-out forwards;
+            `;
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 900);
+
+            // Осколки
+            for (let i = 0; i < 20; i++) {
+                const spark = document.createElement('div');
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 80 + Math.random() * 150;
+                const dx = Math.cos(angle) * dist;
+                const dy = Math.sin(angle) * dist;
+                const size = 4 + Math.random() * 8;
+                const hue = 200 + Math.random() * 40;
+                const color = `hsl(${hue}, 80%, ${70 + Math.random() * 30}%)`;
+                spark.style.cssText = `
+                    position: fixed; left: ${x}px; top: ${y}px;
+                    width: ${size}px; height: ${size}px;
+                    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+                    background: ${color};
+                    box-shadow: 0 0 20px ${color};
+                    pointer-events: none; z-index: 2000;
+                    transition: all 0.8s ease-out;
+                    opacity: 1;
+                `;
+                document.body.appendChild(spark);
+                requestAnimationFrame(() => {
+                    spark.style.transform = `translate(${dx}px, ${dy}px) scale(0) rotate(${Math.random()*360}deg)`;
+                    spark.style.opacity = '0';
+                });
+                setTimeout(() => spark.remove(), 900);
+            }
+        }
+
+        const styleFlash = document.createElement('style');
+        styleFlash.textContent = `
+            @keyframes magicFlash {
+                0% { transform: scale(0); opacity: 1; }
+                50% { transform: scale(2); opacity: 0.6; }
+                100% { transform: scale(3.5); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(styleFlash);
+
+        // =================================================================
+        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ
+        // =================================================================
+        function deleteStar(star) {
+            playCrystalSound();
+            const numParticles = 50;
+            for (let i = 0; i < numParticles; i++) {
+                const particle = document.createElement('div');
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 100 + Math.random() * 250;
+                const dx = Math.cos(angle) * speed;
+                const dy = Math.sin(angle) * speed;
+                const size = 5 + Math.random() * 12;
+                const hue = 190 + Math.random() * 50;
+                const color = `hsl(${hue}, 80%, ${70 + Math.random() * 30}%)`;
+                particle.style.cssText = `
+                    position: fixed; left: ${star.x}px; top: ${star.y}px;
+                    width: ${size}px; height: ${size}px;
+                    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+                    background: ${color};
+                    box-shadow: 0 0 25px ${color};
+                    pointer-events: none; z-index: 2000;
+                    transition: all 0.9s cubic-bezier(0.2, 0.9, 0.4, 1);
+                    opacity: 1;
+                    transform: scale(1) rotate(0deg);
+                `;
+                document.body.appendChild(particle);
+                requestAnimationFrame(() => {
+                    particle.style.transform =
+                        `translate(${dx}px, ${dy}px) scale(0) rotate(${Math.random()*720}deg)`;
+                    particle.style.opacity = '0';
+                });
+                setTimeout(() => particle.remove(), 1000);
+            }
+
+            const data = getDayData(currentDateStr);
+            data.stars = data.stars.filter(s => s.x !== star.x || s.y !== star.y);
+            stars = data.stars;
+            saveData();
+            updateStarCounter();
+            renderCalendar();
+            longPressTarget = null;
+        }
+
+        // =================================================================
+        // 13. ДОЛГОЕ НАЖАТИЕ ДЛЯ УДАЛЕНИЯ ЗВЕЗДЫ
+        // =================================================================
+        let longPressTimer = null,
+            longPressTarget = null;
+
+        document.addEventListener('mousedown', function(e) {
+            if (e.target.id !== 'waveCanvas') return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left,
+                y = e.clientY - rect.top;
+            let found = null;
+            for (const star of stars) {
+                if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 50) { found = star; break; }
+            }
+            if (found) {
+                longPressTarget = found;
+                longPressTimer = setTimeout(() => deleteStar(found), 800);
+            }
+        });
+        document.addEventListener('mouseup', function() {
+            if (longPressTimer) { clearTimeout(longPressTimer);
+                longPressTimer = null; }
+            longPressTarget = null;
+        });
+        document.addEventListener('touchstart', function(e) {
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left,
+                y = touch.clientY - rect.top;
+            let found = null;
+            for (const star of stars) {
+                if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 50) { found = star; break; }
+            }
+            if (found) {
+                longPressTarget = found;
+                longPressTimer = setTimeout(() => deleteStar(found), 800);
+            }
+        });
+        document.addEventListener('touchend', function() {
+            if (longPressTimer) { clearTimeout(longPressTimer);
+                longPressTimer = null; }
+            longPressTarget = null;
+        });
+
+        // =================================================================
+        // 14. РЕДАКТОР ЗАМЕТОК
+        // =================================================================
+        let editingTarget = null,
+            editingType = null,
+            editingStateId = null;
+
+        document.addEventListener('click', function(e) {
+            if (e.target.id !== 'waveCanvas') return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left,
+                y = e.clientY - rect.top;
+
+            let found = null;
+            for (const star of stars) {
+                if (Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2) < 50) { found = star; break; }
+            }
+            if (found) { openNoteEditor('star', found, null); return; }
+
+            if (selectedStates.length > 0 && y > canvas.height * 0.25 && y < canvas.height * 0.55) {
+                let closestState = null;
+                let closestDist = Infinity;
+                selectedStates.forEach((stateId) => {
+                    const state = waveStates[stateId];
+                    if (!state) return;
+                    const waveY = canvas.height * 0.4 + (state.offset || 0);
+                    const dist = Math.abs(y - waveY);
+                    if (dist < closestDist) {
+                        closestDist = dist;
+                        closestState = stateId;
+                    }
+                });
+                if (closestState && closestDist < 80) {
+                    openNoteEditor('state', null, closestState);
+                } else {
+                    openNoteEditor('day', null, null);
+                }
+            }
+        });
+
+        function openNoteEditor(type, data, stateId) {
+            const editor = document.getElementById('noteEditor');
+            const textarea = document.getElementById('noteEditorTextarea');
+            const title = document.getElementById('noteEditorTitle');
+            const content = document.getElementById('noteEditorContent');
+            editingType = type;
+            editingTarget = data;
+            editingStateId = stateId;
+            content.style.removeProperty('--wave-color');
+            content.style.removeProperty('--wave-glow');
+            content.classList.remove('wave-color');
+            if (type === 'star' && data) {
+                title.textContent = '⭐ Особенный момент';
+                textarea.value = data.note || '';
+            } else if (type === 'state' && stateId) {
+                const st = STATES.find(s => s.id === stateId);
+                if (st) {
+                    title.textContent = `🌊 ${st.label}`;
+                    const data = getDayData(currentDateStr);
+                    textarea.value = data.stateNotes?.[stateId] || '';
+                    content.style.setProperty('--wave-color', st.color);
+                    content.style.setProperty('--wave-glow', `${st.color}33`);
+                    content.classList.add('wave-color');
+                }
+            } else if (type === 'day') {
+                title.textContent = '📝 Комментарий ко дню';
+                const dayData = getDayData(currentDateStr);
+                textarea.value = dayData.note || '';
+            }
+            editor.classList.add('active');
+            textarea.focus();
+        }
+
+        document.getElementById('noteEditorBack').addEventListener('click', function() {
+            document.getElementById('noteEditor').classList.remove('active');
+        });
+        document.getElementById('noteEditorSave').addEventListener('click', function() {
+            const textarea = document.getElementById('noteEditorTextarea');
+            const value = textarea.value.trim();
+            if (editingType === 'star' && editingTarget) {
+                editingTarget.note = value;
+                const data = getDayData(currentDateStr);
+                const starIndex = data.stars.findIndex(s => s.x === editingTarget.x && s.y === editingTarget.y);
+                if (starIndex !== -1) { data.stars[starIndex].note = value;
+                    saveData(); }
+                const localIndex = stars.findIndex(s => s.x === editingTarget.x && s.y === editingTarget.y);
+                if (localIndex !== -1) { stars[localIndex].note = value; }
+            } else if (editingType === 'state' && editingStateId) {
+                const data = getDayData(currentDateStr);
+                if (!data.stateNotes) data.stateNotes = {};
+                data.stateNotes[editingStateId] = value;
+                saveData();
+            } else if (editingType === 'day') {
+                const data = getDayData(currentDateStr);
+                data.note = value;
+                saveData();
+                document.getElementById('noteInput').value = value;
+            }
+            document.getElementById('noteEditor').classList.remove('active');
+            editingTarget = null;
+            editingType = null;
+            editingStateId = null;
+        });
+
+        // =================================================================
+        // 15. СБРОС ДНЯ
+        // =================================================================
+        let resetPressTimer = null;
+
+        document.getElementById('waveDate').addEventListener('mousedown', function() {
+            resetPressTimer = setTimeout(() => {
+                if (currentDateStr && !isResetInProgress) {
+                    soundReset();
+                    if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
+                        resetDay();
                     }
                 }
-            });
-
-            // Навигация
-            document.getElementById('prevMonth').addEventListener('click', () => {
-                currentDate.setMonth(currentDate.getMonth()-1);
-                renderCalendar();
-            });
-            document.getElementById('nextMonth').addEventListener('click', () => {
-                currentDate.setMonth(currentDate.getMonth()+1);
-                renderCalendar();
-            });
-            // свайп
-            let startX=0;
-            document.getElementById('calendar').addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
-            document.getElementById('calendar').addEventListener('touchend', e => {
-                const dx = e.changedTouches[0].clientX - startX;
-                if (Math.abs(dx)>50) {
-                    if (dx<0) currentDate.setMonth(currentDate.getMonth()+1);
-                    else currentDate.setMonth(currentDate.getMonth()-1);
-                    renderCalendar();
+                resetPressTimer = null;
+            }, 1000);
+        });
+        document.getElementById('waveDate').addEventListener('mouseup', function() {
+            if (resetPressTimer) { clearTimeout(resetPressTimer);
+                resetPressTimer = null; }
+        });
+        document.getElementById('waveDate').addEventListener('mouseleave', function() {
+            if (resetPressTimer) { clearTimeout(resetPressTimer);
+                resetPressTimer = null; }
+        });
+        document.getElementById('waveDate').addEventListener('touchstart', function(e) {
+            resetPressTimer = setTimeout(() => {
+                if (currentDateStr && !isResetInProgress) {
+                    soundReset();
+                    if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
+                        resetDay();
+                    }
                 }
-            });
+                resetPressTimer = null;
+            }, 1000);
+        });
+        document.getElementById('waveDate').addEventListener('touchend', function() {
+            if (resetPressTimer) { clearTimeout(resetPressTimer);
+                resetPressTimer = null; }
+        });
 
-            // Помощь
-            document.getElementById('helpBtn').addEventListener('click', () => {
-                document.getElementById('helpModal').classList.add('active');
-            });
-            document.getElementById('closeHelp').addEventListener('click', () => {
-                document.getElementById('helpModal').classList.remove('active');
-            });
-
-            // Инициализация
+        function resetDay() {
+            if (!currentDateStr) return;
+            isResetInProgress = true;
+            const fog = document.getElementById('fogOverlay');
+            fog.classList.add('active');
+            const data = getDayData(currentDateStr);
+            data.mood = 0;
+            data.states = [];
+            data.stars = [];
+            data.note = '';
+            data.stateNotes = {};
+            selectedStates = [];
+            stars = [];
+            selectedMood = 0;
+            saveData();
+            updateStarCounter();
             renderCalendar();
-            clearCanvasEffects();
-
-            // Обработка resize
-            window.addEventListener('resize', () => {
-                if (document.getElementById('canvas-container').classList.contains('active')) {
-                    // перерисовать фоны
-                }
+            STATES.forEach(st => {
+                const state = waveStates[st.id];
+                if (state) { state.currentAmp = 0;
+                    state.targetAmp = 0;
+                    state.currentAlpha = 0;
+                    state.targetAlpha = 0; }
             });
+            setTimeout(() => {
+                fog.classList.remove('active');
+                document.getElementById('bottomPanel').classList.remove('active');
+                document.getElementById('backBtn').classList.remove('visible');
+                const selector = document.getElementById('moodSelector');
+                selector.classList.add('active');
+                document.getElementById('moodConfirmBtn').disabled = true;
+                document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
+                setMoodEffect(0);
+                document.getElementById('stateDescriptions').classList.remove('active');
+                const container = document.getElementById('waveContainer');
+                container.style.background = 'transparent';
+                container.style.boxShadow = 'none';
+                stopAllSounds();
+                isResetInProgress = false;
+            }, 1200);
+        }
 
-            // ---- Заглушка для музыки ----
-            document.getElementById('addMusicBtn').addEventListener('click', () => {
-                tg?.showPopup({ message: '🎵 Функция музыки будет доступна в следующей версии', buttons: [{type:'ok'}] });
-            });
+        // =================================================================
+        // 16. ЗАКРЫТИЕ ХОЛСТА, НАВИГАЦИЯ
+        // =================================================================
+        document.getElementById('closeWaves').addEventListener('click', function() {
+            const container = document.getElementById('waveContainer');
+            container.classList.remove('active');
+            document.getElementById('moodSelector').classList.remove('active');
+            document.getElementById('bottomPanel').classList.remove('active');
+            document.getElementById('backBtn').classList.remove('visible');
+            if (animationId) cancelAnimationFrame(animationId);
+            setMoodEffect(0);
+            document.getElementById('stateDescriptions').classList.remove('active');
+            stopAllSounds();
+            renderCalendar();
+        });
 
-        })();
+        document.getElementById('prevMonth').addEventListener('click', function() {
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11;
+                currentYear--; }
+            renderCalendar();
+        });
+        document.getElementById('nextMonth').addEventListener('click', function() {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0;
+                currentYear++; }
+            renderCalendar();
+        });
+
+        // =================================================================
+        // 17. ИНСТРУКЦИЯ
+        // =================================================================
+        document.getElementById('helpBtn').addEventListener('click', function() {
+            document.getElementById('helpModal').classList.add('active');
+        });
+        document.getElementById('helpClose').addEventListener('click', function() {
+            document.getElementById('helpModal').classList.remove('active');
+        });
+        document.getElementById('helpModal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('active');
+        });
+
+        // =================================================================
+        // 18. МУЗЫКА (заглушка)
+        // =================================================================
+        document.getElementById('musicBtn').addEventListener('click', function() {
+            alert('🎵 Функция добавления музыки будет доступна в следующей версии.\nСейчас можно прикрепить аудиозапись через кнопку "Загрузить файл" (в разработке).');
+        });
+
+        // =================================================================
+        // 19. ИНИЦИАЛИЗАЦИЯ
+        // =================================================================
+        loadData();
+        renderCalendar();
+        initBgCanvas();
+
+        window.addEventListener('resize', function() {
+            if (canvas) resizeCanvas();
+            resizeBgCanvas();
+        });
+
+        try {
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+            }
+        } catch (e) {}
+
+        console.log('💎 Хрустальный дневник загружен!');
+        console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
     </script>
 </body>
 </html>
