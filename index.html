@@ -28,6 +28,7 @@
             overflow-y: auto;
             position: relative;
         }
+        /* ===== ГЛУБОКИЙ ТУМАННЫЙ ФОН ===== */
         body::before {
             content: '';
             position: fixed;
@@ -35,17 +36,24 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(ellipse at 20% 30%, rgba(180,100,255,0.06) 0%, transparent 40%),
-                radial-gradient(ellipse at 70% 60%, rgba(100,200,255,0.04) 0%, transparent 40%);
-            animation: nebula 50s ease-in-out infinite alternate;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(180, 100, 255, 0.10) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 60%, rgba(100, 200, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse at 40% 20%, rgba(255, 150, 200, 0.06) 0%, transparent 40%),
+                radial-gradient(ellipse at 80% 40%, rgba(200, 180, 100, 0.05) 0%, transparent 40%),
+                radial-gradient(ellipse at 10% 70%, rgba(150, 100, 255, 0.07) 0%, transparent 40%);
+            animation: cosmicMist 40s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
         }
-        @keyframes nebula {
+        @keyframes cosmicMist {
             0% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 0.4; }
-            50% { transform: translate(4%, -2%) scale(1.06) rotate(1.5deg); opacity: 0.7; }
-            100% { transform: translate(-3%, 4%) scale(0.95) rotate(-1deg); opacity: 0.5; }
+            25% { transform: translate(4%, -3%) scale(1.06) rotate(2deg); opacity: 0.8; }
+            50% { transform: translate(-3%, 5%) scale(0.94) rotate(-1.5deg); opacity: 0.6; }
+            75% { transform: translate(5%, -2%) scale(1.03) rotate(1.5deg); opacity: 0.9; }
+            100% { transform: translate(-4%, 4%) scale(1.08) rotate(-2deg); opacity: 0.5; }
         }
+        /* ===== ЗВЁЗДНАЯ ПЫЛЬ ===== */
         body::after {
             content: '';
             position: fixed;
@@ -53,32 +61,43 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.3), transparent),
-                radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.2), transparent),
-                radial-gradient(1px 1px at 60% 10%, rgba(255,255,255,0.4), transparent);
-            background-size: 300px 300px;
-            opacity: 0.5;
-            animation: starField 18s ease-in-out infinite alternate;
+            background-image:
+                radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
+                radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 55% 10%, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 75% 70%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 40% 85%, rgba(255,255,255,0.35), transparent),
+                radial-gradient(2px 2px at 15% 35%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(2px 2px at 60% 20%, rgba(255,255,255,0.15), transparent),
+                radial-gradient(1px 1px at 85% 45%, rgba(255,255,255,0.25), transparent),
+                radial-gradient(2px 2px at 30% 70%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 70% 90%, rgba(255,255,255,0.15), transparent);
+            background-size: 350px 350px;
+            opacity: 0.6;
+            animation: starDust 14s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
         }
-        @keyframes starField {
+        @keyframes starDust {
             0% { opacity: 0.2; transform: scale(1); }
-            100% { opacity: 0.7; transform: scale(1.02); }
+            50% { opacity: 0.7; transform: scale(1.02); }
+            100% { opacity: 0.3; transform: scale(0.98); }
         }
 
+        /* ===== КАЛЕНДАРЬ ===== */
         .calendar-wrapper {
             position: relative;
-            background: rgba(10,10,18,0.85);
-            backdrop-filter: blur(20px);
-            border-radius: 36px;
+            background: rgba(10, 10, 18, 0.88);
+            backdrop-filter: blur(24px);
+            border-radius: 40px;
             padding: 6px;
             max-width: 420px;
             width: 100%;
-            box-shadow: 0 8px 80px rgba(0,0,0,0.9), inset 0 0 60px rgba(100,150,255,0.03);
+            box-shadow: 0 8px 80px rgba(0, 0, 0, 0.9), inset 0 0 80px rgba(100, 150, 255, 0.03);
             overflow: hidden;
             z-index: 1;
             margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
         }
         .calendar-wrapper::before {
             content: '';
@@ -87,17 +106,19 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(ellipse at 20% 30%, rgba(140,180,255,0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 60%, rgba(200,150,255,0.05) 0%, transparent 50%);
-            animation: aurora 30s ease-in-out infinite alternate;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(140, 180, 255, 0.10) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 60%, rgba(200, 150, 255, 0.07) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(100, 200, 255, 0.06) 0%, transparent 50%);
+            animation: auroraBorealis 30s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
         }
-        @keyframes aurora {
-            0% { transform: translate(0,0) scale(1); opacity: 0.4; }
-            33% { transform: translate(4%, -3%) scale(1.05); opacity: 0.8; }
-            66% { transform: translate(-3%, 4%) scale(0.95); opacity: 0.6; }
-            100% { transform: translate(2%, -1%) scale(1.02); opacity: 0.9; }
+        @keyframes auroraBorealis {
+            0% { transform: translate(0,0) scale(1); opacity: 0.3; }
+            33% { transform: translate(5%, -4%) scale(1.06); opacity: 0.8; }
+            66% { transform: translate(-4%, 6%) scale(0.94); opacity: 0.5; }
+            100% { transform: translate(3%, -2%) scale(1.02); opacity: 0.7; }
         }
         .calendar-wrapper::after {
             content: '';
@@ -106,26 +127,31 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: radial-gradient(2px 2px at 15% 25%, rgba(255,255,255,0.5), transparent),
-                radial-gradient(1px 1px at 60% 15%, rgba(255,255,255,0.6), transparent);
+            background-image:
+                radial-gradient(2px 2px at 15% 25%, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(2px 2px at 45% 55%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(1px 1px at 85% 75%, rgba(255, 255, 255, 0.4), transparent);
             background-size: 200px 200px;
-            opacity: 0.6;
-            animation: starTwinkle 12s ease-in-out infinite alternate;
+            opacity: 0.5;
+            animation: starGlow 14s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
         }
-        @keyframes starTwinkle {
+        @keyframes starGlow {
             0% { opacity: 0.2; }
-            100% { opacity: 0.8; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.3; }
         }
         .calendar {
             position: relative;
             z-index: 1;
-            background: rgba(16,16,26,0.6);
+            background: rgba(16, 16, 26, 0.55);
             backdrop-filter: blur(8px);
-            border-radius: 32px;
+            border-radius: 36px;
             padding: 16px;
         }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -138,29 +164,29 @@
             font-weight: 700;
             color: #f0f0f8;
             letter-spacing: 0.5px;
-            text-shadow: 0 0 30px rgba(100,150,255,0.1);
+            text-shadow: 0 0 40px rgba(100, 150, 255, 0.08);
         }
         .header-actions {
             display: flex;
             gap: 10px;
         }
-        .help-btn {
+        .header-btn {
             background: none;
             border: none;
-            color: rgba(255,255,255,0.15);
+            color: rgba(255, 255, 255, 0.15);
             font-size: 20px;
             cursor: pointer;
             transition: 0.3s;
-            padding: 4px 8px;
-            border-radius: 10px;
+            padding: 4px 10px;
+            border-radius: 12px;
         }
-        .help-btn:hover { color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
+        .header-btn:hover { color: rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.04); }
         .subheader {
             font-size: 11px;
-            color: rgba(255,255,255,0.12);
+            color: rgba(255, 255, 255, 0.10);
             margin-bottom: 14px;
             padding: 0 4px;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
         }
         .month-nav {
             display: flex;
@@ -169,34 +195,34 @@
             padding: 4px 0 14px;
         }
         .month-nav button {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
             border: none;
             font-size: 22px;
             cursor: pointer;
             padding: 4px 14px;
             border-radius: 14px;
             transition: 0.3s;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255, 255, 255, 0.3);
         }
-        .month-nav button:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .month-nav button:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
         .month-nav .month-year {
             font-size: 18px;
             font-weight: 600;
             color: #f0f0f8;
-            text-shadow: 0 0 20px rgba(100,150,255,0.05);
+            text-shadow: 0 0 20px rgba(100, 150, 255, 0.05);
         }
         .month-nav .month-avg {
             font-size: 13px;
             font-weight: 400;
-            color: rgba(255,255,255,0.2);
+            color: rgba(255, 255, 255, 0.2);
             margin-left: 8px;
         }
         .weekdays {
             display: grid;
-            grid-template-columns: repeat(7,1fr);
+            grid-template-columns: repeat(7, 1fr);
             text-align: center;
             font-size: 10px;
-            color: rgba(255,255,255,0.12);
+            color: rgba(255, 255, 255, 0.10);
             font-weight: 600;
             margin-bottom: 8px;
             text-transform: uppercase;
@@ -204,14 +230,14 @@
         }
         .days-grid {
             display: grid;
-            grid-template-columns: repeat(7,1fr);
+            grid-template-columns: repeat(7, 1fr);
             gap: 5px;
         }
         .day {
             aspect-ratio: 1;
             border-radius: 14px;
             cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.2,0.9,0.4,1);
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -222,10 +248,10 @@
             border: 1.5px solid transparent;
             position: relative;
             min-height: 38px;
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
         }
         .day:active { transform: scale(0.92); }
-        .day:hover { transform: scale(1.04); z-index: 2; background: rgba(255,255,255,0.05); }
+        .day:hover { transform: scale(1.04); z-index: 2; background: rgba(255, 255, 255, 0.05); }
         .day.empty { background: transparent !important; cursor: default; border-color: transparent !important; }
         .day.empty:hover { transform: none; background: transparent !important; }
         .day.mood-1 { background: #0a0a0a; color: #e8e8f0; border-color: #1a1a1a; }
@@ -233,9 +259,9 @@
         .day.mood-3 { background: #5a5a5a; color: #f0f0f0; border-color: #6a6a6a; }
         .day.mood-4 { background: #9a9a9a; color: #1a1a1a; border-color: #aaaaaa; }
         .day.mood-5 { background: #d0d0d0; color: #1a1a1a; border-color: #e0e0e0; }
-        .day.today { border-color: #7a9eff; border-width: 2px; box-shadow: 0 0 30px rgba(100,150,255,0.12); }
-        .day.future { opacity: 0.12; cursor: not-allowed; }
-        .day.future:hover { transform: none; background: rgba(255,255,255,0.02); }
+        .day.today { border-color: #7a9eff; border-width: 2px; box-shadow: 0 0 30px rgba(100, 150, 255, 0.10); }
+        .day.future { opacity: 0.10; cursor: not-allowed; }
+        .day.future:hover { transform: none; background: rgba(255, 255, 255, 0.02); }
         .day .day-number { font-size: 14px; font-weight: 500; position: relative; z-index: 2; }
         .day .star-indicator {
             position: absolute;
@@ -243,7 +269,7 @@
             right: 4px;
             font-size: 10px;
             color: #ffd700;
-            text-shadow: 0 0 14px rgba(255,215,0,0.5);
+            text-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
             z-index: 2;
         }
         .day-wave-container {
@@ -269,6 +295,7 @@
             100% { height: 7px; transform: translateY(-2px); opacity: 1; }
         }
 
+        /* ===== ХОЛСТЫ ===== */
         #bgCanvas {
             display: block;
             position: fixed;
@@ -279,7 +306,7 @@
             z-index: 999;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 1s ease;
+            transition: opacity 1.2s ease;
         }
         #bgCanvas.active { opacity: 1; }
 
@@ -291,7 +318,7 @@
             right: 0;
             bottom: 0;
             z-index: 1000;
-            background: rgba(0,0,0,0.15);
+            background: rgba(0, 0, 0, 0.10);
             transition: opacity 0.6s ease, background 0.8s ease;
             overflow: hidden;
             opacity: 0;
@@ -304,7 +331,7 @@
         #waveContainer.active {
             opacity: 1;
             pointer-events: auto;
-            background: rgba(0,0,0,0.25);
+            background: rgba(0, 0, 0, 0.20);
         }
         #waveCanvas {
             width: 100%;
@@ -317,6 +344,7 @@
             z-index: 10;
         }
 
+        /* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
         .top-bar {
             position: fixed;
             top: 20px;
@@ -330,10 +358,10 @@
         }
         .top-bar>* { pointer-events: auto; }
         .back-btn {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.4);
             font-size: 20px;
             width: 44px;
             height: 44px;
@@ -345,13 +373,13 @@
             justify-content: center;
             z-index: 1002;
         }
-        .back-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .back-btn:hover { background: rgba(255, 255, 255, 0.10); color: #fff; }
         .back-btn.visible { display: flex; }
         .close-btn {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.4);
             font-size: 18px;
             width: 44px;
             height: 44px;
@@ -363,34 +391,35 @@
             justify-content: center;
             z-index: 1002;
         }
-        .close-btn:hover { background: rgba(255,255,255,0.1); transform: rotate(90deg); color: #fff; }
+        .close-btn:hover { background: rgba(255, 255, 255, 0.10); transform: rotate(90deg); color: #fff; }
         .wave-date {
             position: fixed;
             top: 76px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1001;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255, 255, 255, 0.3);
             font-size: 16px;
             font-weight: 500;
-            text-shadow: 0 2px 30px rgba(0,0,0,0.9);
-            background: rgba(0,0,0,0.2);
+            text-shadow: 0 2px 30px rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(10px);
             padding: 4px 18px;
             border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.04);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             cursor: default;
             user-select: none;
             -webkit-user-select: none;
         }
 
+        /* ===== ВЫБОР ОЦЕНКИ ===== */
         #moodSelector {
             position: fixed;
             bottom: 190px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1001;
-            background: rgba(0,0,0,0.45);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(28px);
             border-radius: 28px;
             padding: 16px 22px;
@@ -398,8 +427,8 @@
             flex-direction: column;
             align-items: center;
             gap: 12px;
-            border: 1px solid rgba(255,255,255,0.04);
-            box-shadow: 0 8px 80px rgba(0,0,0,0.7);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 8px 80px rgba(0, 0, 0, 0.7);
             max-width: 92%;
             opacity: 0;
             transition: opacity 0.8s ease, transform 0.8s ease;
@@ -411,7 +440,7 @@
             transform: translateX(-50%) translateY(0) scale(1);
         }
         .mood-select-label {
-            color: rgba(255,255,255,0.25);
+            color: rgba(255, 255, 255, 0.25);
             font-size: 12px;
             text-align: center;
             letter-spacing: 0.5px;
@@ -428,23 +457,23 @@
             border-radius: 50%;
             border: 2px solid transparent;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
             font-size: 15px;
             font-weight: 600;
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(4px);
             flex-shrink: 0;
         }
-        .mood-select-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.08); }
+        .mood-select-btn:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.08); }
         .mood-select-btn.selected {
             border-color: #7a9eff;
-            box-shadow: 0 0 40px rgba(100,150,255,0.12);
+            box-shadow: 0 0 40px rgba(100, 150, 255, 0.10);
             transform: scale(1.08);
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
         }
         .mood-select-btn[data-mood="1"] { color: #6a8ab0; }
         .mood-select-btn[data-mood="2"] { color: #8ab0c8; }
@@ -455,7 +484,7 @@
             padding: 8px 32px;
             border-radius: 20px;
             border: none;
-            background: rgba(100,150,255,0.1);
+            background: rgba(100, 150, 255, 0.10);
             color: #7a9eff;
             font-size: 13px;
             font-weight: 500;
@@ -463,9 +492,10 @@
             transition: 0.3s;
             margin-top: 4px;
         }
-        .mood-confirm-btn:hover { background: rgba(100,150,255,0.18); }
-        .mood-confirm-btn:disabled { opacity: 0.12; cursor: not-allowed; }
+        .mood-confirm-btn:hover { background: rgba(100, 150, 255, 0.18); }
+        .mood-confirm-btn:disabled { opacity: 0.10; cursor: not-allowed; }
 
+        /* ===== НИЖНЯЯ ПАНЕЛЬ ===== */
         #bottomPanel {
             position: fixed;
             bottom: 24px;
@@ -495,30 +525,34 @@
             justify-content: center;
         }
         .states-label {
-            color: rgba(255,255,255,0.2);
+            color: rgba(255, 255, 255, 0.2);
             font-size: 12px;
             text-align: center;
             letter-spacing: 0.5px;
             animation: fadeFromFog 1s ease;
         }
         .info-btn-small {
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.15);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.25);
             font-size: 16px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
             cursor: pointer;
             transition: 0.3s;
-            padding: 2px 8px;
-            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             animation: fadeFromFog 1s ease;
         }
-        .info-btn-small:hover { color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); }
+        .info-btn-small:hover { color: rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.08); }
         @keyframes fadeFromFog {
             0% { opacity: 0; transform: scale(0.95); filter: blur(6px); }
             100% { opacity: 1; transform: scale(1); filter: blur(0); }
         }
         #statePanel {
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.25);
             backdrop-filter: blur(20px);
             border-radius: 24px;
             padding: 10px 14px;
@@ -526,8 +560,8 @@
             flex-wrap: wrap;
             gap: 6px;
             justify-content: center;
-            border: 1px solid rgba(255,255,255,0.04);
-            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
             width: 100%;
             animation: fadeFromFog 1.2s ease;
         }
@@ -540,7 +574,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             opacity: 0.3;
-            background: rgba(255,255,255,0.02);
+            background: rgba(255, 255, 255, 0.02);
             color: #fff;
             white-space: nowrap;
         }
@@ -550,7 +584,7 @@
             transform: scale(1.04);
             border-color: currentColor;
             box-shadow: 0 0 30px currentColor;
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
         }
         #noteSection {
             width: 100%;
@@ -563,8 +597,8 @@
             width: 100%;
             padding: 10px 14px;
             border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.06);
-            background: rgba(0,0,0,0.18);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(8px);
             color: #d0d0d8;
             font-size: 14px;
@@ -576,13 +610,13 @@
             user-select: text;
             -webkit-user-select: text;
         }
-        #noteInput:focus { border-color: rgba(255,255,255,0.1); background: rgba(0,0,0,0.25); }
-        #noteInput::placeholder { color: rgba(255,255,255,0.12); }
+        #noteInput:focus { border-color: rgba(255, 255, 255, 0.10); background: rgba(0, 0, 0, 0.20); }
+        #noteInput::placeholder { color: rgba(255, 255, 255, 0.10); }
         #starBtn {
             padding: 6px 18px;
             border-radius: 20px;
-            border: 1.5px solid rgba(255,215,0,0.08);
-            background: rgba(255,215,0,0.02);
+            border: 1.5px solid rgba(255, 215, 0, 0.06);
+            background: rgba(255, 215, 0, 0.02);
             color: #ffd700;
             font-size: 13px;
             font-weight: 500;
@@ -595,10 +629,11 @@
             width: 100%;
             justify-content: center;
         }
-        #starBtn:hover { background: rgba(255,215,0,0.06); border-color: rgba(255,215,0,0.15); transform: scale(1.01); }
-        .star-counter { font-size: 12px; color: rgba(255,255,255,0.15); text-align: center; margin-top: 4px; }
-        .star-hint { font-size: 10px; color: rgba(255,255,255,0.06); text-align: center; margin-top: -2px; }
+        #starBtn:hover { background: rgba(255, 215, 0, 0.05); border-color: rgba(255, 215, 0, 0.12); transform: scale(1.01); }
+        .star-counter { font-size: 12px; color: rgba(255, 255, 255, 0.12); text-align: center; margin-top: 4px; }
+        .star-hint { font-size: 10px; color: rgba(255, 255, 255, 0.05); text-align: center; margin-top: -2px; }
 
+        /* ===== РЕДАКТОР ===== */
         .note-editor {
             display: none;
             position: fixed;
@@ -607,7 +642,7 @@
             right: 0;
             bottom: 0;
             z-index: 2000;
-            background: rgba(0,0,0,0.55);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(28px);
             align-items: center;
             justify-content: center;
@@ -615,20 +650,20 @@
         }
         .note-editor.active { display: flex; }
         .note-editor-content {
-            background: rgba(12,12,20,0.95);
+            background: rgba(12, 12, 20, 0.95);
             backdrop-filter: blur(20px);
             border-radius: 32px;
             padding: 28px 24px;
             max-width: 360px;
             width: 100%;
-            border: 1px solid rgba(255,255,255,0.04);
-            box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8);
             animation: slideUp 0.3s ease;
             transition: border-color 0.5s ease, box-shadow 0.5s ease;
         }
         .note-editor-content.wave-color {
-            border-color: var(--wave-color, rgba(255,255,255,0.06));
-            box-shadow: 0 0 80px var(--wave-glow, rgba(255,255,255,0.03));
+            border-color: var(--wave-color, rgba(255, 255, 255, 0.06));
+            box-shadow: 0 0 80px var(--wave-glow, rgba(255, 255, 255, 0.03));
         }
         @keyframes slideUp {
             from { transform: translateY(30px); opacity: 0; }
@@ -643,20 +678,20 @@
         .note-editor-back {
             background: none;
             border: none;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255, 255, 255, 0.3);
             font-size: 24px;
             cursor: pointer;
             transition: 0.3s;
             padding: 4px;
         }
-        .note-editor-back:hover { color: rgba(255,255,255,0.6); }
+        .note-editor-back:hover { color: rgba(255, 255, 255, 0.6); }
         .note-editor-title { color: #f0f0f8; font-size: 16px; font-weight: 500; }
         .note-editor-textarea {
             width: 100%;
             padding: 12px;
             border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.06);
-            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(0, 0, 0, 0.2);
             color: #d0d0d8;
             font-size: 14px;
             font-family: inherit;
@@ -669,13 +704,13 @@
             user-select: text;
             -webkit-user-select: text;
         }
-        .note-editor-textarea:focus { border-color: rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); }
+        .note-editor-textarea:focus { border-color: rgba(255, 255, 255, 0.10); background: rgba(0, 0, 0, 0.3); }
         .note-editor-save {
             width: 100%;
             padding: 10px;
             border-radius: 16px;
             border: none;
-            background: rgba(100,150,255,0.08);
+            background: rgba(100, 150, 255, 0.08);
             color: #7a9eff;
             font-size: 14px;
             font-weight: 500;
@@ -683,9 +718,10 @@
             transition: 0.3s;
             margin-top: 10px;
         }
-        .note-editor-save:hover { background: rgba(100,150,255,0.15); }
+        .note-editor-save:hover { background: rgba(100, 150, 255, 0.15); }
 
-        .help-modal, .info-modal {
+        .help-modal,
+        .info-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -693,36 +729,40 @@
             right: 0;
             bottom: 0;
             z-index: 3000;
-            background: rgba(0,0,0,0.55);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(28px);
             align-items: center;
             justify-content: center;
             padding: 24px;
         }
-        .help-modal.active, .info-modal.active { display: flex; }
-        .help-content, .info-content {
-            background: rgba(12,12,20,0.95);
+        .help-modal.active,
+        .info-modal.active { display: flex; }
+        .help-content,
+        .info-content {
+            background: rgba(12, 12, 20, 0.95);
             backdrop-filter: blur(20px);
             border-radius: 32px;
             padding: 28px 24px;
             max-width: 360px;
             width: 100%;
-            border: 1px solid rgba(255,255,255,0.04);
-            box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8);
             animation: slideUp 0.3s ease;
             max-height: 80vh;
             overflow-y: auto;
             user-select: text;
             -webkit-user-select: text;
         }
-        .help-content h3, .info-content h3 {
+        .help-content h3,
+        .info-content h3 {
             color: #f0f0f8;
             font-size: 18px;
             margin-bottom: 14px;
             text-align: center;
         }
-        .help-content p, .info-content p {
-            color: rgba(255,255,255,0.4);
+        .help-content p,
+        .info-content p {
+            color: rgba(255, 255, 255, 0.4);
             font-size: 13px;
             line-height: 1.7;
             margin-bottom: 10px;
@@ -732,17 +772,18 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 6px;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             font-size: 13px;
         }
         .info-content .state-info .symbol { font-size: 16px; }
         .info-content .state-info .desc { font-size: 12px; opacity: 0.6; }
-        .help-close, .info-close {
+        .help-close,
+        .info-close {
             width: 100%;
             padding: 10px;
             border-radius: 16px;
             border: none;
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
             color: #fff;
             font-size: 14px;
             font-weight: 500;
@@ -750,7 +791,8 @@
             transition: 0.3s;
             margin-top: 12px;
         }
-        .help-close:hover, .info-close:hover { background: rgba(255,255,255,0.08); }
+        .help-close:hover,
+        .info-close:hover { background: rgba(255, 255, 255, 0.08); }
 
         .fog-overlay {
             position: fixed;
@@ -760,7 +802,7 @@
             bottom: 0;
             z-index: 1500;
             pointer-events: none;
-            background: radial-gradient(ellipse at center, rgba(150,200,255,0.2) 0%, rgba(100,150,200,0.1) 30%, rgba(50,80,120,0.04) 60%, transparent 80%);
+            background: radial-gradient(ellipse at center, rgba(150, 200, 255, 0.15) 0%, rgba(100, 150, 200, 0.08) 30%, rgba(50, 80, 120, 0.03) 60%, transparent 80%);
             opacity: 0;
             transition: opacity 1.2s ease;
         }
@@ -775,10 +817,11 @@
             .mood-select-btn { width: 38px; height: 38px; font-size: 14px; }
             .mood-select-buttons { gap: 6px; }
             #moodSelector { padding: 12px 16px; bottom: 170px; }
-            .close-btn, .back-btn { width: 40px; height: 40px; font-size: 16px; }
+            .close-btn,
+            .back-btn { width: 40px; height: 40px; font-size: 16px; }
             .wave-date { font-size: 14px; padding: 4px 14px; top: 66px; }
             .top-bar { top: 14px; left: 14px; right: 14px; }
-            .info-btn-small { font-size: 14px; }
+            .info-btn-small { width: 26px; height: 26px; font-size: 14px; }
         }
     </style>
 </head>
@@ -789,7 +832,7 @@
             <div class="header">
                 <span class="header-title">Мой дневник</span>
                 <div class="header-actions">
-                    <button class="help-btn" id="helpBtn">?</button>
+                    <button class="header-btn" id="helpBtn">?</button>
                 </div>
             </div>
             <div class="subheader">Нажми на день, чтобы вспомнить</div>
@@ -915,11 +958,12 @@
         let waveStates = {};
 
         // =================================================================
-        // 2. ЗВУКИ
+        // 2. ЗВУКИ — АТМОСФЕРНЫЕ, БЕЗ ДОЖДЯ В 3 И 4
         // =================================================================
         let audioCtx = null;
         let ambientNodes = [];
         let ambientGainNode = null;
+        let droneGainNode = null;
 
         function initAudio() {
             if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
@@ -929,47 +973,105 @@
             ambientNodes.forEach(node => { try { node.stop(); } catch (e) {} });
             ambientNodes = [];
             ambientGainNode = null;
+            droneGainNode = null;
         }
 
+        // ===== ФОНОВЫЙ ГУЛ (постоянный, тихий) =====
+        function playDrone() {
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(55, now);
+                osc.frequency.exponentialRampToValueAtTime(65, now + 10);
+
+                droneGainNode = audioCtx.createGain();
+                droneGainNode.gain.setValueAtTime(0.03, now);
+                droneGainNode.gain.exponentialRampToValueAtTime(0.02, now + 2);
+
+                osc.connect(droneGainNode);
+                droneGainNode.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 30);
+                ambientNodes.push(osc);
+                ambientNodes.push(droneGainNode);
+
+                // Добавляем второй тон для глубины
+                const osc2 = audioCtx.createOscillator();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(43, now + 0.5);
+                osc2.frequency.exponentialRampToValueAtTime(48, now + 12);
+
+                const gain2 = audioCtx.createGain();
+                gain2.gain.setValueAtTime(0.02, now + 0.5);
+                gain2.gain.exponentialRampToValueAtTime(0.015, now + 2.5);
+
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start(now + 0.5);
+                osc2.stop(now + 32);
+                ambientNodes.push(osc2);
+                ambientNodes.push(gain2);
+
+            } catch (e) {}
+        }
+
+        // ===== АТМОСФЕРНЫЕ ЗВУКИ ДЛЯ ОЦЕНОК =====
         function createAmbientSound(type) {
             stopAllSounds();
             initAudio();
             try {
                 const now = audioCtx.currentTime;
-                const bufferSize = audioCtx.sampleRate * 4;
+                const bufferSize = audioCtx.sampleRate * 5;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
 
                 let baseAmp = 0;
                 switch (type) {
-                    case 1: baseAmp = 0.3; break;
-                    case 2: baseAmp = 0.12; break;
-                    case 3: baseAmp = 0.06; break;
-                    case 4: baseAmp = 0.05; break;
-                    case 5: baseAmp = 0.03; break;
-                    default: baseAmp = 0.1;
+                    case 1:
+                        baseAmp = 0.25;
+                        break; // Гроза
+                    case 2:
+                        baseAmp = 0.10;
+                        break; // Дождь
+                    case 3:
+                        baseAmp = 0.05;
+                        break; // Космос
+                    case 4:
+                        baseAmp = 0.04;
+                        break; // Хрусталь
+                    case 5:
+                        baseAmp = 0.03;
+                        break; // Рай
+                    default:
+                        baseAmp = 0.08;
                 }
 
                 for (let i = 0; i < bufferSize; i++) {
                     let val = 0;
                     const t = i / audioCtx.sampleRate;
-                    if (type === 1) {
+                    if (type === 1) { // Гроза
                         val = (Math.random() * 2 - 1) * baseAmp * (0.7 + 0.3 * Math.sin(t * 0.5));
-                        if (Math.random() < 0.0002) val += (Math.random() * 2 - 1) * 0.4;
-                    } else if (type === 2) {
+                        if (Math.random() < 0.00015) val += (Math.random() * 2 - 1) * 0.35;
+                    } else if (type === 2) { // Лёгкий дождь
                         val = (Math.random() * 2 - 1) * baseAmp * (0.8 + 0.2 * Math.sin(t * 0.3));
-                        val += Math.sin(t * 1.2) * baseAmp * 0.2;
-                    } else if (type === 3) {
-                        val = (Math.random() * 2 - 1) * baseAmp * (0.5 + 0.5 * Math.sin(t * 0.05));
-                        val += Math.sin(t * 0.15) * baseAmp * 0.3;
-                    } else if (type === 4) {
-                        val = (Math.random() * 2 - 1) * baseAmp * (0.6 + 0.4 * Math.sin(t * 0.6));
-                        val += Math.sin(t * 0.8 + 0.5) * baseAmp * 0.2;
-                    } else if (type === 5) {
-                        val = Math.sin(t * 0.8) * baseAmp * 0.5 +
-                            Math.sin(t * 1.2 + 0.5) * baseAmp * 0.3 +
-                            Math.sin(t * 0.4 + 1.2) * baseAmp * 0.2;
-                        val += (Math.random() * 2 - 1) * baseAmp * 0.15;
+                        val += Math.sin(t * 1.5) * baseAmp * 0.15;
+                    } else if (type === 3) { // Космический гул
+                        val = Math.sin(t * 0.4) * baseAmp * 0.3 +
+                            Math.sin(t * 0.7 + 0.5) * baseAmp * 0.2 +
+                            Math.sin(t * 0.2 + 1.2) * baseAmp * 0.15;
+                        val += (Math.random() * 2 - 1) * baseAmp * 0.1;
+                    } else if (type === 4) { // Хрустальные переливы
+                        val = Math.sin(t * 0.8) * baseAmp * 0.4 +
+                            Math.sin(t * 1.2 + 0.5) * baseAmp * 0.25 +
+                            Math.sin(t * 0.5 + 1.0) * baseAmp * 0.15;
+                        val += (Math.random() * 2 - 1) * baseAmp * 0.05;
+                    } else if (type === 5) { // Райские тона
+                        val = Math.sin(t * 0.6) * baseAmp * 0.5 +
+                            Math.sin(t * 1.0 + 0.3) * baseAmp * 0.3 +
+                            Math.sin(t * 0.3 + 0.8) * baseAmp * 0.2;
+                        val += (Math.random() * 2 - 1) * baseAmp * 0.04;
                     }
                     data[i] = val;
                 }
@@ -979,64 +1081,69 @@
                 noise.loop = true;
 
                 ambientGainNode = audioCtx.createGain();
-                ambientGainNode.gain.setValueAtTime(0.15, now);
-                ambientGainNode.gain.exponentialRampToValueAtTime(0.12, now + 0.5);
+                ambientGainNode.gain.setValueAtTime(0.12, now);
+                ambientGainNode.gain.exponentialRampToValueAtTime(0.08, now + 0.8);
 
                 noise.connect(ambientGainNode);
                 ambientGainNode.connect(audioCtx.destination);
                 noise.start(now);
-                noise.stop(now + 12);
+                noise.stop(now + 15);
                 ambientNodes.push(noise);
 
+                // Дополнительные слои
                 if (type === 1) {
-                    for (let i = 0; i < 3; i++) {
+                    for (let i = 0; i < 4; i++) {
                         const osc = audioCtx.createOscillator();
                         osc.type = 'sawtooth';
-                        osc.frequency.setValueAtTime(40 + i * 15, now + i * 1.2);
-                        osc.frequency.exponentialRampToValueAtTime(25 + i * 10, now + i * 1.2 + 1.8);
+                        osc.frequency.setValueAtTime(35 + i * 12, now + i * 0.8);
+                        osc.frequency.exponentialRampToValueAtTime(20 + i * 8, now + i * 0.8 + 2);
                         const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.04, now + i * 1.2);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 1.2 + 1.8);
+                        g.gain.setValueAtTime(0.035, now + i * 0.8);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.8 + 2);
                         osc.connect(g);
                         g.connect(audioCtx.destination);
-                        osc.start(now + i * 1.2);
-                        osc.stop(now + i * 1.2 + 1.8);
+                        osc.start(now + i * 0.8);
+                        osc.stop(now + i * 0.8 + 2);
                         ambientNodes.push(osc);
                         ambientNodes.push(g);
                     }
                 } else if (type === 4) {
-                    for (let i = 0; i < 5; i++) {
+                    for (let i = 0; i < 7; i++) {
                         const osc = audioCtx.createOscillator();
                         osc.type = 'sine';
-                        osc.frequency.setValueAtTime(250 + i * 60 + Math.random() * 20, now + i * 0.15);
-                        osc.frequency.exponentialRampToValueAtTime(350 + i * 50 + Math.random() * 15, now + i * 0.15 + 1.5);
+                        osc.frequency.setValueAtTime(280 + i * 55 + Math.random() * 15, now + i * 0.1);
+                        osc.frequency.exponentialRampToValueAtTime(380 + i * 45 + Math.random() * 10, now + i * 0.1 + 1.8);
                         const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.015, now + i * 0.15);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 1.5);
+                        g.gain.setValueAtTime(0.015, now + i * 0.1);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 1.8);
                         osc.connect(g);
                         g.connect(audioCtx.destination);
-                        osc.start(now + i * 0.15);
-                        osc.stop(now + i * 0.15 + 1.5);
+                        osc.start(now + i * 0.1);
+                        osc.stop(now + i * 0.1 + 1.8);
                         ambientNodes.push(osc);
                         ambientNodes.push(g);
                     }
                 } else if (type === 5) {
-                    for (let i = 0; i < 8; i++) {
+                    for (let i = 0; i < 10; i++) {
                         const osc = audioCtx.createOscillator();
                         osc.type = 'sine';
-                        osc.frequency.setValueAtTime(400 + i * 70 + Math.random() * 30, now + i * 0.12);
-                        osc.frequency.exponentialRampToValueAtTime(500 + i * 60 + Math.random() * 25, now + i * 0.12 + 2);
+                        osc.frequency.setValueAtTime(420 + i * 65 + Math.random() * 25, now + i * 0.08);
+                        osc.frequency.exponentialRampToValueAtTime(520 + i * 55 + Math.random() * 20, now + i * 0.08 + 2.5);
                         const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.02, now + i * 0.12);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 2);
+                        g.gain.setValueAtTime(0.02, now + i * 0.08);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 2.5);
                         osc.connect(g);
                         g.connect(audioCtx.destination);
-                        osc.start(now + i * 0.12);
-                        osc.stop(now + i * 0.12 + 2);
+                        osc.start(now + i * 0.08);
+                        osc.stop(now + i * 0.08 + 2.5);
                         ambientNodes.push(osc);
                         ambientNodes.push(g);
                     }
                 }
+
+                // Запускаем дрон (если ещё не играет)
+                if (!droneGainNode) playDrone();
+
             } catch (e) {}
         }
 
@@ -1046,40 +1153,42 @@
             }
         }
 
+        // ===== ХРУСТАЛЬНЫЕ ЗВУКИ =====
         function playCrystalSound() {
             initAudio();
             try {
                 const now = audioCtx.currentTime;
-                for (let i = 0; i < 8; i++) {
+                for (let i = 0; i < 10; i++) {
                     const osc = audioCtx.createOscillator();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(1000 + Math.random() * 600, now + i * 0.025);
-                    osc.frequency.exponentialRampToValueAtTime(300 + Math.random() * 300, now + i * 0.025 + 0.35);
+                    osc.frequency.setValueAtTime(900 + Math.random() * 700, now + i * 0.02);
+                    osc.frequency.exponentialRampToValueAtTime(250 + Math.random() * 300, now + i * 0.02 + 0.4);
                     const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.04, now + i * 0.025);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.025 + 0.35);
+                    gain.gain.setValueAtTime(0.035, now + i * 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.02 + 0.4);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
-                    osc.start(now + i * 0.025);
-                    osc.stop(now + i * 0.025 + 0.35);
+                    osc.start(now + i * 0.02);
+                    osc.stop(now + i * 0.02 + 0.4);
                     ambientNodes.push(osc);
                     ambientNodes.push(gain);
                 }
-                const bufferSize = audioCtx.sampleRate * 0.1;
+                // Шум осколков (очень мягкий)
+                const bufferSize = audioCtx.sampleRate * 0.08;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
-                    data[i] = (Math.random() * 2 - 1) * 0.04 * (1 - i / bufferSize);
+                    data[i] = (Math.random() * 2 - 1) * 0.025 * (1 - i / bufferSize);
                 }
                 const noise = audioCtx.createBufferSource();
                 noise.buffer = buffer;
                 const gain2 = audioCtx.createGain();
-                gain2.gain.setValueAtTime(0.03, now);
-                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                gain2.gain.setValueAtTime(0.025, now);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
                 noise.connect(gain2);
                 gain2.connect(audioCtx.destination);
                 noise.start(now);
-                noise.stop(now + 0.1);
+                noise.stop(now + 0.08);
                 ambientNodes.push(noise);
                 ambientNodes.push(gain2);
             } catch (e) {}
@@ -1089,18 +1198,18 @@
             initAudio();
             try {
                 const now = audioCtx.currentTime;
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 4; i++) {
                     const osc = audioCtx.createOscillator();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(1200 + i * 200, now + i * 0.05);
-                    osc.frequency.exponentialRampToValueAtTime(700 + i * 150, now + i * 0.05 + 0.2);
+                    osc.frequency.setValueAtTime(1100 + i * 180, now + i * 0.04);
+                    osc.frequency.exponentialRampToValueAtTime(600 + i * 130, now + i * 0.04 + 0.25);
                     const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.04, now + i * 0.05);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.2);
+                    gain.gain.setValueAtTime(0.035, now + i * 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.25);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
-                    osc.start(now + i * 0.05);
-                    osc.stop(now + i * 0.05 + 0.2);
+                    osc.start(now + i * 0.04);
+                    osc.stop(now + i * 0.04 + 0.25);
                     ambientNodes.push(osc);
                     ambientNodes.push(gain);
                 }
@@ -1115,7 +1224,7 @@
                 osc.frequency.setValueAtTime(700, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(500, audioCtx.currentTime + 0.04);
                 const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.025, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -1130,18 +1239,18 @@
             initAudio();
             try {
                 const now = audioCtx.currentTime;
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 4; i++) {
                     const osc = audioCtx.createOscillator();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(600 + i * 150, now + i * 0.06);
-                    osc.frequency.exponentialRampToValueAtTime(800 + i * 120, now + i * 0.06 + 0.1);
+                    osc.frequency.setValueAtTime(550 + i * 130, now + i * 0.05);
+                    osc.frequency.exponentialRampToValueAtTime(750 + i * 100, now + i * 0.05 + 0.12);
                     const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.03, now + i * 0.06);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.1);
+                    gain.gain.setValueAtTime(0.025, now + i * 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.12);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
-                    osc.start(now + i * 0.06);
-                    osc.stop(now + i * 0.06 + 0.1);
+                    osc.start(now + i * 0.05);
+                    osc.stop(now + i * 0.05 + 0.12);
                     ambientNodes.push(osc);
                     ambientNodes.push(gain);
                 }
@@ -1153,15 +1262,15 @@
             try {
                 const osc = audioCtx.createOscillator();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.5);
+                osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.6);
                 const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.025, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.5);
+                osc.stop(audioCtx.currentTime + 0.6);
                 ambientNodes.push(osc);
                 ambientNodes.push(gain);
             } catch (e) {}
@@ -1349,7 +1458,7 @@
                 bgCtx.beginPath();
                 bgCtx.moveTo(drop.x, drop.y);
                 bgCtx.lineTo(drop.x + Math.sin(drop.angle) * drop.length, drop.y + Math.cos(drop.angle) * drop.length);
-                bgCtx.strokeStyle = color || 'rgba(180,200,255,0.5)';
+                bgCtx.strokeStyle = color || 'rgba(180,200,255,0.4)';
                 bgCtx.lineWidth = drop.width;
                 bgCtx.globalAlpha = drop.opacity;
                 bgCtx.stroke();
@@ -1383,8 +1492,8 @@
         function drawGlassDrops() {
             for (let drop of glassDrops) {
                 const grad = bgCtx.createRadialGradient(drop.x, drop.y, 0, drop.x, drop.y, drop.radius);
-                grad.addColorStop(0, 'rgba(255,255,255,0.4)');
-                grad.addColorStop(0.5, 'rgba(200,220,255,0.15)');
+                grad.addColorStop(0, 'rgba(255,255,255,0.3)');
+                grad.addColorStop(0.5, 'rgba(200,220,255,0.10)');
                 grad.addColorStop(1, 'rgba(200,220,255,0)');
                 bgCtx.beginPath();
                 bgCtx.arc(drop.x, drop.y, drop.radius, 0, Math.PI * 2);
@@ -1392,7 +1501,7 @@
                 bgCtx.fill();
                 bgCtx.beginPath();
                 bgCtx.arc(drop.x - drop.radius * 0.3, drop.y - drop.radius * 0.3, drop.radius * 0.2, 0, Math.PI * 2);
-                bgCtx.fillStyle = 'rgba(255,255,255,0.5)';
+                bgCtx.fillStyle = 'rgba(255,255,255,0.4)';
                 bgCtx.fill();
             }
         }
@@ -1422,8 +1531,8 @@
                 bgCtx.save();
                 bgCtx.globalAlpha = cloud.opacity;
                 const gradient = bgCtx.createRadialGradient(cloud.x, cloud.y, 0, cloud.x, cloud.y, cloud.w);
-                gradient.addColorStop(0, 'rgba(255,255,255,0.7)');
-                gradient.addColorStop(0.7, 'rgba(255,255,255,0.25)');
+                gradient.addColorStop(0, 'rgba(255,255,255,0.6)');
+                gradient.addColorStop(0.7, 'rgba(255,255,255,0.20)');
                 gradient.addColorStop(1, 'rgba(255,255,255,0)');
                 bgCtx.beginPath();
                 bgCtx.ellipse(cloud.x, cloud.y, cloud.w, cloud.h, 0, 0, Math.PI * 2);
@@ -1484,10 +1593,10 @@
                     x: Math.random() * bgCanvas.width,
                     y: Math.random() * bgCanvas.height,
                     radius: 50 + Math.random() * 150,
-                    speedX: (Math.random() - 0.5) * 0.3,
-                    speedY: (Math.random() - 0.5) * 0.3,
-                    opacity: 0.1 + Math.random() * 0.25,
-                    color: `hsla(${200 + Math.random()*60}, 80%, 70%, 0.3)`,
+                    speedX: (Math.random() - 0.5) * 0.2,
+                    speedY: (Math.random() - 0.5) * 0.2,
+                    opacity: 0.1 + Math.random() * 0.2,
+                    color: `hsla(${200 + Math.random()*60}, 70%, 70%, 0.25)`,
                 });
             }
         }
@@ -1528,21 +1637,21 @@
                     bgCtx.fillStyle = '#0a0a1a';
                     bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
                     updateRain(rainDrops);
-                    drawRain(rainDrops, 'rgba(180,200,255,0.5)');
+                    drawRain(rainDrops, 'rgba(180,200,255,0.4)');
                     updateGlassDrops();
                     drawGlassDrops();
-                    if (Math.random() < 0.0003) lightningFlash = 0.7;
+                    if (Math.random() < 0.0002) lightningFlash = 0.6;
                     if (lightningFlash > 0) {
-                        bgCtx.fillStyle = `rgba(200,220,255,${lightningFlash * 0.25})`;
+                        bgCtx.fillStyle = `rgba(200,220,255,${lightningFlash * 0.2})`;
                         bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-                        lightningFlash *= 0.97;
+                        lightningFlash *= 0.96;
                     }
                     break;
                 case 2:
                     bgCtx.fillStyle = '#1a2a3a';
                     bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
                     updateRain(rainDrops2);
-                    drawRain(rainDrops2, 'rgba(200,220,255,0.3)');
+                    drawRain(rainDrops2, 'rgba(200,220,255,0.25)');
                     updateGlassDrops();
                     drawGlassDrops();
                     break;
@@ -1561,13 +1670,13 @@
                     bgCtx.fillStyle = '#8ac4d4';
                     bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
                     const grad = bgCtx.createConicGradient(0, bgCanvas.width / 2, bgCanvas.height * 0.8);
-                    grad.addColorStop(0, 'rgba(255,0,0,0.08)');
-                    grad.addColorStop(0.17, 'rgba(255,165,0,0.08)');
-                    grad.addColorStop(0.33, 'rgba(255,255,0,0.08)');
-                    grad.addColorStop(0.5, 'rgba(0,255,0,0.08)');
-                    grad.addColorStop(0.67, 'rgba(0,0,255,0.08)');
-                    grad.addColorStop(0.83, 'rgba(75,0,130,0.08)');
-                    grad.addColorStop(1, 'rgba(238,130,238,0.08)');
+                    grad.addColorStop(0, 'rgba(255,0,0,0.06)');
+                    grad.addColorStop(0.17, 'rgba(255,165,0,0.06)');
+                    grad.addColorStop(0.33, 'rgba(255,255,0,0.06)');
+                    grad.addColorStop(0.5, 'rgba(0,255,0,0.06)');
+                    grad.addColorStop(0.67, 'rgba(0,0,255,0.06)');
+                    grad.addColorStop(0.83, 'rgba(75,0,130,0.06)');
+                    grad.addColorStop(1, 'rgba(238,130,238,0.06)');
                     bgCtx.beginPath();
                     bgCtx.arc(bgCanvas.width / 2, bgCanvas.height * 0.8, Math.min(bgCanvas.width, bgCanvas.height) * 0.6, 0,
                         Math.PI);
@@ -1602,14 +1711,14 @@
 
             switch (mood) {
                 case 1:
-                    generateRain(rainDrops, 200, 0.2, 9, [15, 35], 1.8);
-                    generateGlassDrops(18);
-                    generateFlareParticles(12);
+                    generateRain(rainDrops, 180, 0.2, 8, [15, 32], 1.6);
+                    generateGlassDrops(15);
+                    generateFlareParticles(10);
                     createAmbientSound(1);
                     break;
                 case 2:
-                    generateRain(rainDrops2, 110, 0.4, 7, [12, 25], 1.3);
-                    generateGlassDrops(10);
+                    generateRain(rainDrops2, 90, 0.4, 6, [12, 22], 1.2);
+                    generateGlassDrops(8);
                     generateFlareParticles(8);
                     createAmbientSound(2);
                     break;
@@ -1620,11 +1729,11 @@
                     break;
                 case 4:
                     generateFlowers(18);
-                    generateFlareParticles(14);
+                    generateFlareParticles(12);
                     createAmbientSound(4);
                     break;
                 case 5:
-                    generateFlareParticles(30);
+                    generateFlareParticles(25);
                     createAmbientSound(5);
                     break;
             }
@@ -1676,7 +1785,7 @@
                 buildStatePanel();
                 updateStarCounter();
                 selectedStates.forEach(stId => setWaveTarget(stId, true));
-                setTimeout(() => setAmbientVolume(0.07), 400);
+                setTimeout(() => setAmbientVolume(0.06), 400);
             } else {
                 document.getElementById('moodSelector').classList.add('active');
                 document.getElementById('bottomPanel').classList.remove('active');
@@ -1725,7 +1834,7 @@
                 this.classList.add('selected');
                 document.getElementById('moodConfirmBtn').disabled = false;
                 setMoodEffect(selectedMood);
-                setAmbientVolume(0.18);
+                setAmbientVolume(0.14);
             });
         });
 
@@ -1738,7 +1847,7 @@
                 saveData();
                 renderCalendar();
                 showAdditions();
-                setTimeout(() => setAmbientVolume(0.07), 500);
+                setTimeout(() => setAmbientVolume(0.06), 500);
             }
         });
 
@@ -1912,11 +2021,11 @@
             });
 
             if (!hasActive && selectedStates.length === 0) {
-                ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                ctx.fillStyle = 'rgba(255,255,255,0.03)';
                 ctx.font = '16px system-ui';
                 ctx.textAlign = 'center';
                 ctx.fillText('Выбери состояния ↓', w / 2, h * 0.4 - 10);
-                ctx.fillStyle = 'rgba(255,255,255,0.02)';
+                ctx.fillStyle = 'rgba(255,255,255,0.015)';
                 ctx.font = '13px system-ui';
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
@@ -1924,18 +2033,18 @@
             // === ПАРЯЩИЕ ХРУСТАЛЬНЫЕ ЗВЁЗДЫ ===
             stars.forEach((star, idx) => {
                 const floatOffset = star.floatPhase || 0;
-                const floatY = Math.sin(time * 0.6 + floatOffset) * 12;
-                const floatX = Math.sin(time * 0.4 + floatOffset * 0.7) * 8;
-                const twinkle = 0.5 + 0.5 * Math.sin(time * 1.5 + floatOffset);
+                const floatY = Math.sin(time * 0.5 + floatOffset) * 14;
+                const floatX = Math.sin(time * 0.35 + floatOffset * 0.6) * 10;
+                const twinkle = 0.5 + 0.5 * Math.sin(time * 1.4 + floatOffset);
 
                 const x = star.x + floatX;
                 const y = star.y + floatY;
-                const size = 14 + 4 * (0.5 + 0.5 * Math.sin(time * 0.8 + floatOffset));
+                const size = 14 + 4 * (0.5 + 0.5 * Math.sin(time * 0.7 + floatOffset));
 
                 // Свечение
                 const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 16);
-                glowGrad.addColorStop(0, `rgba(255,255,255,${0.15 * twinkle + 0.1})`);
-                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.1 * twinkle + 0.05})`);
+                glowGrad.addColorStop(0, `rgba(255,255,255,${0.12 * twinkle + 0.08})`);
+                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.08 * twinkle + 0.04})`);
                 glowGrad.addColorStop(1, 'rgba(255,255,255,0)');
                 ctx.fillStyle = glowGrad;
                 ctx.fillRect(x - size * 16, y - size * 16, size * 32, size * 32);
@@ -1943,9 +2052,8 @@
                 // Хрустальная звезда
                 ctx.save();
                 ctx.translate(x, y);
-                ctx.rotate(time * 0.15 + idx * 0.5);
+                ctx.rotate(time * 0.12 + idx * 0.4);
 
-                // Основная форма
                 ctx.beginPath();
                 const spikes = 5;
                 const outerR = size;
@@ -1958,18 +2066,16 @@
                 }
                 ctx.closePath();
 
-                // Градиент для хрустального эффекта
                 const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
                 grad.addColorStop(0, `rgba(255,255,255,${0.7 + 0.3 * twinkle})`);
                 grad.addColorStop(0.4, `rgba(220,240,255,${0.5 + 0.2 * twinkle})`);
                 grad.addColorStop(1, `rgba(180,210,240,${0.2 + 0.1 * twinkle})`);
                 ctx.fillStyle = grad;
                 ctx.shadowBlur = 60;
-                ctx.shadowColor = 'rgba(200,230,255,0.3)';
+                ctx.shadowColor = 'rgba(200,230,255,0.25)';
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Внутреннее свечение
                 const innerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.5);
                 innerGrad.addColorStop(0, `rgba(255,255,255,${0.8 + 0.2 * twinkle})`);
                 innerGrad.addColorStop(1, 'rgba(200,230,255,0)');
@@ -1978,7 +2084,6 @@
                 ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Блик (отражение света)
                 ctx.beginPath();
                 ctx.ellipse(-size * 0.2, -size * 0.3, size * 0.15, size * 0.08, -0.5, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(255,255,255,${0.3 + 0.2 * twinkle})`;
@@ -1986,9 +2091,8 @@
 
                 ctx.restore();
 
-                // Подпись
                 if (star.note) {
-                    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                    ctx.fillStyle = 'rgba(255,255,255,0.07)';
                     ctx.font = '10px system-ui';
                     ctx.textAlign = 'center';
                     const displayNote = star.note.length > 15 ? star.note.slice(0, 15) + '…' : star.note;
@@ -2002,7 +2106,7 @@
         }
 
         // =================================================================
-        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ
+        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ (КРУГОВАЯ ВОЛНА)
         // =================================================================
         function updateStarCounter() {
             document.getElementById('starCounter').textContent = `⭐ ${stars.length}`;
@@ -2061,32 +2165,49 @@
             saveData();
             updateStarCounter();
             renderCalendar();
-            createMagicAppearance(x, y);
+            createRippleAppearance(x, y);
             document.getElementById('noteInput').value = '';
             data.note = '';
             saveData();
         });
 
-        function createMagicAppearance(x, y) {
-            const flash = document.createElement('div');
-            flash.style.cssText = `
-                position: fixed; left: ${x-80}px; top: ${y-80}px;
-                width: 160px; height: 160px; border-radius: 50%;
-                background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(200,230,255,0.25) 40%, transparent 70%);
+        function createRippleAppearance(x, y) {
+            // Круговая волна
+            const ripple = document.createElement('div');
+            ripple.style.cssText = `
+                position: fixed; left: ${x-100}px; top: ${y-100}px;
+                width: 200px; height: 200px;
+                border: 2px solid rgba(200,230,255,0.3);
+                border-radius: 50%;
                 pointer-events: none; z-index: 2000;
                 transform: scale(0);
-                animation: magicFlash 0.8s ease-out forwards;
+                animation: rippleExpand 0.8s ease-out forwards;
+            `;
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 900);
+
+            // Вспышка
+            const flash = document.createElement('div');
+            flash.style.cssText = `
+                position: fixed; left: ${x-60}px; top: ${y-60}px;
+                width: 120px; height: 120px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(200,230,255,0.15) 40%, transparent 70%);
+                pointer-events: none; z-index: 2000;
+                transform: scale(0);
+                animation: flashAppear 0.6s ease-out forwards;
             `;
             document.body.appendChild(flash);
-            setTimeout(() => flash.remove(), 900);
+            setTimeout(() => flash.remove(), 700);
 
-            for (let i = 0; i < 20; i++) {
+            // Искры
+            for (let i = 0; i < 16; i++) {
                 const spark = document.createElement('div');
                 const angle = Math.random() * Math.PI * 2;
-                const dist = 80 + Math.random() * 150;
+                const dist = 50 + Math.random() * 100;
                 const dx = Math.cos(angle) * dist;
                 const dy = Math.sin(angle) * dist;
-                const size = 4 + Math.random() * 8;
+                const size = 3 + Math.random() * 6;
                 const hue = 200 + Math.random() * 40;
                 const color = `hsl(${hue}, 80%, ${70 + Math.random() * 30}%)`;
                 spark.style.cssText = `
@@ -2094,9 +2215,9 @@
                     width: ${size}px; height: ${size}px;
                     clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
                     background: ${color};
-                    box-shadow: 0 0 20px ${color};
+                    box-shadow: 0 0 15px ${color};
                     pointer-events: none; z-index: 2000;
-                    transition: all 0.8s ease-out;
+                    transition: all 0.7s ease-out;
                     opacity: 1;
                 `;
                 document.body.appendChild(spark);
@@ -2104,53 +2225,76 @@
                     spark.style.transform = `translate(${dx}px, ${dy}px) scale(0) rotate(${Math.random()*360}deg)`;
                     spark.style.opacity = '0';
                 });
-                setTimeout(() => spark.remove(), 900);
+                setTimeout(() => spark.remove(), 800);
+            }
+
+            // Добавляем стили анимаций
+            if (!document.getElementById('rippleStyles')) {
+                const style = document.createElement('style');
+                style.id = 'rippleStyles';
+                style.textContent = `
+                    @keyframes rippleExpand {
+                        0% { transform: scale(0); opacity: 1; }
+                        50% { transform: scale(1.2); opacity: 0.6; }
+                        100% { transform: scale(1.8); opacity: 0; }
+                    }
+                    @keyframes flashAppear {
+                        0% { transform: scale(0); opacity: 1; }
+                        50% { transform: scale(1.5); opacity: 0.8; }
+                        100% { transform: scale(2.5); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
             }
         }
 
-        const styleFlash = document.createElement('style');
-        styleFlash.textContent = `
-            @keyframes magicFlash {
-                0% { transform: scale(0); opacity: 1; }
-                50% { transform: scale(2); opacity: 0.6; }
-                100% { transform: scale(3.5); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(styleFlash);
-
         // =================================================================
-        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ
+        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ (РАСТВОРЕНИЕ В ДЫМКЕ)
         // =================================================================
         function deleteStar(star) {
             playCrystalSound();
-            const numParticles = 50;
-            for (let i = 0; i < numParticles; i++) {
+
+            // Дымка исчезновения
+            const mist = document.createElement('div');
+            mist.style.cssText = `
+                position: fixed; left: ${star.x-120}px; top: ${star.y-120}px;
+                width: 240px; height: 240px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(200,230,255,0.2) 0%, rgba(150,200,255,0.1) 30%, transparent 70%);
+                pointer-events: none; z-index: 2000;
+                transform: scale(0.5);
+                opacity: 0;
+                animation: mistDissolve 0.8s ease-out forwards;
+            `;
+            document.body.appendChild(mist);
+            setTimeout(() => mist.remove(), 900);
+
+            // Светящиеся частицы, улетающие вверх
+            for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
-                const angle = Math.random() * Math.PI * 2;
-                const speed = 100 + Math.random() * 250;
+                const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.2;
+                const speed = 80 + Math.random() * 150;
                 const dx = Math.cos(angle) * speed;
-                const dy = Math.sin(angle) * speed;
-                const size = 5 + Math.random() * 12;
-                const hue = 190 + Math.random() * 50;
-                const color = `hsl(${hue}, 80%, ${70 + Math.random() * 30}%)`;
+                const dy = Math.sin(angle) * speed - 80;
+                const size = 3 + Math.random() * 6;
+                const hue = 190 + Math.random() * 40;
+                const color = `hsl(${hue}, 70%, ${70 + Math.random() * 30}%)`;
                 particle.style.cssText = `
                     position: fixed; left: ${star.x}px; top: ${star.y}px;
                     width: ${size}px; height: ${size}px;
-                    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+                    border-radius: 50%;
                     background: ${color};
-                    box-shadow: 0 0 25px ${color};
+                    box-shadow: 0 0 20px ${color};
                     pointer-events: none; z-index: 2000;
-                    transition: all 0.9s cubic-bezier(0.2, 0.9, 0.4, 1);
+                    transition: all 1s cubic-bezier(0.2, 0.9, 0.4, 1);
                     opacity: 1;
-                    transform: scale(1) rotate(0deg);
                 `;
                 document.body.appendChild(particle);
                 requestAnimationFrame(() => {
-                    particle.style.transform =
-                        `translate(${dx}px, ${dy}px) scale(0) rotate(${Math.random()*720}deg)`;
+                    particle.style.transform = `translate(${dx}px, ${dy}px) scale(0)`;
                     particle.style.opacity = '0';
                 });
-                setTimeout(() => particle.remove(), 1000);
+                setTimeout(() => particle.remove(), 1200);
             }
 
             const data = getDayData(currentDateStr);
@@ -2160,6 +2304,20 @@
             updateStarCounter();
             renderCalendar();
             longPressTarget = null;
+
+            // Добавляем стили анимаций
+            if (!document.getElementById('mistStyles')) {
+                const style = document.createElement('style');
+                style.id = 'mistStyles';
+                style.textContent = `
+                    @keyframes mistDissolve {
+                        0% { transform: scale(0.5); opacity: 0; }
+                        30% { transform: scale(1.2); opacity: 0.8; }
+                        100% { transform: scale(2); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
         }
 
         // =================================================================
@@ -2385,7 +2543,7 @@
                 document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
                 setMoodEffect(0);
                 const container = document.getElementById('waveContainer');
-                container.style.background = 'rgba(0,0,0,0.15)';
+                container.style.background = 'rgba(0,0,0,0.10)';
                 container.style.boxShadow = 'none';
                 stopAllSounds();
                 isResetInProgress = false;
@@ -2449,6 +2607,8 @@
         loadData();
         renderCalendar();
         initBgCanvas();
+        // Запускаем тихий дрон при загрузке (для атмосферы)
+        setTimeout(() => { if (!droneGainNode) playDrone(); }, 1000);
 
         window.addEventListener('resize', function() {
             if (canvas) resizeCanvas();
