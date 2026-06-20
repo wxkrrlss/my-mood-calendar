@@ -104,7 +104,6 @@
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.03);
         }
-        /* Внутренний туман календаря (усиленный) */
         .calendar-wrapper::before {
             content: '';
             position: absolute;
@@ -406,7 +405,6 @@
             touch-action: none;
         }
 
-        /* ===== БЛИКИ НА ФОНЕ (капли на объективе) ===== */
         .lens-flare {
             position: fixed;
             border-radius: 50%;
@@ -1090,7 +1088,6 @@
 
     <!-- ===== ХОЛСТ ===== -->
     <div id="waveContainer">
-        <!-- Блики (капли на объективе) -->
         <div class="lens-flare flare-1"></div>
         <div class="lens-flare flare-2"></div>
         <div class="lens-flare flare-3"></div>
@@ -1184,7 +1181,7 @@
             3: { bg: '#3a3515', glow: 'rgba(180,160,60,0.5)' },
             4: { bg: '#2a1520', glow: 'rgba(160,60,90,0.6)' },
             5: { bg: '#d0d8e8', glow: 'rgba(200,220,255,0.4)' }
-        ];
+        };
 
         let moodData = {};
         let currentDate = new Date();
@@ -1345,7 +1342,7 @@
         }
 
         // ===================================================================
-        // ОТКРЫТЬ ДЕНЬ (С ПЛАВНЫМ ПОЯВЛЕНИЕМ)
+        // ОТКРЫТЬ ДЕНЬ
         // ===================================================================
 
         function openDay(dateStr) {
@@ -1359,7 +1356,6 @@
             container.style.opacity = '0';
             container.classList.add('active');
 
-            // Плавное появление контейнера
             requestAnimationFrame(() => {
                 container.style.opacity = '1';
             });
@@ -1370,23 +1366,19 @@
             ];
             document.getElementById('waveDate').textContent = `${parts[2]} ${months[parts[1]-1]} ${parts[0]}`;
 
-            // Скрываем стрелку назад
             document.getElementById('backBtn').classList.remove('visible');
 
-            // Показываем выбор оценки (плавно)
             const selector = document.getElementById('moodSelector');
             selector.classList.add('active');
             document.getElementById('bottomPanel').classList.remove('active');
 
             document.getElementById('noteInput').value = data.note || '';
 
-            // Обновляем выбранную оценку
             document.querySelectorAll('.mood-select-btn').forEach(btn => {
                 btn.classList.toggle('selected', parseInt(btn.dataset.mood) === selectedMood);
             });
             document.getElementById('moodConfirmBtn').disabled = selectedMood === 0;
 
-            // ФОН — строго нейтрально-серый, без примесей
             container.style.background = '#2a2a30';
             container.style.boxShadow = 'none';
 
@@ -1410,7 +1402,6 @@
             container.style.background = color.bg;
 
             if (mood === 5) {
-                // Облачный фон с переливами для оценки 5
                 container.style.background = `
                     radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.4) 0%, rgba(240,245,255,0.2) 30%, rgba(220,230,255,0.1) 60%, transparent 80%),
                     radial-gradient(ellipse at 70% 60%, rgba(255,240,245,0.3) 0%, rgba(245,240,255,0.15) 30%, rgba(230,220,255,0.05) 60%, transparent 80%),
@@ -1491,7 +1482,6 @@
             const mood = getDayData(currentDateStr).mood || 0;
             const color = MOOD_COLORS[mood] || MOOD_COLORS[3];
 
-            // Фоновое свечение
             if (mood === 5) {
                 const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.8);
                 grad.addColorStop(0, 'rgba(255,240,250,0.2)');
@@ -1509,7 +1499,6 @@
                 ctx.fillRect(0, 0, w, h);
             }
 
-            // Волны
             if (selectedEmotions.length > 0) {
                 selectedEmotions.forEach((emotionId, index) => {
                     const em = EMOTIONS.find(e => e.id === emotionId);
@@ -1520,7 +1509,6 @@
                     const freq = 0.025 + index * 0.005;
                     const speed = 1.8 + index * 0.2;
 
-                    // Основная волна
                     ctx.beginPath();
                     ctx.moveTo(0, h / 2 + offset);
                     for (let x = 0; x <= w; x += 2) {
@@ -1538,7 +1526,6 @@
                     ctx.shadowColor = color;
                     ctx.stroke();
 
-                    // Слой 2
                     ctx.beginPath();
                     ctx.moveTo(0, h / 2 + offset + 25 + Math.sin(time * 0.25 + index) * 12);
                     for (let x = 0; x <= w; x += 3) {
@@ -1555,7 +1542,6 @@
                     ctx.shadowColor = color;
                     ctx.stroke();
 
-                    // Слой 3
                     ctx.beginPath();
                     ctx.moveTo(0, h / 2 + offset - 20 + Math.sin(time * 0.3 + index * 0.8) * 10);
                     for (let x = 0; x <= w; x += 4) {
@@ -1581,7 +1567,6 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h / 2 + 24);
             }
 
-            // Звёзды
             stars.forEach((star, idx) => {
                 const twinkle = 0.6 + Math.sin(time * 1.8 + idx * 2.3) * 0.4;
                 const size = 10 + Math.sin(time * 1.2 + idx * 1.7) * 3;
@@ -1721,7 +1706,6 @@
             const data = getDayData(currentDateStr);
             if (!data.stars) data.stars = [];
 
-            // Звезда появляется в верхней части экрана
             const centerX = canvas.width / 2;
             const centerY = canvas.height * 0.25;
             const offsetX = (Math.random() - 0.5) * canvas.width * 0.6;
@@ -1905,7 +1889,7 @@
         });
 
         // ===================================================================
-        // УДАЛЕНИЕ ЗВЕЗДЫ (ДОЛГИЙ КЛИК)
+        // УДАЛЕНИЕ ЗВЕЗДЫ
         // ===================================================================
 
         let longPressTimer = null;
@@ -1974,7 +1958,6 @@
         });
 
         function deleteStar(star) {
-            // Взрыв светло-голубой/серебряный
             const flash = document.createElement('div');
             flash.style.cssText = `
                 position: fixed;
