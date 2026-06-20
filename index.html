@@ -144,7 +144,7 @@
             display: flex;
             gap: 10px;
         }
-        .header-btn {
+        .help-btn {
             background: none;
             border: none;
             color: rgba(255,255,255,0.15);
@@ -154,7 +154,7 @@
             padding: 4px 8px;
             border-radius: 10px;
         }
-        .header-btn:hover { color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
+        .help-btn:hover { color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
         .subheader {
             font-size: 11px;
             color: rgba(255,255,255,0.12);
@@ -487,14 +487,32 @@
             opacity: 1;
             transform: translateX(-50%) translateY(0) scale(1);
         }
+        .states-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
         .states-label {
             color: rgba(255,255,255,0.2);
             font-size: 12px;
             text-align: center;
             letter-spacing: 0.5px;
-            margin-bottom: 2px;
             animation: fadeFromFog 1s ease;
         }
+        .info-btn-small {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.15);
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            padding: 2px 8px;
+            border-radius: 10px;
+            animation: fadeFromFog 1s ease;
+        }
+        .info-btn-small:hover { color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); }
         @keyframes fadeFromFog {
             0% { opacity: 0; transform: scale(0.95); filter: blur(6px); }
             100% { opacity: 1; transform: scale(1); filter: blur(0); }
@@ -760,6 +778,7 @@
             .close-btn, .back-btn { width: 40px; height: 40px; font-size: 16px; }
             .wave-date { font-size: 14px; padding: 4px 14px; top: 66px; }
             .top-bar { top: 14px; left: 14px; right: 14px; }
+            .info-btn-small { font-size: 14px; }
         }
     </style>
 </head>
@@ -770,8 +789,7 @@
             <div class="header">
                 <span class="header-title">Мой дневник</span>
                 <div class="header-actions">
-                    <button class="header-btn" id="infoBtn">!</button>
-                    <button class="header-btn" id="helpBtn">?</button>
+                    <button class="help-btn" id="helpBtn">?</button>
                 </div>
             </div>
             <div class="subheader">Нажми на день, чтобы вспомнить</div>
@@ -815,7 +833,10 @@
         </div>
 
         <div id="bottomPanel">
-            <div class="states-label">Какое состояние описывает ваш день? (до 4-х)</div>
+            <div class="states-header">
+                <span class="states-label">Какое состояние описывает ваш день? (до 4-х)</span>
+                <button class="info-btn-small" id="infoBtnSmall">!</button>
+            </div>
             <div id="statePanel"></div>
             <div id="noteSection">
                 <input type="text" id="noteInput" placeholder="Опиши события дня...">
@@ -894,7 +915,7 @@
         let waveStates = {};
 
         // =================================================================
-        // 2. ЗВУКИ — ГЛУБОКИЕ И ПЛАВНЫЕ
+        // 2. ЗВУКИ
         // =================================================================
         let audioCtx = null;
         let ambientNodes = [];
@@ -920,33 +941,31 @@
                 const data = buffer.getChannelData(0);
 
                 let baseAmp = 0;
-                let freqMod = 1;
                 switch (type) {
-                    case 1: baseAmp = 0.3; freqMod = 0.01; break;
-                    case 2: baseAmp = 0.12; freqMod = 0.005; break;
-                    case 3: baseAmp = 0.06; freqMod = 0.002; break;
-                    case 4: baseAmp = 0.05; freqMod = 0.008; break;
-                    case 5: baseAmp = 0.03; freqMod = 0.003; break;
+                    case 1: baseAmp = 0.3; break;
+                    case 2: baseAmp = 0.12; break;
+                    case 3: baseAmp = 0.06; break;
+                    case 4: baseAmp = 0.05; break;
+                    case 5: baseAmp = 0.03; break;
                     default: baseAmp = 0.1;
                 }
 
-                // Основной шум
                 for (let i = 0; i < bufferSize; i++) {
                     let val = 0;
                     const t = i / audioCtx.sampleRate;
-                    if (type === 1) { // Гроза
+                    if (type === 1) {
                         val = (Math.random() * 2 - 1) * baseAmp * (0.7 + 0.3 * Math.sin(t * 0.5));
                         if (Math.random() < 0.0002) val += (Math.random() * 2 - 1) * 0.4;
-                    } else if (type === 2) { // Лёгкий дождь
+                    } else if (type === 2) {
                         val = (Math.random() * 2 - 1) * baseAmp * (0.8 + 0.2 * Math.sin(t * 0.3));
                         val += Math.sin(t * 1.2) * baseAmp * 0.2;
-                    } else if (type === 3) { // Ветер
+                    } else if (type === 3) {
                         val = (Math.random() * 2 - 1) * baseAmp * (0.5 + 0.5 * Math.sin(t * 0.05));
                         val += Math.sin(t * 0.15) * baseAmp * 0.3;
-                    } else if (type === 4) { // Шуршание
+                    } else if (type === 4) {
                         val = (Math.random() * 2 - 1) * baseAmp * (0.6 + 0.4 * Math.sin(t * 0.6));
                         val += Math.sin(t * 0.8 + 0.5) * baseAmp * 0.2;
-                    } else if (type === 5) { // Хрустальные тона
+                    } else if (type === 5) {
                         val = Math.sin(t * 0.8) * baseAmp * 0.5 +
                             Math.sin(t * 1.2 + 0.5) * baseAmp * 0.3 +
                             Math.sin(t * 0.4 + 1.2) * baseAmp * 0.2;
@@ -969,9 +988,7 @@
                 noise.stop(now + 12);
                 ambientNodes.push(noise);
 
-                // Дополнительные тона для атмосферы
                 if (type === 1) {
-                    // Гром
                     for (let i = 0; i < 3; i++) {
                         const osc = audioCtx.createOscillator();
                         osc.type = 'sawtooth';
@@ -988,7 +1005,6 @@
                         ambientNodes.push(g);
                     }
                 } else if (type === 4) {
-                    // Лёгкие колокольчики
                     for (let i = 0; i < 5; i++) {
                         const osc = audioCtx.createOscillator();
                         osc.type = 'sine';
@@ -1005,7 +1021,6 @@
                         ambientNodes.push(g);
                     }
                 } else if (type === 5) {
-                    // Хрустальные переливы
                     for (let i = 0; i < 8; i++) {
                         const osc = audioCtx.createOscillator();
                         osc.type = 'sine';
@@ -1022,7 +1037,6 @@
                         ambientNodes.push(g);
                     }
                 }
-
             } catch (e) {}
         }
 
@@ -1051,7 +1065,6 @@
                     ambientNodes.push(osc);
                     ambientNodes.push(gain);
                 }
-                // Мягкий шум осколков
                 const bufferSize = audioCtx.sampleRate * 0.1;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
@@ -1649,7 +1662,8 @@
                     targetAmp: 0,
                     currentAlpha: 0,
                     targetAlpha: 0,
-                    offset: (Math.random() - 0.5) * 120
+                    offset: (Math.random() - 0.5) * 120,
+                    floatPhase: Math.random() * Math.PI * 2
                 };
             });
 
@@ -1786,7 +1800,8 @@
                     targetAmp: 0,
                     currentAlpha: 0,
                     targetAlpha: 0,
-                    offset: (Math.random() - 0.5) * 120
+                    offset: (Math.random() - 0.5) * 120,
+                    floatPhase: Math.random() * Math.PI * 2
                 };
             }
             return waveStates[stateId];
@@ -1811,7 +1826,7 @@
         }
 
         // =================================================================
-        // 10. АНИМАЦИЯ ВОЛН И ЗВЁЗД
+        // 10. АНИМАЦИЯ ВОЛН И ПАРЯЩИХ ЗВЁЗД
         // =================================================================
         function animateWaves() {
             if (!canvas || !ctx) return;
@@ -1906,23 +1921,35 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
+            // === ПАРЯЩИЕ ХРУСТАЛЬНЫЕ ЗВЁЗДЫ ===
             stars.forEach((star, idx) => {
-                const twinkle = 0.6 + Math.sin(time * 1.8 + idx * 2.3) * 0.4;
-                const size = 16 + Math.sin(time * 1.2 + idx * 1.7) * 4;
-                const glowGrad = ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, size * 14);
-                glowGrad.addColorStop(0, `rgba(255,255,255,${0.25 * twinkle})`);
-                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.15 * twinkle})`);
+                const floatOffset = star.floatPhase || 0;
+                const floatY = Math.sin(time * 0.6 + floatOffset) * 12;
+                const floatX = Math.sin(time * 0.4 + floatOffset * 0.7) * 8;
+                const twinkle = 0.5 + 0.5 * Math.sin(time * 1.5 + floatOffset);
+
+                const x = star.x + floatX;
+                const y = star.y + floatY;
+                const size = 14 + 4 * (0.5 + 0.5 * Math.sin(time * 0.8 + floatOffset));
+
+                // Свечение
+                const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 16);
+                glowGrad.addColorStop(0, `rgba(255,255,255,${0.15 * twinkle + 0.1})`);
+                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.1 * twinkle + 0.05})`);
                 glowGrad.addColorStop(1, 'rgba(255,255,255,0)');
                 ctx.fillStyle = glowGrad;
-                ctx.fillRect(star.x - size * 14, star.y - size * 14, size * 28, size * 28);
+                ctx.fillRect(x - size * 16, y - size * 16, size * 32, size * 32);
 
+                // Хрустальная звезда
                 ctx.save();
-                ctx.translate(star.x, star.y);
-                ctx.rotate(time * 0.3 + idx);
+                ctx.translate(x, y);
+                ctx.rotate(time * 0.15 + idx * 0.5);
+
+                // Основная форма
                 ctx.beginPath();
                 const spikes = 5;
                 const outerR = size;
-                const innerR = size * 0.4;
+                const innerR = size * 0.35;
                 for (let i = 0; i < spikes * 2; i++) {
                     const radius = i % 2 === 0 ? outerR : innerR;
                     const angle = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
@@ -1930,26 +1957,42 @@
                     else ctx.lineTo(radius * Math.cos(angle), radius * Math.sin(angle));
                 }
                 ctx.closePath();
-                ctx.fillStyle = `rgba(255, 255, 255, ${0.85 + 0.15 * twinkle})`;
-                ctx.shadowBlur = 80;
-                ctx.shadowColor = 'rgba(200,230,255,0.6)';
+
+                // Градиент для хрустального эффекта
+                const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+                grad.addColorStop(0, `rgba(255,255,255,${0.7 + 0.3 * twinkle})`);
+                grad.addColorStop(0.4, `rgba(220,240,255,${0.5 + 0.2 * twinkle})`);
+                grad.addColorStop(1, `rgba(180,210,240,${0.2 + 0.1 * twinkle})`);
+                ctx.fillStyle = grad;
+                ctx.shadowBlur = 60;
+                ctx.shadowColor = 'rgba(200,230,255,0.3)';
                 ctx.fill();
                 ctx.shadowBlur = 0;
-                const innerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.6);
+
+                // Внутреннее свечение
+                const innerGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.5);
                 innerGrad.addColorStop(0, `rgba(255,255,255,${0.8 + 0.2 * twinkle})`);
                 innerGrad.addColorStop(1, 'rgba(200,230,255,0)');
                 ctx.fillStyle = innerGrad;
                 ctx.beginPath();
-                ctx.arc(0, 0, size * 0.6, 0, Math.PI * 2);
+                ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
                 ctx.fill();
+
+                // Блик (отражение света)
+                ctx.beginPath();
+                ctx.ellipse(-size * 0.2, -size * 0.3, size * 0.15, size * 0.08, -0.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,255,255,${0.3 + 0.2 * twinkle})`;
+                ctx.fill();
+
                 ctx.restore();
 
+                // Подпись
                 if (star.note) {
-                    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                    ctx.fillStyle = 'rgba(255,255,255,0.08)';
                     ctx.font = '10px system-ui';
                     ctx.textAlign = 'center';
                     const displayNote = star.note.length > 15 ? star.note.slice(0, 15) + '…' : star.note;
-                    ctx.fillText(displayNote, star.x, star.y + size + 22);
+                    ctx.fillText(displayNote, x, y + size + 20);
                 }
             });
 
@@ -2006,7 +2049,13 @@
                 y = Math.max(margin + 40, Math.min(canvas.height * 0.65, y));
             } while (isPositionTooClose(x, y, existing) && attempts < 30);
 
-            const newStar = { x, y, note, date: currentDateStr };
+            const newStar = {
+                x,
+                y,
+                note,
+                date: currentDateStr,
+                floatPhase: Math.random() * Math.PI * 2
+            };
             data.stars.push(newStar);
             stars = data.stars;
             saveData();
@@ -2384,7 +2433,7 @@
             if (e.target === this) this.classList.remove('active');
         });
 
-        document.getElementById('infoBtn').addEventListener('click', function() {
+        document.getElementById('infoBtnSmall').addEventListener('click', function() {
             document.getElementById('infoModal').classList.add('active');
         });
         document.getElementById('infoClose').addEventListener('click', function() {
