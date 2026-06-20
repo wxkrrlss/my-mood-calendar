@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Природный дневник</title>
+    <title>Хрустальный дневник</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -35,21 +35,20 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(ellipse at 20% 30%, rgba(180, 100, 255, 0.10) 0%, transparent 40%),
-                radial-gradient(ellipse at 70% 60%, rgba(100, 200, 255, 0.08) 0%, transparent 40%),
-                radial-gradient(ellipse at 40% 20%, rgba(255, 150, 200, 0.06) 0%, transparent 40%),
-                radial-gradient(ellipse at 80% 40%, rgba(200, 180, 100, 0.05) 0%, transparent 40%),
-                radial-gradient(ellipse at 10% 70%, rgba(150, 100, 255, 0.07) 0%, transparent 40%);
-            animation: cosmicMist 40s ease-in-out infinite alternate;
+            background: radial-gradient(ellipse at 20% 30%, rgba(180, 100, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 60%, rgba(100, 200, 255, 0.06) 0%, transparent 40%),
+                radial-gradient(ellipse at 40% 20%, rgba(255, 150, 200, 0.04) 0%, transparent 40%),
+                radial-gradient(ellipse at 80% 40%, rgba(200, 180, 100, 0.03) 0%, transparent 40%);
+            animation: cosmicMist 50s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
         }
         @keyframes cosmicMist {
             0% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 0.4; }
-            25% { transform: translate(4%, -3%) scale(1.06) rotate(2deg); opacity: 0.8; }
-            50% { transform: translate(-3%, 5%) scale(0.94) rotate(-1.5deg); opacity: 0.6; }
-            75% { transform: translate(5%, -2%) scale(1.03) rotate(1.5deg); opacity: 0.9; }
-            100% { transform: translate(-4%, 4%) scale(1.08) rotate(-2deg); opacity: 0.5; }
+            25% { transform: translate(4%, -3%) scale(1.06) rotate(2deg); opacity: 0.7; }
+            50% { transform: translate(-3%, 5%) scale(0.94) rotate(-1.5deg); opacity: 0.5; }
+            75% { transform: translate(5%, -2%) scale(1.03) rotate(1.5deg); opacity: 0.8; }
+            100% { transform: translate(-4%, 4%) scale(1.08) rotate(-2deg); opacity: 0.4; }
         }
         body::after {
             content: '';
@@ -58,24 +57,19 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
-                radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,0.3), transparent),
-                radial-gradient(1px 1px at 55% 10%, rgba(255,255,255,0.5), transparent),
-                radial-gradient(1px 1px at 75% 70%, rgba(255,255,255,0.2), transparent),
-                radial-gradient(2px 2px at 15% 35%, rgba(255,255,255,0.2), transparent),
-                radial-gradient(2px 2px at 60% 20%, rgba(255,255,255,0.15), transparent),
-                radial-gradient(1px 1px at 85% 45%, rgba(255,255,255,0.25), transparent),
-                radial-gradient(2px 2px at 30% 70%, rgba(255,255,255,0.2), transparent),
-                radial-gradient(1px 1px at 70% 90%, rgba(255,255,255,0.15), transparent);
+            background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 25% 55%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 55% 10%, rgba(255,255,255,0.4), transparent),
+                radial-gradient(1px 1px at 75% 70%, rgba(255,255,255,0.15), transparent);
             background-size: 350px 350px;
-            opacity: 0.6;
-            animation: starDust 14s ease-in-out infinite alternate;
+            opacity: 0.5;
+            animation: starDust 18s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
         }
         @keyframes starDust {
             0% { opacity: 0.2; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.02); }
+            50% { opacity: 0.6; transform: scale(1.02); }
             100% { opacity: 0.3; transform: scale(0.98); }
         }
         .calendar-wrapper {
@@ -99,9 +93,9 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(ellipse at 20% 30%, rgba(140, 180, 255, 0.10) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 60%, rgba(200, 150, 255, 0.07) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 80%, rgba(100, 200, 255, 0.06) 0%, transparent 50%);
+            background: radial-gradient(ellipse at 20% 30%, rgba(140, 180, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 60%, rgba(200, 150, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(100, 200, 255, 0.05) 0%, transparent 50%);
             animation: auroraBorealis 30s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
@@ -119,10 +113,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: radial-gradient(2px 2px at 15% 25%, rgba(255, 255, 255, 0.5), transparent),
-                radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.6), transparent),
-                radial-gradient(2px 2px at 45% 55%, rgba(255, 255, 255, 0.3), transparent),
-                radial-gradient(1px 1px at 85% 75%, rgba(255, 255, 255, 0.4), transparent);
+            background-image: radial-gradient(2px 2px at 15% 25%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(2px 2px at 45% 55%, rgba(255, 255, 255, 0.3), transparent);
             background-size: 200px 200px;
             opacity: 0.5;
             animation: starGlow 14s ease-in-out infinite alternate;
@@ -934,7 +927,7 @@
         let waveStates = {};
 
         // =================================================================
-        // 2. ЗВУКИ — ПОЛНОСТЬЮ ПЕРЕРАБОТАНЫ
+        // 2. ЗВУКИ — МОЙ ФИРМЕННЫЙ НАБОР
         // =================================================================
         let audioCtx = null;
         let ambientNodes = [];
@@ -957,7 +950,7 @@
             isAmbientPlaying = false;
         }
 
-        // ===== ОСНОВНОЙ ФОН ДЛЯ КАЛЕНДАРЯ (ВЕТЕР + КОЛОКОЛЬЧИКИ) =====
+        // ===== ОСНОВНОЙ ФОН (КОСМИЧЕСКИЙ ГУЛ) =====
         function playMainAmbient() {
             if (isAmbientPlaying) return;
             try {
@@ -965,52 +958,47 @@
                 const now = audioCtx.currentTime;
                 isAmbientPlaying = true;
 
-                // Шум ветра (через буфер)
-                const bufferSize = audioCtx.sampleRate * 5;
+                const bufferSize = audioCtx.sampleRate * 6;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
                     const t = i / audioCtx.sampleRate;
-                    data[i] = (Math.random() * 2 - 1) * 0.04 *
-                        (0.6 + 0.4 * Math.sin(t * 0.2)) *
-                        (0.7 + 0.3 * Math.sin(t * 0.05));
+                    data[i] = (Math.random() * 2 - 1) * 0.03 *
+                        (0.5 + 0.5 * Math.sin(t * 0.05)) *
+                        (0.6 + 0.4 * Math.sin(t * 0.02));
                 }
                 const noise = audioCtx.createBufferSource();
                 noise.buffer = buffer;
                 noise.loop = true;
 
                 ambientGainNode = audioCtx.createGain();
-                ambientGainNode.gain.setValueAtTime(0.04, now);
-                ambientGainNode.gain.exponentialRampToValueAtTime(0.03, now + 2);
+                ambientGainNode.gain.setValueAtTime(0.035, now);
+                ambientGainNode.gain.exponentialRampToValueAtTime(0.025, now + 2);
 
                 noise.connect(ambientGainNode);
                 ambientGainNode.connect(audioCtx.destination);
                 noise.start(now);
-                noise.stop(now + 30);
+                noise.stop(now + 35);
                 ambientNodes.push(noise);
 
-                // Далекие колокольчики
-                const notes = [200, 230, 180, 210, 190];
-                notes.forEach((freq, i) => {
-                    const osc = audioCtx.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, now + i * 0.7 + 0.3);
-                    osc.frequency.exponentialRampToValueAtTime(freq * 1.01, now + i * 0.7 + 1.2);
-                    const g = audioCtx.createGain();
-                    g.gain.setValueAtTime(0.008, now + i * 0.7 + 0.3);
-                    g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.7 + 1.2);
-                    osc.connect(g);
-                    g.connect(audioCtx.destination);
-                    osc.start(now + i * 0.7 + 0.3);
-                    osc.stop(now + i * 0.7 + 1.2);
-                    ambientNodes.push(osc);
-                    ambientNodes.push(g);
-                });
+                // Глубокие тона
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(55, now);
+                osc.frequency.exponentialRampToValueAtTime(65, now + 10);
+                const g = audioCtx.createGain();
+                g.gain.setValueAtTime(0.015, now);
+                g.gain.exponentialRampToValueAtTime(0.01, now + 2);
+                osc.connect(g);
+                g.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 30);
+                ambientNodes.push(osc);
+                ambientNodes.push(g);
 
-                // Повтор через 25 секунд
                 ambientInterval = setTimeout(() => {
                     if (isAmbientPlaying) playMainAmbient();
-                }, 25000);
+                }, 30000);
 
             } catch (e) {}
         }
@@ -1027,23 +1015,12 @@
 
                 let baseAmp = 0;
                 switch (type) {
-                    case 1:
-                        baseAmp = 0.12;
-                        break;
-                    case 2:
-                        baseAmp = 0.06;
-                        break;
-                    case 3:
-                        baseAmp = 0.04;
-                        break;
-                    case 4:
-                        baseAmp = 0.03;
-                        break;
-                    case 5:
-                        baseAmp = 0.04;
-                        break;
-                    default:
-                        baseAmp = 0.05;
+                    case 1: baseAmp = 0.10; break;
+                    case 2: baseAmp = 0.06; break;
+                    case 3: baseAmp = 0.04; break;
+                    case 4: baseAmp = 0.04; break;
+                    case 5: baseAmp = 0.03; break;
+                    default: baseAmp = 0.05;
                 }
 
                 for (let i = 0; i < bufferSize; i++) {
@@ -1051,23 +1028,25 @@
                     const t = i / audioCtx.sampleRate;
                     if (type === 1) { // Дождь
                         val = (Math.random() * 2 - 1) * baseAmp * (0.8 + 0.2 * Math.sin(t * 0.3));
-                        if (Math.random() < 0.001) val += (Math.random() * 2 - 1) * 0.15;
-                    } else if (type === 2) { // Лёгкий дождь
-                        val = (Math.random() * 2 - 1) * baseAmp * (0.7 + 0.3 * Math.sin(t * 0.2));
-                        val += Math.sin(t * 0.5) * baseAmp * 0.1;
-                    } else if (type === 3) { // Листва
-                        val = (Math.random() * 2 - 1) * baseAmp * (0.5 + 0.5 * Math.sin(t * 0.1));
-                        val += Math.sin(t * 0.3 + 0.5) * baseAmp * 0.2;
-                    } else if (type === 4) { // Птицы
-                        val = Math.sin(t * 0.8 + 0.3) * baseAmp * 0.5 +
-                            Math.sin(t * 1.2 + 0.7) * baseAmp * 0.3 +
-                            Math.sin(t * 0.4 + 1.0) * baseAmp * 0.2;
+                        if (Math.random() < 0.001) val += (Math.random() * 2 - 1) * 0.12;
+                    } else if (type === 2) { // Ветер
+                        val = (Math.random() * 2 - 1) * baseAmp * (0.6 + 0.4 * Math.sin(t * 0.1));
+                        val += Math.sin(t * 0.2 + 0.5) * baseAmp * 0.2;
+                    } else if (type === 3) { // Звёздный гул
+                        val = Math.sin(t * 0.3) * baseAmp * 0.3 +
+                            Math.sin(t * 0.6 + 0.5) * baseAmp * 0.2 +
+                            Math.sin(t * 0.1 + 1.2) * baseAmp * 0.15;
                         val += (Math.random() * 2 - 1) * baseAmp * 0.05;
-                    } else if (type === 5) { // Море
-                        val = Math.sin(t * 0.3) * baseAmp * 0.6 +
-                            Math.sin(t * 0.6 + 0.3) * baseAmp * 0.3 +
-                            Math.sin(t * 0.1 + 0.7) * baseAmp * 0.2;
-                        val += (Math.random() * 2 - 1) * baseAmp * 0.08;
+                    } else if (type === 4) { // Вода
+                        val = Math.sin(t * 0.5) * baseAmp * 0.4 +
+                            Math.sin(t * 0.8 + 0.3) * baseAmp * 0.2 +
+                            Math.sin(t * 0.2 + 0.7) * baseAmp * 0.15;
+                        val += (Math.random() * 2 - 1) * baseAmp * 0.04;
+                    } else if (type === 5) { // Колокольчики
+                        val = Math.sin(t * 0.4) * baseAmp * 0.5 +
+                            Math.sin(t * 0.7 + 0.3) * baseAmp * 0.25 +
+                            Math.sin(t * 0.2 + 0.8) * baseAmp * 0.15;
+                        val += (Math.random() * 2 - 1) * baseAmp * 0.03;
                     }
                     data[i] = val;
                 }
@@ -1078,7 +1057,7 @@
 
                 ambientGainNode = audioCtx.createGain();
                 ambientGainNode.gain.setValueAtTime(0.08, now);
-                ambientGainNode.gain.exponentialRampToValueAtTime(0.06, now + 1);
+                ambientGainNode.gain.exponentialRampToValueAtTime(0.05, now + 1);
 
                 noise.connect(ambientGainNode);
                 ambientGainNode.connect(audioCtx.destination);
@@ -1086,42 +1065,25 @@
                 noise.stop(now + 20);
                 ambientNodes.push(noise);
 
-                // Дополнительные слои
-                if (type === 4) { // Птицы — дополнительные трели
+                // Дополнительные тона
+                if (type === 5) {
                     for (let i = 0; i < 6; i++) {
                         const osc = audioCtx.createOscillator();
                         osc.type = 'sine';
-                        osc.frequency.setValueAtTime(400 + i * 80 + Math.random() * 30, now + i * 0.5 + 0.3);
-                        osc.frequency.exponentialRampToValueAtTime(500 + i * 70 + Math.random() * 20, now + i * 0.5 + 0.8);
+                        osc.frequency.setValueAtTime(350 + i * 60 + Math.random() * 20, now + i * 0.12);
+                        osc.frequency.exponentialRampToValueAtTime(450 + i * 50 + Math.random() * 15, now + i * 0.12 + 1.5);
                         const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.01, now + i * 0.5 + 0.3);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.5 + 0.8);
+                        g.gain.setValueAtTime(0.015, now + i * 0.12);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 1.5);
                         osc.connect(g);
                         g.connect(audioCtx.destination);
-                        osc.start(now + i * 0.5 + 0.3);
-                        osc.stop(now + i * 0.5 + 0.8);
-                        ambientNodes.push(osc);
-                        ambientNodes.push(g);
-                    }
-                } else if (type === 5) { // Море — дополнительные волны
-                    for (let i = 0; i < 4; i++) {
-                        const osc = audioCtx.createOscillator();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(120 + i * 15, now + i * 1.5 + 0.5);
-                        osc.frequency.exponentialRampToValueAtTime(100 + i * 12, now + i * 1.5 + 1.5);
-                        const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.015, now + i * 1.5 + 0.5);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 1.5 + 1.5);
-                        osc.connect(g);
-                        g.connect(audioCtx.destination);
-                        osc.start(now + i * 1.5 + 0.5);
-                        osc.stop(now + i * 1.5 + 1.5);
+                        osc.start(now + i * 0.12);
+                        osc.stop(now + i * 0.12 + 1.5);
                         ambientNodes.push(osc);
                         ambientNodes.push(g);
                     }
                 }
 
-                // Основной фон продолжает играть тихо
                 setTimeout(() => {
                     if (!isAmbientPlaying) {
                         isAmbientPlaying = true;
@@ -1144,67 +1106,52 @@
             try {
                 const now = audioCtx.currentTime;
                 if (type === 'add') {
-                    // Капля воды
-                    const osc = audioCtx.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(800, now);
-                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
-                    const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.04, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.15);
-                    ambientNodes.push(osc);
-                    ambientNodes.push(gain);
-
-                    setTimeout(() => {
-                        const osc2 = audioCtx.createOscillator();
-                        osc2.type = 'sine';
-                        osc2.frequency.setValueAtTime(600, audioCtx.currentTime);
-                        osc2.frequency.exponentialRampToValueAtTime(350, audioCtx.currentTime + 0.08);
-                        const gain2 = audioCtx.createGain();
-                        gain2.gain.setValueAtTime(0.02, audioCtx.currentTime);
-                        gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
-                        osc2.connect(gain2);
-                        gain2.connect(audioCtx.destination);
-                        osc2.start();
-                        osc2.stop(audioCtx.currentTime + 0.12);
-                        ambientNodes.push(osc2);
-                        ambientNodes.push(gain2);
-                    }, 200);
+                    for (let i = 0; i < 4; i++) {
+                        const osc = audioCtx.createOscillator();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(700 + i * 120 + Math.random() * 30, now + i * 0.04);
+                        osc.frequency.exponentialRampToValueAtTime(500 + i * 80 + Math.random() * 20, now + i * 0.04 + 0.3);
+                        const gain = audioCtx.createGain();
+                        gain.gain.setValueAtTime(0.025, now + i * 0.04);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.3);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + i * 0.04);
+                        osc.stop(now + i * 0.04 + 0.3);
+                        ambientNodes.push(osc);
+                        ambientNodes.push(gain);
+                    }
                 } else if (type === 'remove') {
-                    // Затухающий колокольчик
-                    const osc = audioCtx.createOscillator();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(700, now);
-                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.3);
-                    const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.03, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start(now);
-                    osc.stop(now + 0.3);
-                    ambientNodes.push(osc);
-                    ambientNodes.push(gain);
-
-                    const bufferSize = audioCtx.sampleRate * 0.05;
+                    for (let i = 0; i < 3; i++) {
+                        const osc = audioCtx.createOscillator();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(600 + i * 100 + Math.random() * 20, now + i * 0.03);
+                        osc.frequency.exponentialRampToValueAtTime(400 + i * 70 + Math.random() * 15, now + i * 0.03 + 0.4);
+                        const gain = audioCtx.createGain();
+                        gain.gain.setValueAtTime(0.02, now + i * 0.03);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.03 + 0.4);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(now + i * 0.03);
+                        osc.stop(now + i * 0.03 + 0.4);
+                        ambientNodes.push(osc);
+                        ambientNodes.push(gain);
+                    }
+                    const bufferSize = audioCtx.sampleRate * 0.06;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
-                        data[i] = (Math.random() * 2 - 1) * 0.02 * (1 - i / bufferSize);
+                        data[i] = (Math.random() * 2 - 1) * 0.015 * (1 - i / bufferSize);
                     }
                     const noise = audioCtx.createBufferSource();
                     noise.buffer = buffer;
                     const gain2 = audioCtx.createGain();
-                    gain2.gain.setValueAtTime(0.02, now);
-                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    gain2.gain.setValueAtTime(0.015, now);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
                     noise.connect(gain2);
                     gain2.connect(audioCtx.destination);
                     noise.start(now);
-                    noise.stop(now + 0.05);
+                    noise.stop(now + 0.06);
                     ambientNodes.push(noise);
                     ambientNodes.push(gain2);
                 }
@@ -1220,7 +1167,7 @@
                 osc.frequency.setValueAtTime(500, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.04);
                 const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -1768,7 +1715,8 @@
                     currentAlpha: 0,
                     targetAlpha: 0,
                     offset: (Math.random() - 0.5) * 120,
-                    floatPhase: Math.random() * Math.PI * 2
+                    floatPhase: Math.random() * Math.PI * 2,
+                    crystalPhase: Math.random() * Math.PI * 2
                 };
             });
 
@@ -1906,7 +1854,8 @@
                     currentAlpha: 0,
                     targetAlpha: 0,
                     offset: (Math.random() - 0.5) * 120,
-                    floatPhase: Math.random() * Math.PI * 2
+                    floatPhase: Math.random() * Math.PI * 2,
+                    crystalPhase: Math.random() * Math.PI * 2
                 };
             }
             return waveStates[stateId];
@@ -1931,7 +1880,7 @@
         }
 
         // =================================================================
-        // 10. АНИМАЦИЯ ВОЛН И ЗВЁЗД
+        // 10. АНИМАЦИЯ ВОЛН И ХРУСТАЛЬНЫХ ЗВЁЗД
         // =================================================================
         function animateWaves() {
             if (!canvas || !ctx) return;
@@ -2026,26 +1975,32 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
+            // === ХРУСТАЛЬНЫЕ ЗВЁЗДЫ (моя анимация) ===
             stars.forEach((star, idx) => {
                 const floatOffset = star.floatPhase || 0;
+                const crystalOffset = star.crystalPhase || 0;
                 const floatY = Math.sin(time * 0.4 + floatOffset) * 12;
                 const floatX = Math.sin(time * 0.3 + floatOffset * 0.5) * 8;
+                const pulse = 0.5 + 0.5 * Math.sin(time * 0.8 + crystalOffset);
                 const twinkle = 0.5 + 0.5 * Math.sin(time * 1.2 + floatOffset);
 
                 const x = star.x + floatX;
                 const y = star.y + floatY;
-                const size = 13 + 3 * (0.5 + 0.5 * Math.sin(time * 0.6 + floatOffset));
+                const size = 14 + 4 * pulse;
 
-                const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 14);
-                glowGrad.addColorStop(0, `rgba(255,255,255,${0.10 * twinkle + 0.06})`);
-                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.06 * twinkle + 0.03})`);
+                // Мягкое свечение
+                const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, size * 15);
+                glowGrad.addColorStop(0, `rgba(255,255,255,${0.08 * twinkle + 0.05})`);
+                glowGrad.addColorStop(0.2, `rgba(200,230,255,${0.05 * twinkle + 0.03})`);
                 glowGrad.addColorStop(1, 'rgba(255,255,255,0)');
                 ctx.fillStyle = glowGrad;
-                ctx.fillRect(x - size * 14, y - size * 14, size * 28, size * 28);
+                ctx.fillRect(x - size * 15, y - size * 15, size * 30, size * 30);
 
+                // Хрустальная звезда
                 ctx.save();
                 ctx.translate(x, y);
-                ctx.rotate(time * 0.08 + idx * 0.3);
+                ctx.rotate(time * 0.06 + idx * 0.25 + Math.sin(time * 0.2 + idx) * 0.1);
+
                 ctx.beginPath();
                 const spikes = 5;
                 const outerR = size;
@@ -2063,7 +2018,7 @@
                 grad.addColorStop(0.4, `rgba(220,240,255,${0.5 + 0.2 * twinkle})`);
                 grad.addColorStop(1, `rgba(180,210,240,${0.2 + 0.1 * twinkle})`);
                 ctx.fillStyle = grad;
-                ctx.shadowBlur = 40;
+                ctx.shadowBlur = 50;
                 ctx.shadowColor = 'rgba(200,230,255,0.2)';
                 ctx.fill();
                 ctx.shadowBlur = 0;
@@ -2076,8 +2031,9 @@
                 ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
                 ctx.fill();
 
+                // Блик
                 ctx.beginPath();
-                ctx.ellipse(-size * 0.2, -size * 0.3, size * 0.12, size * 0.06, -0.5, 0, Math.PI * 2);
+                ctx.ellipse(-size * 0.2, -size * 0.3, size * 0.15, size * 0.08, -0.5, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(255,255,255,${0.3 + 0.2 * twinkle})`;
                 ctx.fill();
 
@@ -2098,7 +2054,7 @@
         }
 
         // =================================================================
-        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ
+        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ (МОЯ АНИМАЦИЯ)
         // =================================================================
         function updateStarCounter() {
             document.getElementById('starCounter').textContent = `⭐ ${stars.length}`;
@@ -2150,20 +2106,22 @@
                 y,
                 note,
                 date: currentDateStr,
-                floatPhase: Math.random() * Math.PI * 2
+                floatPhase: Math.random() * Math.PI * 2,
+                crystalPhase: Math.random() * Math.PI * 2
             };
             data.stars.push(newStar);
             stars = data.stars;
             saveData();
             updateStarCounter();
             renderCalendar();
-            createSoftRipple(x, y);
+            createCrystalAppearance(x, y);
             document.getElementById('noteInput').value = '';
             data.note = '';
             saveData();
         });
 
-        function createSoftRipple(x, y) {
+        function createCrystalAppearance(x, y) {
+            // Круговая волна
             const ripple = document.createElement('div');
             ripple.style.cssText = `
                 position: fixed; left: ${x-80}px; top: ${y-80}px;
@@ -2172,11 +2130,12 @@
                 border-radius: 50%;
                 pointer-events: none; z-index: 2000;
                 transform: scale(0);
-                animation: rippleSoft 1s ease-out forwards;
+                animation: rippleCrystal 1s ease-out forwards;
             `;
             document.body.appendChild(ripple);
             setTimeout(() => ripple.remove(), 1100);
 
+            // Вспышка
             const flash = document.createElement('div');
             flash.style.cssText = `
                 position: fixed; left: ${x-50}px; top: ${y-50}px;
@@ -2185,12 +2144,13 @@
                 background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(200,230,255,0.05) 40%, transparent 70%);
                 pointer-events: none; z-index: 2000;
                 transform: scale(0);
-                animation: flashSoft 0.8s ease-out forwards;
+                animation: flashCrystal 0.8s ease-out forwards;
             `;
             document.body.appendChild(flash);
             setTimeout(() => flash.remove(), 900);
 
-            for (let i = 0; i < 12; i++) {
+            // Искры
+            for (let i = 0; i < 15; i++) {
                 const spark = document.createElement('div');
                 const angle = Math.random() * Math.PI * 2;
                 const dist = 40 + Math.random() * 80;
@@ -2217,16 +2177,17 @@
                 setTimeout(() => spark.remove(), 900);
             }
 
-            if (!document.getElementById('softRippleStyles')) {
+            // Стили
+            if (!document.getElementById('crystalStyles')) {
                 const style = document.createElement('style');
-                style.id = 'softRippleStyles';
+                style.id = 'crystalStyles';
                 style.textContent = `
-                    @keyframes rippleSoft {
+                    @keyframes rippleCrystal {
                         0% { transform: scale(0); opacity: 1; }
                         60% { transform: scale(1.4); opacity: 0.5; }
                         100% { transform: scale(2); opacity: 0; }
                     }
-                    @keyframes flashSoft {
+                    @keyframes flashCrystal {
                         0% { transform: scale(0); opacity: 1; }
                         50% { transform: scale(1.8); opacity: 0.6; }
                         100% { transform: scale(3); opacity: 0; }
@@ -2237,7 +2198,7 @@
         }
 
         // =================================================================
-        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ
+        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ (МОЯ АНИМАЦИЯ)
         // =================================================================
         function deleteStar(star) {
             playStarSound('remove');
@@ -2251,7 +2212,7 @@
                 pointer-events: none; z-index: 2000;
                 transform: scale(0.5);
                 opacity: 0;
-                animation: mistSoft 1s ease-out forwards;
+                animation: mistCrystal 1s ease-out forwards;
             `;
             document.body.appendChild(mist);
             setTimeout(() => mist.remove(), 1100);
@@ -2291,11 +2252,11 @@
             renderCalendar();
             longPressTarget = null;
 
-            if (!document.getElementById('mistSoftStyles')) {
+            if (!document.getElementById('mistCrystalStyles')) {
                 const style = document.createElement('style');
-                style.id = 'mistSoftStyles';
+                style.id = 'mistCrystalStyles';
                 style.textContent = `
-                    @keyframes mistSoft {
+                    @keyframes mistCrystal {
                         0% { transform: scale(0.5); opacity: 0; }
                         30% { transform: scale(1.2); opacity: 0.5; }
                         100% { transform: scale(2.2); opacity: 0; }
@@ -2593,7 +2554,6 @@
         renderCalendar();
         initBgCanvas();
 
-        // Запускаем основной фоновый звук для календаря
         setTimeout(() => {
             if (!isAmbientPlaying) playMainAmbient();
         }, 500);
@@ -2610,7 +2570,7 @@
             }
         } catch (e) {}
 
-        console.log('🌿 Природный дневник загружен!');
+        console.log('💎 Хрустальный дневник загружен!');
         console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
     </script>
 </body>
