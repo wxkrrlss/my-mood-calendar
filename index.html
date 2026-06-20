@@ -318,18 +318,18 @@
         }
         .day-wave-container {
             position: absolute;
-            bottom: 2px;
+            bottom: -2px;
             left: 0;
             right: 0;
-            height: 10px;
+            height: 8px;
             display: flex;
             justify-content: center;
             gap: 2px;
             z-index: 1;
-            opacity: 0.8;
+            opacity: 0.7;
         }
         .mini-wave {
-            width: 3px;
+            width: 2px;
             border-radius: 2px;
             animation: miniWaveAnim 2s ease-in-out infinite alternate;
             user-select: none;
@@ -341,8 +341,8 @@
         @keyframes miniWaveAnim {
             0% { height: 2px;
                 transform: translateY(0); }
-            100% { height: 8px;
-                transform: translateY(-3px); }
+            100% { height: 6px;
+                transform: translateY(-2px); }
         }
 
         /* ===== ХОЛСТ ===== */
@@ -614,7 +614,7 @@
         }
         .mood-select-btn[data-mood="1"] { color: #8a9ab0; }
         .mood-select-btn[data-mood="2"] { color: #8ab0d0; }
-        .mood-select-btn[data-mood="3"] { color: #3a3515; }
+        .mood-select-btn[data-mood="3"] { color: #e8d080; }  /* светло-жёлтая цифра */
         .mood-select-btn[data-mood="4"] { color: #d0a0b0; }
         .mood-select-btn[data-mood="5"] { color: #e8e8f0; }
         .mood-confirm-btn {
@@ -1188,22 +1188,22 @@
             { id: 'комфорт', label: '🌿 Комфорт', color: '#2ed573' }
         ];
 
-        // ЦВЕТА ОЦЕНОК ДЛЯ ХОЛСТА
+        // ОБНОВЛЁННЫЕ ЦВЕТА ОЦЕНОК
         const MOOD_COLORS = {
-            1: { bg: '#0a0a2a', glow: 'rgba(5,10,50,0.95)' },
-            2: { bg: '#1a2a4a', glow: 'rgba(30,60,120,0.8)' },
-            3: { bg: '#d4c98a', glow: 'rgba(200,180,100,0.5)' },
-            4: { bg: '#2a1520', glow: 'rgba(160,60,90,0.6)' },
-            5: { bg: 'linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1, #fbc2eb)', glow: 'rgba(200,220,255,0.4)' }
+            1: { bg: '#0d0a2a', glow: 'rgba(10,5,50,0.95)' }, // тёмно-сине-фиолетовый
+            2: { bg: '#1a3a5a', glow: 'rgba(30,60,120,0.8)' }, // сине-голубой
+            3: { bg: '#c4b878', glow: 'rgba(180,170,100,0.4)' }, // спокойный бежевый
+            4: { bg: '#4a1a2a', glow: 'rgba(160,60,90,0.6)' }, // светло-розовый
+            5: { bg: '#e8e0f0', glow: 'rgba(200,220,255,0.4)' } // светло-сиреневый
         };
 
         // ЦВЕТА БЛИКОВ ДЛЯ ОЦЕНОК
         const FLARE_COLORS = {
             1: [
-                'rgba(60,120,255,0.5)', 'rgba(40,90,220,0.4)',
-                'rgba(80,160,255,0.35)', 'rgba(20,70,200,0.3)',
-                'rgba(100,180,255,0.25)', 'rgba(10,50,180,0.2)',
-                'rgba(120,200,255,0.2)', 'rgba(30,80,230,0.15)'
+                'rgba(60,100,255,0.5)', 'rgba(40,70,220,0.4)',
+                'rgba(80,130,255,0.35)', 'rgba(20,50,200,0.3)',
+                'rgba(100,150,255,0.25)', 'rgba(10,30,180,0.2)',
+                'rgba(120,170,255,0.2)', 'rgba(30,60,230,0.15)'
             ],
             2: [
                 'rgba(120,200,255,0.5)', 'rgba(80,180,255,0.4)',
@@ -1212,10 +1212,10 @@
                 'rgba(220,245,255,0.2)', 'rgba(100,190,255,0.15)'
             ],
             3: [
-                'rgba(255,230,150,0.5)', 'rgba(255,220,120,0.4)',
-                'rgba(255,240,180,0.35)', 'rgba(255,200,80,0.3)',
-                'rgba(255,250,200,0.25)', 'rgba(255,180,60,0.2)',
-                'rgba(255,245,160,0.2)', 'rgba(255,210,100,0.15)'
+                'rgba(230,200,130,0.5)', 'rgba(210,180,100,0.4)',
+                'rgba(240,220,160,0.35)', 'rgba(190,160,80,0.3)',
+                'rgba(250,230,180,0.25)', 'rgba(170,140,60,0.2)',
+                'rgba(240,220,140,0.2)', 'rgba(200,170,90,0.15)'
             ],
             4: [
                 'rgba(255,140,180,0.5)', 'rgba(220,110,160,0.4)',
@@ -1224,11 +1224,11 @@
                 'rgba(255,220,240,0.2)', 'rgba(230,130,170,0.15)'
             ],
             5: [
-                'rgba(255,200,220,0.5)', 'rgba(200,220,255,0.5)',
-                'rgba(255,220,200,0.4)', 'rgba(220,255,240,0.4)',
-                'rgba(255,200,240,0.35)', 'rgba(200,240,255,0.35)',
-                'rgba(255,240,200,0.3)', 'rgba(240,255,220,0.3)',
-                'rgba(255,180,200,0.25)', 'rgba(180,200,255,0.25)'
+                'rgba(220,210,255,0.5)', 'rgba(200,200,255,0.5)',
+                'rgba(230,220,255,0.4)', 'rgba(210,210,255,0.4)',
+                'rgba(240,230,255,0.35)', 'rgba(190,190,255,0.35)',
+                'rgba(250,240,255,0.3)', 'rgba(220,220,255,0.3)',
+                'rgba(200,180,255,0.25)', 'rgba(180,180,255,0.25)'
             ]
         };
 
@@ -1362,9 +1362,9 @@
                     starDot.className = 'star-indicator';
                     starDot.textContent = '✦';
                     dayEl.appendChild(starDot);
-                }
+               El }
 
-                dayEl.addEventListener('click', () => {
+                day.addEventListener('click', () => {
                     if (!isFuture(dateStr)) openDay(dateStr);
                     else alert('Этот день ещё не наступил 😊');
                 });
@@ -1451,7 +1451,6 @@
 
             // Если есть оценка — сразу показываем дополнения, иначе — выбор оценки
             if (selectedMood > 0) {
-                // Сразу показываем дополнения
                 applyMoodGlow(selectedMood);
                 document.getElementById('moodSelector').classList.remove('active');
                 document.getElementById('backBtn').classList.add('visible');
@@ -1460,7 +1459,6 @@
                 buildEmotionPanel();
                 updateStarCounter();
             } else {
-                // Показываем выбор оценки
                 document.getElementById('moodSelector').classList.add('active');
                 document.getElementById('bottomPanel').classList.remove('active');
                 document.getElementById('backBtn').classList.remove('visible');
@@ -1488,17 +1486,8 @@
         function applyMoodGlow(mood) {
             const container = document.getElementById('waveContainer');
             const color = MOOD_COLORS[mood] || MOOD_COLORS[3];
-
-            if (mood === 5) {
-                container.style.background = 'linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1, #fbc2eb)';
-                container.style.boxShadow = `inset 0 0 200px rgba(255,200,220,0.3), inset 0 0 150px rgba(200,220,255,0.3), inset 0 0 100px rgba(200,255,220,0.2)`;
-            } else if (mood === 3) {
-                container.style.background = '#d4c98a';
-                container.style.boxShadow = `inset 0 0 150px rgba(200,180,100,0.5)`;
-            } else {
-                container.style.background = color.bg;
-                container.style.boxShadow = `inset 0 0 150px ${color.glow}`;
-            }
+            container.style.background = color.bg;
+            container.style.boxShadow = `inset 0 0 150px ${color.glow}`;
             updateFlares(mood);
         }
 
@@ -1575,7 +1564,7 @@
         function setWaveTarget(emotionId, active) {
             const state = getWaveState(emotionId);
             if (active) {
-                state.targetAmp = 30 + Math.random() * 8; // уменьшенная амплитуда
+                state.targetAmp = 30 + Math.random() * 8;
                 state.targetAlpha = 0.6 + Math.random() * 0.2;
             } else {
                 state.targetAmp = 0;
@@ -1584,7 +1573,7 @@
         }
 
         // ===================================================================
-        // АНИМАЦИЯ ВОЛН (РАНДОМНЫЙ РАЗБРОС, МЕНЬШАЯ АМПЛИТУДА)
+        // АНИМАЦИЯ ВОЛН (РАНДОМНЫЙ РАЗБРОС, МЕНЬШАЯ ЧАСТОТА, ЯРЧЕ)
         // ===================================================================
 
         function animateWaves() {
@@ -1598,22 +1587,11 @@
             const color = MOOD_COLORS[mood] || MOOD_COLORS[3];
 
             // Фоновое свечение
-            if (mood === 5) {
-                const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.8);
-                grad.addColorStop(0, 'rgba(255,240,250,0.3)');
-                grad.addColorStop(0.2, 'rgba(240,245,255,0.35)');
-                grad.addColorStop(0.4, 'rgba(240,255,245,0.25)');
-                grad.addColorStop(0.6, 'rgba(255,245,240,0.3)');
-                grad.addColorStop(1, 'rgba(220,230,255,0.2)');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, w, h);
-            } else {
-                const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.7);
-                grad.addColorStop(0, color.glow || 'rgba(200,200,220,0.3)');
-                grad.addColorStop(1, 'transparent');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, w, h);
-            }
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.7);
+            grad.addColorStop(0, color.glow);
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
 
             // Волны с рандомным разбросом, выше центра
             let hasActiveWaves = false;
@@ -1631,14 +1609,29 @@
                 hasActiveWaves = true;
 
                 const color = em.color;
-                const offset = state.offset || 0; // используем сохранённый рандомный разброс
-                // Смещаем центр волн выше (h * 0.4)
+                const offset = state.offset || 0;
                 const centerY = h * 0.4;
                 // Уменьшенная частота
-                const freq = 0.015 + index * 0.003;
+                const freq = 0.012 + index * 0.002;
                 const speed = 1.0 + index * 0.1;
 
-                // Слой 1
+                // СЛОЙ СВЕЧЕНИЯ (размытый, самый яркий)
+                ctx.beginPath();
+                ctx.moveTo(0, centerY + offset);
+                for (let x = 0; x <= w; x += 4) {
+                    const y = centerY + offset +
+                        Math.sin(x * freq * 0.8 + time * speed * 0.7 + index * 1.5) * currentAmp * 1.2 +
+                        Math.sin(x * freq * 0.3 + time * 0.5 + index * 2.0) * currentAmp * 0.6;
+                    ctx.lineTo(x, y);
+                }
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 8.0;
+                ctx.globalAlpha = currentAlpha * 0.2;
+                ctx.shadowBlur = 80;
+                ctx.shadowColor = color;
+                ctx.stroke();
+
+                // Слой 1 (основной)
                 ctx.beginPath();
                 ctx.moveTo(0, centerY + offset);
                 for (let x = 0; x <= w; x += 2) {
@@ -1650,13 +1643,13 @@
                     ctx.lineTo(x, y);
                 }
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 3.0 + Math.sin(time * 0.3 + index) * 0.8;
+                ctx.lineWidth = 4.5 + Math.sin(time * 0.3 + index) * 1.0;
                 ctx.globalAlpha = currentAlpha * (0.6 + Math.sin(time * 0.4 + index * 1.0) * 0.15);
-                ctx.shadowBlur = 40;
+                ctx.shadowBlur = 60;
                 ctx.shadowColor = color;
                 ctx.stroke();
 
-                // Слой 2
+                // Слой 2 (средний)
                 ctx.beginPath();
                 ctx.moveTo(0, centerY + offset + 18 + Math.sin(time * 0.2 + index) * 8);
                 for (let x = 0; x <= w; x += 3) {
@@ -1667,13 +1660,13 @@
                     ctx.lineTo(x, y);
                 }
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 2.0;
-                ctx.globalAlpha = currentAlpha * 0.25;
-                ctx.shadowBlur = 25;
+                ctx.lineWidth = 2.5;
+                ctx.globalAlpha = currentAlpha * 0.3;
+                ctx.shadowBlur = 30;
                 ctx.shadowColor = color;
                 ctx.stroke();
 
-                // Слой 3
+                // Слой 3 (лёгкая дымка)
                 ctx.beginPath();
                 ctx.moveTo(0, centerY + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6);
                 for (let x = 0; x <= w; x += 4) {
@@ -1683,13 +1676,13 @@
                     ctx.lineTo(x, y);
                 }
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 1.2;
-                ctx.globalAlpha = currentAlpha * 0.12;
-                ctx.shadowBlur = 15;
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = currentAlpha * 0.15;
+                ctx.shadowBlur = 20;
                 ctx.shadowColor = color;
                 ctx.stroke();
 
-                // Слой 4
+                // Слой 4 (рассеивание)
                 ctx.beginPath();
                 ctx.moveTo(0, centerY + offset + 30 + Math.sin(time * 0.15 + index * 0.5) * 10);
                 for (let x = 0; x <= w; x += 4) {
@@ -1699,9 +1692,9 @@
                     ctx.lineTo(x, y);
                 }
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 0.8;
-                ctx.globalAlpha = currentAlpha * 0.06;
-                ctx.shadowBlur = 10;
+                ctx.lineWidth = 1.0;
+                ctx.globalAlpha = currentAlpha * 0.08;
+                ctx.shadowBlur = 15;
                 ctx.shadowColor = color;
                 ctx.stroke();
             });
