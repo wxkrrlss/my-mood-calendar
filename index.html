@@ -29,7 +29,7 @@
             overflow-x: hidden;
         }
 
-        /* ===== СЕВЕРНОЕ СИЯНИЕ НА ФОНЕ ВСЕГО САЙТА ===== */
+        /* ===== ТУМАН И СИЯНИЕ НА ВСЁМ ЭКРАНЕ ===== */
         body::before {
             content: '';
             position: fixed;
@@ -42,26 +42,23 @@
                 radial-gradient(ellipse at 80% 60%, rgba(200, 160, 255, 0.12) 0%, transparent 50%),
                 radial-gradient(ellipse at 50% 80%, rgba(100, 180, 255, 0.10) 0%, transparent 50%),
                 radial-gradient(ellipse at 10% 20%, rgba(220, 240, 255, 0.08) 0%, transparent 40%),
-                radial-gradient(ellipse at 90% 30%, rgba(160, 190, 255, 0.12) 0%, transparent 40%),
-                radial-gradient(ellipse at 40% 10%, rgba(180, 220, 255, 0.08) 0%, transparent 30%),
-                radial-gradient(ellipse at 70% 90%, rgba(200, 210, 255, 0.10) 0%, transparent 30%);
-            animation: auroraBody 20s ease-in-out infinite alternate;
+                radial-gradient(ellipse at 90% 30%, rgba(160, 190, 255, 0.12) 0%, transparent 40%);
+            animation: auroraMoveBg 20s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
         }
-        @keyframes auroraBody {
+        @keyframes auroraMoveBg {
             0% { transform: translate(0%, 0%) scale(1) rotate(0deg);
                 opacity: 0.6; }
-            25% { transform: translate(4%, -3%) scale(1.08) rotate(2deg);
+            25% { transform: translate(3%, -2%) scale(1.05) rotate(1.5deg);
                 opacity: 1; }
-            50% { transform: translate(-3%, 5%) scale(0.95) rotate(-1.5deg);
-                opacity: 0.8; }
-            75% { transform: translate(5%, -2%) scale(1.03) rotate(1.5deg);
+            50% { transform: translate(-2%, 3%) scale(0.95) rotate(-1deg);
+                opacity: 0.7; }
+            75% { transform: translate(4%, -1%) scale(1.02) rotate(1deg);
                 opacity: 0.9; }
-            100% { transform: translate(-4%, 4%) scale(1.1) rotate(-2deg);
+            100% { transform: translate(-3%, 2%) scale(1.08) rotate(-1.5deg);
                 opacity: 0.7; }
         }
-
         body::after {
             content: '';
             position: fixed;
@@ -70,39 +67,39 @@
             right: 0;
             bottom: 0;
             background-image:
-                radial-gradient(2px 2px at 15% 25%, rgba(255, 255, 255, 0.3), transparent),
-                radial-gradient(2px 2px at 35% 65%, rgba(255, 255, 255, 0.2), transparent),
-                radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(1px 1px at 15% 25%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(1px 1px at 35% 65%, rgba(255, 255, 255, 0.2), transparent),
+                radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.35), transparent),
                 radial-gradient(1px 1px at 85% 75%, rgba(255, 255, 255, 0.15), transparent),
-                radial-gradient(2px 2px at 5% 85%, rgba(255, 255, 255, 0.25), transparent),
+                radial-gradient(1px 1px at 5% 85%, rgba(255, 255, 255, 0.25), transparent),
                 radial-gradient(1px 1px at 45% 45%, rgba(255, 255, 255, 0.15), transparent),
-                radial-gradient(2px 2px at 75% 50%, rgba(255, 255, 255, 0.30), transparent),
+                radial-gradient(1px 1px at 75% 50%, rgba(255, 255, 255, 0.30), transparent),
                 radial-gradient(1px 1px at 25% 90%, rgba(255, 255, 255, 0.20), transparent);
             background-size: 300px 300px;
             opacity: 0.5;
-            animation: starTwinkleBody 8s ease-in-out infinite alternate;
+            animation: starTwinkleBg 7s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
         }
-        @keyframes starTwinkleBody {
+        @keyframes starTwinkleBg {
             0% { opacity: 0.2; }
-            50% { opacity: 0.7; }
+            50% { opacity: 0.6; }
             100% { opacity: 0.3; }
         }
 
+        /* ===== КАЛЕНДАРЬ ===== */
         .calendar-wrapper {
             position: relative;
             background: rgba(13, 13, 20, 0.85);
+            backdrop-filter: blur(12px);
             border-radius: 28px;
             padding: 4px;
             max-width: 420px;
             width: 100%;
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
             overflow: hidden;
-            touch-action: none;
             z-index: 1;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            touch-action: none;
         }
         .calendar-wrapper::before {
             content: '';
@@ -112,11 +109,11 @@
             width: 200%;
             height: 200%;
             background:
-                radial-gradient(ellipse at 20% 40%, rgba(140, 200, 255, 0.30) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 60%, rgba(200, 160, 255, 0.25) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 80%, rgba(100, 180, 255, 0.20) 0%, transparent 50%),
-                radial-gradient(ellipse at 10% 20%, rgba(220, 240, 255, 0.18) 0%, transparent 40%),
-                radial-gradient(ellipse at 90% 30%, rgba(160, 190, 255, 0.22) 0%, transparent 40%);
+                radial-gradient(ellipse at 20% 40%, rgba(140, 200, 255, 0.20) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 60%, rgba(200, 160, 255, 0.18) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(100, 180, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 10% 20%, rgba(220, 240, 255, 0.12) 0%, transparent 40%),
+                radial-gradient(ellipse at 90% 30%, rgba(160, 190, 255, 0.16) 0%, transparent 40%);
             animation: auroraMove 18s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
@@ -127,13 +124,13 @@
             20% { transform: translate(5%, -4%) scale(1.10) rotate(2deg);
                 opacity: 1; }
             40% { transform: translate(-4%, 6%) scale(0.95) rotate(-1.5deg);
-                opacity: 0.85; }
+                opacity: 0.8; }
             60% { transform: translate(6%, -2%) scale(1.05) rotate(2.5deg);
-                opacity: 0.95; }
+                opacity: 0.9; }
             80% { transform: translate(-5%, 5%) scale(1.12) rotate(-2deg);
                 opacity: 1; }
             100% { transform: translate(2%, -3%) scale(0.98) rotate(1deg);
-                opacity: 0.75; }
+                opacity: 0.7; }
         }
         .calendar-wrapper::after {
             content: '';
@@ -143,14 +140,14 @@
             right: 0;
             bottom: 0;
             background-image:
-                radial-gradient(2px 2px at 15% 25%, rgba(255, 255, 255, 0.5), transparent),
-                radial-gradient(2px 2px at 35% 65%, rgba(255, 255, 255, 0.4), transparent),
-                radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.6), transparent),
-                radial-gradient(1px 1px at 85% 75%, rgba(255, 255, 255, 0.35), transparent),
-                radial-gradient(2px 2px at 5% 85%, rgba(255, 255, 255, 0.45), transparent),
-                radial-gradient(1px 1px at 45% 45%, rgba(255, 255, 255, 0.30), transparent),
-                radial-gradient(2px 2px at 75% 50%, rgba(255, 255, 255, 0.50), transparent),
-                radial-gradient(1px 1px at 25% 90%, rgba(255, 255, 255, 0.40), transparent);
+                radial-gradient(2px 2px at 15% 25%, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(2px 2px at 35% 65%, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(1px 1px at 65% 15%, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(1px 1px at 85% 75%, rgba(255, 255, 255, 0.25), transparent),
+                radial-gradient(2px 2px at 5% 85%, rgba(255, 255, 255, 0.35), transparent),
+                radial-gradient(1px 1px at 45% 45%, rgba(255, 255, 255, 0.20), transparent),
+                radial-gradient(2px 2px at 75% 50%, rgba(255, 255, 255, 0.40), transparent),
+                radial-gradient(1px 1px at 25% 90%, rgba(255, 255, 255, 0.30), transparent);
             background-size: 300px 300px;
             opacity: 0.7;
             animation: starTwinkleLong 7s ease-in-out infinite alternate;
@@ -166,7 +163,7 @@
             position: relative;
             z-index: 1;
             background: rgba(16, 16, 24, 0.70);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(8px);
             border-radius: 24px;
             padding: 16px;
             touch-action: none;
@@ -300,23 +297,21 @@
             background: transparent !important;
         }
 
-        .day.mood-0 { background: rgba(255, 255, 255, 0.03);
-            color: rgba(255, 255, 255, 0.15); }
         .day.mood-1 { background: #0a0a0a;
             color: #e8e8f0;
             border-color: #1a1a1a; }
-        .day.mood-2 { background: #1a1a30;
+        .day.mood-2 { background: #1a2a4a;
             color: #e0e0f0;
-            border-color: #2a2a4a; }
-        .day.mood-3 { background: #3a3515;
-            color: #f0f0e0;
-            border-color: #4a4520; }
+            border-color: #2a3a5a; }
+        .day.mood-3 { background: #4a4a55;
+            color: #f0f0f0;
+            border-color: #5a5a65; }
         .day.mood-4 { background: #2a1520;
             color: #f0e0e8;
             border-color: #3a1a2a; }
-        .day.mood-5 { background: #d0d0e0;
+        .day.mood-5 { background: #d0d8e8;
             color: #1a1a2a;
-            border-color: #e0e0f0; }
+            border-color: #e0e8f0; }
 
         .day.today {
             border-color: #7a9eff;
@@ -377,7 +372,7 @@
 
         /* ===== ХОЛСТ ===== */
         #waveContainer {
-            display: none;
+            display: block;
             position: fixed;
             top: 0;
             left: 0;
@@ -385,16 +380,17 @@
             bottom: 0;
             z-index: 1000;
             background: #2a2a30;
-            transition: background 1.8s ease, box-shadow 1.8s ease, opacity 0.6s ease;
+            transition: opacity 0.6s ease, background 1.8s ease, box-shadow 1.8s ease;
             overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
             touch-action: none;
             opacity: 0;
+            pointer-events: none;
         }
         #waveContainer.active {
-            display: block;
             opacity: 1;
+            pointer-events: auto;
         }
         #waveCanvas {
             width: 100%;
@@ -405,45 +401,19 @@
             touch-action: none;
         }
 
+        /* ===== БЛИКИ НА ФОНЕ ===== */
         .lens-flare {
             position: fixed;
             border-radius: 50%;
             pointer-events: none;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 1.2s ease;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            z-index: 0;
+            mix-blend-mode: screen;
+            opacity: 0.3;
+            animation: flareMove 12s ease-in-out infinite alternate;
         }
-        #waveContainer.active .lens-flare {
-            opacity: 1;
-        }
-        .flare-1 {
-            width: 300px;
-            height: 300px;
-            top: -50px;
-            right: -80px;
-            background: radial-gradient(circle, rgba(180, 220, 255, 0.10) 0%, transparent 70%);
-            animation: flareFloat 12s ease-in-out infinite alternate;
-        }
-        .flare-2 {
-            width: 200px;
-            height: 200px;
-            bottom: 80px;
-            left: -60px;
-            background: radial-gradient(circle, rgba(200, 180, 255, 0.08) 0%, transparent 70%);
-            animation: flareFloat 15s ease-in-out infinite alternate-reverse;
-        }
-        .flare-3 {
-            width: 150px;
-            height: 150px;
-            top: 30%;
-            left: 20%;
-            background: radial-gradient(circle, rgba(255, 200, 220, 0.06) 0%, transparent 70%);
-            animation: flareFloat 10s ease-in-out infinite alternate;
-        }
-        @keyframes flareFloat {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            100% { transform: translate(30px, -20px) scale(1.2); opacity: 1; }
+        @keyframes flareMove {
+            0% { transform: translate(0%, 0%) scale(1); }
+            100% { transform: translate(10%, -5%) scale(1.2); }
         }
 
         .top-bar {
@@ -477,6 +447,7 @@
             align-items: center;
             justify-content: center;
             touch-action: none;
+            z-index: 1002;
         }
         .back-btn:hover {
             background: rgba(255, 255, 255, 0.12);
@@ -504,6 +475,7 @@
             align-items: center;
             justify-content: center;
             touch-action: none;
+            z-index: 1002;
         }
         .close-btn:hover {
             background: rgba(255, 255, 255, 0.12);
@@ -605,11 +577,11 @@
             user-select: none;
             -webkit-user-select: none;
             touch-action: none;
-            color: #e0e0e8;
+            backdrop-filter: blur(4px);
         }
         .mood-select-btn:hover {
             transform: scale(1.1);
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.15);
         }
         .mood-select-btn.selected {
             border-color: #7a9eff;
@@ -617,6 +589,11 @@
             transform: scale(1.05);
             background: rgba(255, 255, 255, 0.15);
         }
+        .mood-select-btn[data-mood="1"] { color: #8a9ab0; }
+        .mood-select-btn[data-mood="2"] { color: #8ab0d0; }
+        .mood-select-btn[data-mood="3"] { color: #c0c0cc; }
+        .mood-select-btn[data-mood="4"] { color: #d0a0b0; }
+        .mood-select-btn[data-mood="5"] { color: #e8e8f0; }
 
         .mood-confirm-btn {
             padding: 6px 24px;
@@ -1040,7 +1017,8 @@
             .close-btn,
             .back-btn { width: 36px;
                 height: 36px;
-                font-size: 16px; }
+                font-size: 16px;
+                top: 12px; }
             .wave-date { font-size: 14px;
                 padding: 4px 14px;
                 top: 60px; }
@@ -1051,12 +1029,6 @@
             .top-bar { top: 12px;
                 left: 12px;
                 right: 12px; }
-            .flare-1 { width: 150px;
-                height: 150px; }
-            .flare-2 { width: 100px;
-                height: 100px; }
-            .flare-3 { width: 80px;
-                height: 80px; }
         }
     </style>
 </head>
@@ -1088,11 +1060,13 @@
 
     <!-- ===== ХОЛСТ ===== -->
     <div id="waveContainer">
-        <div class="lens-flare flare-1"></div>
-        <div class="lens-flare flare-2"></div>
-        <div class="lens-flare flare-3"></div>
-
         <div class="fog-overlay" id="fogOverlay"></div>
+
+        <!-- Блики на фоне -->
+        <div class="lens-flare" style="top:10%;left:5%;width:300px;height:300px;background:radial-gradient(circle,rgba(180,210,255,0.15),transparent 70%);animation-delay:0s;"></div>
+        <div class="lens-flare" style="bottom:20%;right:10%;width:200px;height:200px;background:radial-gradient(circle,rgba(200,180,255,0.10),transparent 70%);animation-delay:2s;"></div>
+        <div class="lens-flare" style="top:40%;left:60%;width:150px;height:150px;background:radial-gradient(circle,rgba(180,220,255,0.12),transparent 70%);animation-delay:4s;"></div>
+        <div class="lens-flare" style="bottom:50%;left:10%;width:180px;height:180px;background:radial-gradient(circle,rgba(200,200,255,0.08),transparent 70%);animation-delay:1s;"></div>
 
         <div class="top-bar">
             <button class="back-btn" id="backBtn">←</button>
@@ -1175,10 +1149,11 @@
             { id: 'комфорт', label: '🌿 Комфорт', color: '#2ed573' }
         ];
 
+        // Цвета фона для оценок (жёлтый полностью убран)
         const MOOD_COLORS = {
             1: { bg: '#0a0a2a', glow: 'rgba(5,10,50,0.95)' },
             2: { bg: '#1a2a4a', glow: 'rgba(30,60,120,0.8)' },
-            3: { bg: '#3a3515', glow: 'rgba(180,160,60,0.5)' },
+            3: { bg: '#4a4a55', glow: 'rgba(100,100,120,0.5)' },
             4: { bg: '#2a1520', glow: 'rgba(160,60,90,0.6)' },
             5: { bg: '#d0d8e8', glow: 'rgba(200,220,255,0.4)' }
         };
@@ -1342,7 +1317,7 @@
         }
 
         // ===================================================================
-        // ОТКРЫТЬ ДЕНЬ
+        // ОТКРЫТЬ ДЕНЬ (ПЛАВНО)
         // ===================================================================
 
         function openDay(dateStr) {
@@ -1353,12 +1328,9 @@
             selectedMood = data.mood || 0;
 
             const container = document.getElementById('waveContainer');
-            container.style.opacity = '0';
-            container.classList.add('active');
 
-            requestAnimationFrame(() => {
-                container.style.opacity = '1';
-            });
+            // Сначала показываем контейнер (плавно)
+            container.classList.add('active');
 
             const parts = dateStr.split('-');
             const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
@@ -1366,8 +1338,10 @@
             ];
             document.getElementById('waveDate').textContent = `${parts[2]} ${months[parts[1]-1]} ${parts[0]}`;
 
+            // Скрываем стрелку назад
             document.getElementById('backBtn').classList.remove('visible');
 
+            // Показываем выбор оценки (плавно из тумана)
             const selector = document.getElementById('moodSelector');
             selector.classList.add('active');
             document.getElementById('bottomPanel').classList.remove('active');
@@ -1379,8 +1353,15 @@
             });
             document.getElementById('moodConfirmBtn').disabled = selectedMood === 0;
 
-            container.style.background = '#2a2a30';
-            container.style.boxShadow = 'none';
+            if (selectedMood > 0) {
+                applyMoodGlow(selectedMood);
+                setTimeout(() => {
+                    showAdditions();
+                }, 400);
+            } else {
+                container.style.background = '#2a2a30';
+                container.style.boxShadow = 'none';
+            }
 
             canvas = document.getElementById('waveCanvas');
             ctx = canvas.getContext('2d');
@@ -1402,19 +1383,14 @@
             container.style.background = color.bg;
 
             if (mood === 5) {
-                container.style.background = `
-                    radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.4) 0%, rgba(240,245,255,0.2) 30%, rgba(220,230,255,0.1) 60%, transparent 80%),
-                    radial-gradient(ellipse at 70% 60%, rgba(255,240,245,0.3) 0%, rgba(245,240,255,0.15) 30%, rgba(230,220,255,0.05) 60%, transparent 80%),
-                    radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 70%)
-                `;
-                container.style.boxShadow = `inset 0 0 200px rgba(255,255,255,0.1), inset 0 0 150px rgba(200,220,255,0.15)`;
+                container.style.boxShadow = `inset 0 0 200px rgba(200,220,255,0.25), inset 0 0 150px rgba(255,200,220,0.20), inset 0 0 100px rgba(200,255,220,0.15)`;
             } else {
                 container.style.boxShadow = `inset 0 0 150px ${color.glow}`;
             }
         }
 
         // ===================================================================
-        // ПОКАЗ ДОПОЛНЕНИЙ
+        // ПОКАЗ ДОПОЛНЕНИЙ (ПЛАВНО)
         // ===================================================================
 
         function showAdditions() {
@@ -1468,7 +1444,7 @@
         }
 
         // ===================================================================
-        // АНИМАЦИЯ ВОЛН
+        // АНИМАЦИЯ ВОЛН (СПОКОЙНЫЕ)
         // ===================================================================
 
         function animateWaves() {
@@ -1482,13 +1458,14 @@
             const mood = getDayData(currentDateStr).mood || 0;
             const color = MOOD_COLORS[mood] || MOOD_COLORS[3];
 
+            // Фоновое свечение
             if (mood === 5) {
                 const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.8);
-                grad.addColorStop(0, 'rgba(255,240,250,0.2)');
-                grad.addColorStop(0.2, 'rgba(240,245,255,0.25)');
-                grad.addColorStop(0.4, 'rgba(240,255,245,0.15)');
-                grad.addColorStop(0.6, 'rgba(255,245,240,0.2)');
-                grad.addColorStop(1, 'rgba(220,230,255,0.1)');
+                grad.addColorStop(0, 'rgba(255,240,250,0.25)');
+                grad.addColorStop(0.2, 'rgba(240,245,255,0.30)');
+                grad.addColorStop(0.4, 'rgba(240,255,245,0.20)');
+                grad.addColorStop(0.6, 'rgba(255,245,240,0.25)');
+                grad.addColorStop(1, 'rgba(220,230,255,0.15)');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, w, h);
             } else {
@@ -1499,61 +1476,62 @@
                 ctx.fillRect(0, 0, w, h);
             }
 
+            // Волны — спокойные, плавные
             if (selectedEmotions.length > 0) {
                 selectedEmotions.forEach((emotionId, index) => {
                     const em = EMOTIONS.find(e => e.id === emotionId);
                     if (!em) return;
                     const color = em.color;
-                    const offset = (index - (selectedEmotions.length - 1) / 2) * 55;
-                    const baseAmp = 50 + Math.sin(time * 0.35 + index * 1.5) * 18;
-                    const freq = 0.025 + index * 0.005;
-                    const speed = 1.8 + index * 0.2;
+                    const offset = (index - (selectedEmotions.length - 1) / 2) * 45;
+                    const baseAmp = 30 + Math.sin(time * 0.25 + index * 1.3) * 10;
+                    const freq = 0.018 + index * 0.003;
+                    const speed = 1.2 + index * 0.15;
 
+                    // Основная волна
                     ctx.beginPath();
                     ctx.moveTo(0, h / 2 + offset);
                     for (let x = 0; x <= w; x += 2) {
                         const y = h / 2 + offset +
-                            Math.sin(x * freq + time * speed + index * 1.3) * baseAmp +
-                            Math.sin(x * freq * 0.7 + time * 0.9 + index * 2.5) * baseAmp * 0.6 +
-                            Math.sin(x * freq * 2.5 + time * 2.8 + index * 0.5) * baseAmp * 0.3 +
-                            Math.sin(x * freq * 0.3 + time * 0.5 + index * 3.5) * baseAmp * 0.2;
+                            Math.sin(x * freq + time * speed + index * 1.1) * baseAmp +
+                            Math.sin(x * freq * 0.6 + time * 0.7 + index * 2.2) * baseAmp * 0.5 +
+                            Math.sin(x * freq * 1.8 + time * 2.0 + index * 0.5) * baseAmp * 0.2;
                         ctx.lineTo(x, y);
                     }
                     ctx.strokeStyle = color;
-                    ctx.lineWidth = 4 + Math.sin(time * 0.4 + index) * 1.0;
-                    ctx.globalAlpha = 0.55 + Math.sin(time * 0.5 + index * 1.1) * 0.15;
-                    ctx.shadowBlur = 50;
+                    ctx.lineWidth = 3.0 + Math.sin(time * 0.3 + index) * 0.8;
+                    ctx.globalAlpha = 0.5 + Math.sin(time * 0.4 + index * 1.0) * 0.15;
+                    ctx.shadowBlur = 40;
                     ctx.shadowColor = color;
                     ctx.stroke();
 
+                    // Слой 2 (рассеивание)
                     ctx.beginPath();
-                    ctx.moveTo(0, h / 2 + offset + 25 + Math.sin(time * 0.25 + index) * 12);
+                    ctx.moveTo(0, h / 2 + offset + 18 + Math.sin(time * 0.2 + index) * 8);
                     for (let x = 0; x <= w; x += 3) {
-                        const y = h / 2 + offset + 25 + Math.sin(time * 0.25 + index) * 12 +
-                            Math.sin(x * freq * 0.8 + time * 1.2 + index * 2.1) * baseAmp * 0.7 +
-                            Math.sin(x * freq * 0.5 + time * 0.6 + index * 3.3) * baseAmp * 0.4 +
-                            Math.sin(x * freq * 2.0 + time * 2.0 + index * 1.1) * baseAmp * 0.2;
+                        const y = h / 2 + offset + 18 + Math.sin(time * 0.2 + index) * 8 +
+                            Math.sin(x * freq * 0.7 + time * 0.9 + index * 1.8) * baseAmp * 0.6 +
+                            Math.sin(x * freq * 0.4 + time * 0.5 + index * 2.8) * baseAmp * 0.3;
                         ctx.lineTo(x, y);
                     }
                     ctx.strokeStyle = color;
-                    ctx.lineWidth = 2.0;
-                    ctx.globalAlpha = 0.2;
-                    ctx.shadowBlur = 30;
+                    ctx.lineWidth = 1.5;
+                    ctx.globalAlpha = 0.15;
+                    ctx.shadowBlur = 20;
                     ctx.shadowColor = color;
                     ctx.stroke();
 
+                    // Слой 3 (лёгкая дымка)
                     ctx.beginPath();
-                    ctx.moveTo(0, h / 2 + offset - 20 + Math.sin(time * 0.3 + index * 0.8) * 10);
+                    ctx.moveTo(0, h / 2 + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6);
                     for (let x = 0; x <= w; x += 4) {
-                        const y = h / 2 + offset - 20 + Math.sin(time * 0.3 + index * 0.8) * 10 +
-                            Math.sin(x * freq * 0.6 + time * 0.9 + index * 1.8) * baseAmp * 0.5 +
-                            Math.sin(x * freq * 0.3 + time * 0.4 + index * 2.8) * baseAmp * 0.25;
+                        const y = h / 2 + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6 +
+                            Math.sin(x * freq * 0.5 + time * 0.6 + index * 1.5) * baseAmp * 0.3;
                         ctx.lineTo(x, y);
                     }
                     ctx.strokeStyle = color;
-                    ctx.lineWidth = 1.2;
-                    ctx.globalAlpha = 0.12;
-                    ctx.shadowBlur = 20;
+                    ctx.lineWidth = 1.0;
+                    ctx.globalAlpha = 0.08;
+                    ctx.shadowBlur = 15;
                     ctx.shadowColor = color;
                     ctx.stroke();
                 });
@@ -1567,6 +1545,7 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h / 2 + 24);
             }
 
+            // Звёзды
             stars.forEach((star, idx) => {
                 const twinkle = 0.6 + Math.sin(time * 1.8 + idx * 2.3) * 0.4;
                 const size = 10 + Math.sin(time * 1.2 + idx * 1.7) * 3;
@@ -1795,7 +1774,7 @@
                     const h = canvas.height;
 
                     selectedEmotions.forEach((emotionId, index) => {
-                        const offset = (index - (selectedEmotions.length - 1) / 2) * 55;
+                        const offset = (index - (selectedEmotions.length - 1) / 2) * 45;
                         const waveY = h / 2 + offset;
                         const dist = Math.abs(y - waveY);
                         if (dist < closestDist) {
@@ -1889,7 +1868,7 @@
         });
 
         // ===================================================================
-        // УДАЛЕНИЕ ЗВЕЗДЫ
+        // УДАЛЕНИЕ ЗВЕЗДЫ (ДОЛГИЙ КЛИК)
         // ===================================================================
 
         let longPressTimer = null;
@@ -2092,7 +2071,6 @@
         document.getElementById('closeWaves').addEventListener('click', () => {
             const container = document.getElementById('waveContainer');
             container.classList.remove('active');
-            container.style.opacity = '0';
             document.getElementById('moodSelector').classList.remove('active');
             document.getElementById('bottomPanel').classList.remove('active');
             document.getElementById('backBtn').classList.remove('visible');
