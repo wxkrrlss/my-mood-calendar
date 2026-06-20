@@ -28,6 +28,7 @@
             overflow-y: auto;
             position: relative;
         }
+        /* ===== КОСМИЧЕСКИЙ ФОН ===== */
         body::before {
             content: '';
             position: fixed;
@@ -37,8 +38,7 @@
             height: 200%;
             background: radial-gradient(ellipse at 20% 30%, rgba(180, 100, 255, 0.08) 0%, transparent 40%),
                 radial-gradient(ellipse at 70% 60%, rgba(100, 200, 255, 0.06) 0%, transparent 40%),
-                radial-gradient(ellipse at 40% 20%, rgba(255, 150, 200, 0.04) 0%, transparent 40%),
-                radial-gradient(ellipse at 80% 40%, rgba(200, 180, 100, 0.03) 0%, transparent 40%);
+                radial-gradient(ellipse at 40% 20%, rgba(255, 150, 200, 0.04) 0%, transparent 40%);
             animation: cosmicMist 50s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: 0;
@@ -796,7 +796,7 @@
 </head>
 <body>
 
-    <!-- ===== ФОНОВЫЙ АУДИО-ПЛЕЕР (ПЕСНЯ) ===== -->
+    <!-- ===== ФОНОВАЯ МУЗЫКА (ИГРАЕТ ВСЕГДА) ===== -->
     <audio id="bgMusic" loop style="display:none;">
         <source src="background.mp3" type="audio/mpeg">
     </audio>
@@ -932,12 +932,16 @@
         let waveStates = {};
 
         // =================================================================
-        // 2. ЗВУКИ — ТОЛЬКО ДОЖДЬ ДЛЯ ФОНОВ 1 И 2
+        // 2. ЗВУКИ (ПЕСНЯ + ДОЖДЬ ДЛЯ 1 И 2 ФОНА)
         // =================================================================
         let audioCtx = null;
         let ambientNodes = [];
         let ambientGainNode = null;
         let isAmbientPlaying = false;
+        let ambientInterval = null;
+        let mainAudio = null;
+        let rainNodes1 = [];
+        let rainNodes2 = [];
 
         function initAudio() {
             if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
@@ -947,16 +951,43 @@
             ambientNodes.forEach(node => { try { node.stop(); } catch (e) {} });
             ambientNodes = [];
             ambientGainNode = null;
+            if (ambientInterval) {
+                clearTimeout(ambientInterval);
+                ambientInterval = null;
+            }
             isAmbientPlaying = false;
+            if (mainAudio) {
+                mainAudio.pause();
+                mainAudio.currentTime = 0;
+            }
+            rainNodes1.forEach(node => { try { node.stop(); } catch (e) {} });
+            rainNodes1 = [];
+            rainNodes2.forEach(node => { try { node.stop(); } catch (e) {} });
+            rainNodes2 = [];
         }
 
-        // ===== ДОЖДЬ ДЛЯ ФОНА 1 =====
-        function createRainSound1() {
-            stopAllSounds();
-            initAudio();
+        // ===== ЗАПУСК ПЕСНИ =====
+        function playMainAmbient() {
             try {
+                if (!mainAudio) {
+                    mainAudio = document.getElementById('bgMusic');
+                    if (!mainAudio) return;
+                }
+                mainAudio.volume = 0.4;
+                mainAudio.loop = true;
+                mainAudio.play().catch(e => {
+                    console.log('Автоматическое воспроизведение заблокировано, ожидаем взаимодействия');
+                });
+                isAmbientPlaying = true;
+            } catch (e) {}
+        }
+
+        // ===== ЗВУК ДОЖДЯ ДЛЯ ОЦЕНКИ 1 =====
+        function createRainSound1() {
+            try {
+                initAudio();
                 const now = audioCtx.currentTime;
-                const bufferSize = audioCtx.sampleRate * 5;
+                const bufferSize = audioCtx.sampleRate * 4;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
@@ -977,11 +1008,11 @@
                 noise.connect(gain);
                 gain.connect(audioCtx.destination);
                 noise.start(now);
-                noise.stop(now + 25);
-                ambientNodes.push(noise);
-                ambientNodes.push(gain);
+                noise.stop(now + 20);
+                rainNodes1.push(noise);
+                rainNodes1.push(gain);
 
-                // Гром
+                // Гром (для атмосферы)
                 for (let i = 0; i < 3; i++) {
                     const osc = audioCtx.createOscillator();
                     osc.type = 'sawtooth';
@@ -994,28 +1025,27 @@
                     g.connect(audioCtx.destination);
                     osc.start(now + i * 2.5 + 1);
                     osc.stop(now + i * 2.5 + 2.5);
-                    ambientNodes.push(osc);
-                    ambientNodes.push(g);
+                    rainNodes1.push(osc);
+                    rainNodes1.push(g);
                 }
-                isAmbientPlaying = true;
             } catch (e) {}
         }
 
-        // ===== ДОЖДЬ ДЛЯ ФОНА 2 =====
+        // ===== ЗВУК ДОЖДЯ ДЛЯ ОЦЕНКИ 2 =====
         function createRainSound2() {
-            stopAllSounds();
-            initAudio();
             try {
+                initAudio();
                 const now = audioCtx.currentTime;
-                const bufferSize = audioCtx.sampleRate * 5;
+                const bufferSize = audioCtx.sampleRate * 4;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
                     const t = i / audioCtx.sampleRate;
-                    let val = (Math.random() * 2 - 1) * 0.07 * (0.5 + 0.5 * Math.sin(t * 0.1));
-                    val += Math.sin(t * 3.5 + 0.3) * 0.015;
-                    val += Math.sin(t * 4.2 + 0.7) * 0.010;
-                    val += Math.sin(t * 0.15 + 0.5) * 0.02;
+                    let val = (Math.random() * 2 - 1) * 0.06 * (0.6 + 0.4 * Math.sin(t * 0.2));
+                    val += Math.sin(t * 0.5) * 0.01;
+                    if (Math.random() < 0.001) {
+                        val += (Math.random() * 2 - 1) * 0.06;
+                    }
                     data[i] = val;
                 }
                 const noise = audioCtx.createBufferSource();
@@ -1027,25 +1057,57 @@
                 noise.connect(gain);
                 gain.connect(audioCtx.destination);
                 noise.start(now);
-                noise.stop(now + 25);
-                ambientNodes.push(noise);
-                ambientNodes.push(gain);
-                isAmbientPlaying = true;
+                noise.stop(now + 20);
+                rainNodes2.push(noise);
+                rainNodes2.push(gain);
             } catch (e) {}
         }
 
-        // ===== ОСТАЛЬНЫЕ ЗВУКИ — ПУСТЫЕ =====
-        function playMainAmbient() {}
+        // ===== ФУНКЦИИ ДЛЯ ОЦЕНОК =====
         function createMoodSound(type) {
-            if (type === 1) createRainSound1();
-            else if (type === 2) createRainSound2();
-            else stopAllSounds();
+            // Останавливаем старые звуки дождя
+            rainNodes1.forEach(node => { try { node.stop(); } catch (e) {} });
+            rainNodes1 = [];
+            rainNodes2.forEach(node => { try { node.stop(); } catch (e) {} });
+            rainNodes2 = [];
+
+            if (type === 1) {
+                createRainSound1();
+            } else if (type === 2) {
+                createRainSound2();
+            }
+            // Для 3,4,5 — нет дополнительных звуков, только песня
         }
-        function playStarSound(type) {}
+
+        function setAmbientVolume(vol) {
+            if (mainAudio) {
+                mainAudio.volume = Math.min(0.4, vol * 2);
+            }
+        }
+
+        function stopAllSounds() {
+            ambientNodes.forEach(node => { try { node.stop(); } catch (e) {} });
+            ambientNodes = [];
+            ambientGainNode = null;
+            if (ambientInterval) {
+                clearTimeout(ambientInterval);
+                ambientInterval = null;
+            }
+            isAmbientPlaying = false;
+            if (mainAudio) {
+                mainAudio.pause();
+                mainAudio.currentTime = 0;
+            }
+            rainNodes1.forEach(node => { try { node.stop(); } catch (e) {} });
+            rainNodes1 = [];
+            rainNodes2.forEach(node => { try { node.stop(); } catch (e) {} });
+            rainNodes2 = [];
+        }
+
         function soundClick() {}
         function soundConfirm() {}
         function soundReset() {}
-        function setAmbientVolume(vol) {}
+        function playStarSound(type) {}
 
         // =================================================================
         // 3. ДАННЫЕ
@@ -1161,8 +1223,7 @@
 
                 dayEl.addEventListener('click', (function(ds) {
                     return function() {
-                        if (!isFuture(ds)) { soundClick();
-                            openDay(ds); } else alert('Этот день ещё не наступил 😊');
+                        if (!isFuture(ds)) { openDay(ds); } else alert('Этот день ещё не наступил 😊');
                     };
                 })(dateStr));
                 grid.appendChild(dayEl);
@@ -1468,7 +1529,6 @@
             const bgCanvasEl = document.getElementById('bgCanvas');
             if (mood === 0) {
                 bgCanvasEl.classList.remove('active');
-                stopAllSounds();
                 return;
             }
             bgCanvasEl.classList.add('active');
@@ -1480,14 +1540,8 @@
             flareParticles = [];
             lightningFlash = 0;
 
-            // Запускаем звук дождя для 1 и 2
-            if (mood === 1) {
-                createRainSound1();
-            } else if (mood === 2) {
-                createRainSound2();
-            } else {
-                stopAllSounds();
-            }
+            // ЗАПУСКАЕМ ЗВУКИ ДОЖДЯ
+            createMoodSound(mood);
 
             switch (mood) {
                 case 1:
@@ -1522,7 +1576,8 @@
 
         // =================================================================
         // 6. ОТКРЫТЬ ДЕНЬ
-        // =================================================================        function openDay(dateStr) {
+        // =================================================================
+        function openDay(dateStr) {
             currentDateStr = dateStr;
             const data = getDayData(dateStr);
             selectedStates = data.states ? [...data.states] : [];
@@ -1590,7 +1645,6 @@
                 btn.style.color = st.color;
                 if (selectedStates.includes(st.id)) btn.classList.add('selected');
                 btn.addEventListener('click', function() {
-                    soundClick();
                     toggleState(st.id, this);
                 });
                 panel.appendChild(btn);
@@ -1602,7 +1656,6 @@
         // =================================================================
         document.querySelectorAll('.mood-select-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                soundClick();
                 selectedMood = parseInt(this.dataset.mood);
                 document.querySelectorAll('.mood-select-btn').forEach(b => b.classList.remove('selected'));
                 this.classList.add('selected');
@@ -1613,7 +1666,6 @@
 
         document.getElementById('moodConfirmBtn').addEventListener('click', function() {
             if (selectedMood === 0) return;
-            soundConfirm();
             if (currentDateStr) {
                 const data = getDayData(currentDateStr);
                 data.mood = selectedMood;
@@ -1633,7 +1685,6 @@
         }
 
         function goBackToMood() {
-            soundClick();
             document.getElementById('bottomPanel').classList.remove('active');
             document.getElementById('backBtn').classList.remove('visible');
             document.getElementById('moodSelector').classList.add('active');
@@ -1642,7 +1693,6 @@
                 .dataset.mood) === selectedMood));
             document.getElementById('moodConfirmBtn').disabled = selectedMood === 0;
             STATES.forEach(st => setWaveTarget(st.id, false));
-            stopAllSounds();
         }
         document.getElementById('backBtn').addEventListener('click', goBackToMood);
 
@@ -1803,7 +1853,6 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
-            // ЗВЁЗДЫ
             stars.forEach((star, idx) => {
                 const floatOffset = star.floatPhase || 0;
                 const crystalOffset = star.crystalPhase || 0;
@@ -2241,7 +2290,6 @@
         document.getElementById('waveDate').addEventListener('mousedown', function() {
             resetPressTimer = setTimeout(() => {
                 if (currentDateStr && !isResetInProgress) {
-                    soundReset();
                     if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
                         resetDay();
                     }
@@ -2260,7 +2308,6 @@
         document.getElementById('waveDate').addEventListener('touchstart', function(e) {
             resetPressTimer = setTimeout(() => {
                 if (currentDateStr && !isResetInProgress) {
-                    soundReset();
                     if (confirm('🗑️ Точно сбросить все данные за этот день?')) {
                         resetDay();
                     }
@@ -2309,7 +2356,6 @@
                 const container = document.getElementById('waveContainer');
                 container.style.background = 'rgba(0,0,0,0.10)';
                 container.style.boxShadow = 'none';
-                stopAllSounds();
                 isResetInProgress = false;
             }, 1200);
         }
@@ -2325,7 +2371,6 @@
             document.getElementById('backBtn').classList.remove('visible');
             if (animationId) cancelAnimationFrame(animationId);
             setMoodEffect(0);
-            stopAllSounds();
             renderCalendar();
         });
 
@@ -2366,31 +2411,16 @@
         });
 
         // =================================================================
-        // 18. ЗАПУСК ПЕСНИ И ИНИЦИАЛИЗАЦИЯ
+        // 18. ИНИЦИАЛИЗАЦИЯ
         // =================================================================
-        function startBackgroundMusic() {
-            try {
-                const audio = document.getElementById('bgMusic');
-                if (audio) {
-                    audio.volume = 0.4;
-                    audio.play().catch(e => {
-                        console.log('Автозапуск музыки заблокирован, ожидаем взаимодействия');
-                        // При первом клике пользователя запустим музыку
-                        document.addEventListener('click', function playOnClick() {
-                            audio.play().catch(() => {});
-                            document.removeEventListener('click', playOnClick);
-                        }, { once: true });
-                    });
-                }
-            } catch (e) {}
-        }
-
         loadData();
         renderCalendar();
         initBgCanvas();
 
-        // Запускаем песню после загрузки
-        setTimeout(startBackgroundMusic, 100);
+        // ЗАПУСКАЕМ ПЕСНЮ ПРИ ЗАГРУЗКЕ
+        setTimeout(() => {
+            playMainAmbient();
+        }, 500);
 
         window.addEventListener('resize', function() {
             if (canvas) resizeCanvas();
