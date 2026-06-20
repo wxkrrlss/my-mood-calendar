@@ -944,165 +944,98 @@
         let isResetInProgress = false;
         let waveStates = {};
 
+// =================================================================
+        // 2. ЗВУКИ — ТОЛЬКО ПЕСНЯ (ПРИВЯЗАНА К САЙТУ)
         // =================================================================
-        // 2. ЗВУКИ (ПЕСНЯ + ДОЖДЬ ДЛЯ 1 И 2 ФОНА)
-        // =================================================================
-        let audioCtx = null;
-        let ambientNodes = [];
-        let ambientGainNode = null;
-        let isAmbientPlaying = false;
-        let ambientInterval = null;
-        let mainAudio = null;
-        let rainNodes1 = [];
-        let rainNodes2 = [];
+        let audioContext = null;
+        let audioElement = null;
+        let isMusicPlaying = false;
+        let musicStarted = false;
 
+        // Инициализация аудио
         function initAudio() {
-            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-        }
-
-        function stopAllSounds() {
-            ambientNodes.forEach(node => { try { node.stop(); } catch (e) {} });
-            ambientNodes = [];
-            ambientGainNode = null;
-            if (ambientInterval) {
-                clearTimeout(ambientInterval);
-                ambientInterval = null;
-            }
-            isAmbientPlaying = false;
-            if (mainAudio) {
-                mainAudio.pause();
-                mainAudio.currentTime = 0;
-            }
-            rainNodes1.forEach(node => { try { node.stop(); } catch (e) {} });
-            rainNodes1 = [];
-            rainNodes2.forEach(node => { try { node.stop(); } catch (e) {} });
-            rainNodes2 = [];
-        }
-
-        // ===== ЗАПУСК ПЕСНИ =====
-        function playMainAmbient() {
-            try {
-                if (!mainAudio) {
-                    mainAudio = document.getElementById('bgMusic');
-                    if (!mainAudio) return;
+                if (!audioContext) {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 }
-                mainAudio.volume = 0.4;
-                mainAudio.loop = true;
-                mainAudio.play().catch(e => {
-                    console.log('Автоматическое воспроизведение заблокировано, ожидаем взаимодействия');
-                });
-                isAmbientPlaying = true;
-            } catch (e) {}
+                if (!audioElement) {
+                        audioElement = document.getElementById('bgMusic');
+                        if (audioElement) {
+                                audioElement.volume = 0.4;
+                                audioElement.loop = true;
+                        }
+                }
         }
 
-        // ===== ЗВУК ДОЖДЯ ДЛЯ ОЦЕНКИ 1 =====
-        function createRainSound1() {
-            try {
+        // Запуск музыки (привязка к сайту)
+        function startMusic() {
+                if (musicStarted) return;
+                musicStarted = true;
+                
                 initAudio();
-                const now = audioCtx.currentTime;
-                const bufferSize = audioCtx.sampleRate * 4;
-                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    const t = i / audioCtx.sampleRate;
-                    let val = (Math.random() * 2 - 1) * 0.12 * (0.8 + 0.2 * Math.sin(t * 0.3));
-                    if (Math.random() < 0.002) {
-                        val += (Math.random() * 2 - 1) * 0.15;
-                    }
-                    val += Math.sin(t * 0.05) * 0.01;
-                    data[i] = val;
+                
+                if (!audioElement) {
+                        console.log('❌ Аудио элемент не найден');
+                        return;
                 }
-                const noise = audioCtx.createBufferSource();
-                noise.buffer = buffer;
-                noise.loop = true;
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.08, now);
-                gain.gain.exponentialRampToValueAtTime(0.06, now + 1);
-                noise.connect(gain);
-                gain.connect(audioCtx.destination);
-                noise.start(now);
-                noise.stop(now + 20);
-                rainNodes1.push(noise);
-                rainNodes1.push(gain);
+                
+                // Включаем звук
+                audioElement.play()
+                        .then(() => {
+                                isMusicPlaying = true;
+                                console.log('🎵 Музыка играет (привязана к сайту)');
+                                console.log('🎵 Бесконечный реплей включен');
+                        })
+                        .catch((err) => {
+                                console.log('❌ Ошибка запуска:', err);
+                                // Пробуем через AudioContext
+                                tryPlayViaContext();
+                        });
+                
+                // Удаляем обработчики после запуска
+                document.removeEventListener('click', startMusic);
+                document.removeEventListener('touchstart', startMusic);
+        }
 
-                // Гром (для атмосферы)
-                for (let i = 0; i < 3; i++) {
-                    const osc = audioCtx.createOscillator();
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(50 + i * 15, now + i * 2.5 + 1);
-                    osc.frequency.exponentialRampToValueAtTime(30 + i * 10, now + i * 2.5 + 2.5);
-                    const g = audioCtx.createGain();
-                    g.gain.setValueAtTime(0.03, now + i * 2.5 + 1);
-                    g.gain.exponentialRampToValueAtTime(0.001, now + i * 2.5 + 2.5);
-                    osc.connect(g);
-                    g.connect(audioCtx.destination);
-                    osc.start(now + i * 2.5 + 1);
-                    osc.stop(now + i * 2.5 + 2.5);
-                    rainNodes1.push(osc);
-                    rainNodes1.push(g);
+        // Запасной вариант через AudioContext
+        function tryPlayViaContext() {
+                try {
+                        if (!audioContext) return;
+                        if (audioContext.state === 'suspended') {
+                                audioContext.resume();
+                        }
+                        // Пробуем ещё раз
+                        if (audioElement) {
+                                audioElement.play().catch(() => {});
+                        }
+                } catch (e) {}
+        }
+
+        // Остановка музыки (если нужно)
+        function stopMusic() {
+                if (audioElement) {
+                        audioElement.pause();
+                        audioElement.currentTime = 0;
                 }
-            } catch (e) {}
+                isMusicPlaying = false;
+                musicStarted = false;
+                console.log('⏹️ Музыка остановлена');
         }
 
-        // ===== ЗВУК ДОЖДЯ ДЛЯ ОЦЕНКИ 2 =====
-        function createRainSound2() {
-            try {
-                initAudio();
-                const now = audioCtx.currentTime;
-                const bufferSize = audioCtx.sampleRate * 4;
-                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    const t = i / audioCtx.sampleRate;
-                    let val = (Math.random() * 2 - 1) * 0.06 * (0.6 + 0.4 * Math.sin(t * 0.2));
-                    val += Math.sin(t * 0.5) * 0.01;
-                    if (Math.random() < 0.001) {
-                        val += (Math.random() * 2 - 1) * 0.06;
-                    }
-                    data[i] = val;
+        // Переключение play/pause
+        function toggleMusic() {
+                if (isMusicPlaying) {
+                        stopMusic();
+                } else {
+                        startMusic();
                 }
-                const noise = audioCtx.createBufferSource();
-                noise.buffer = buffer;
-                noise.loop = true;
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.05, now);
-                gain.gain.exponentialRampToValueAtTime(0.035, now + 1);
-                noise.connect(gain);
-                gain.connect(audioCtx.destination);
-                noise.start(now);
-                noise.stop(now + 20);
-                rainNodes2.push(noise);
-                rainNodes2.push(gain);
-            } catch (e) {}
         }
 
-        // ===== ФУНКЦИИ ДЛЯ ОЦЕНОК =====
-        function createMoodSound(type) {
-            // Останавливаем старые звуки дождя
-            rainNodes1.forEach(node => { try { node.stop(); } catch (e) {} });
-            rainNodes1 = [];
-            rainNodes2.forEach(node => { try { node.stop(); } catch (e) {} });
-            rainNodes2 = [];
+        // Вешаем обработчики на клик и касание
+        document.addEventListener('click', startMusic);
+        document.addEventListener('touchstart', startMusic);
 
-            if (type === 1) {
-                createRainSound1();
-            } else if (type === 2) {
-                createRainSound2();
-            }
-            // Для 3,4,5 — нет дополнительных звуков, только песня
-        }
-
-        function setAmbientVolume(vol) {
-            if (mainAudio) {
-                mainAudio.volume = Math.min(0.4, vol * 2);
-            }
-        }
-
-        function soundClick() {}
-        function soundConfirm() {}
-        function soundReset() {}
-        function playStarSound(type) {}
-
+        console.log('🎵 Нажмите на страницу, чтобы включить музыку');
+        console.log('🎵 Музыка привязана к сайту и будет играть бесконечно');
         // =================================================================
         // 3. ДАННЫЕ
         // =================================================================
