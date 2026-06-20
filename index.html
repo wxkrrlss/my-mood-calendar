@@ -28,7 +28,6 @@
             overflow-y: auto;
             position: relative;
         }
-        /* Космический фон */
         body::before {
             content: '';
             position: fixed;
@@ -92,6 +91,7 @@
             overflow: hidden;
             z-index: 1;
             margin-bottom: 20px;
+            transition: box-shadow 0.5s;
         }
         .calendar-wrapper::before {
             content: '';
@@ -165,7 +165,7 @@
             display: flex;
             gap: 12px;
         }
-        .help-btn {
+        .help-btn, .stats-btn, .export-btn {
             background: none;
             border: none;
             color: rgba(255,255,255,0.15);
@@ -175,7 +175,10 @@
             padding: 4px 8px;
             border-radius: 8px;
         }
-        .help-btn:hover { color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.04); }
+        .help-btn:hover, .stats-btn:hover, .export-btn:hover {
+            color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.04);
+        }
 
         .subheader {
             font-size: 11px;
@@ -214,6 +217,17 @@
             color: rgba(255,255,255,0.2);
             margin-left: 8px;
         }
+        .month-nav .today-btn {
+            background: rgba(255,255,255,0.02);
+            border: none;
+            color: rgba(255,255,255,0.2);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .month-nav .today-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
 
         .weekdays {
             display: grid;
@@ -434,7 +448,9 @@
             cursor: default;
             user-select: none;
             -webkit-user-select: none;
+            transition: all 0.3s;
         }
+        .wave-date:active { transform: translateX(-50%) scale(0.96); }
 
         /* ===== ВЫБОР ОЦЕНКИ ===== */
         #moodSelector {
@@ -521,7 +537,7 @@
         .mood-confirm-btn:hover { background: rgba(100,150,255,0.2); }
         .mood-confirm-btn:disabled { opacity: 0.15; cursor: not-allowed; }
 
-        /* ===== СОСТОЯНИЯ (вместо эмоций) ===== */
+        /* ===== СОСТОЯНИЯ ===== */
         #bottomPanel {
             position: fixed;
             bottom: 24px;
@@ -731,6 +747,57 @@
         }
         .note-editor-save:hover { background: rgba(100,150,255,0.15); }
 
+        /* ===== СТАТИСТИКА ===== */
+        .stats-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 3000;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(24px);
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .stats-modal.active { display: flex; }
+        .stats-content {
+            background: rgba(12,12,20,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 24px 20px;
+            max-width: 360px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+            animation: slideUp 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        .stats-content h3 { color: #f0f0f8; font-size: 18px; margin-bottom: 12px; text-align: center; }
+        .stats-content p { color: rgba(255,255,255,0.4); font-size: 13px; line-height: 1.6; margin-bottom: 4px; }
+        .stats-content .stat-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .stats-content .stat-label { color: rgba(255,255,255,0.3); }
+        .stats-content .stat-value { color: #f0f0f8; }
+        .stats-close {
+            width: 100%;
+            padding: 10px;
+            border-radius: 16px;
+            border: none;
+            background: rgba(255,255,255,0.03);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 12px;
+        }
+        .stats-close:hover { background: rgba(255,255,255,0.06); }
+
         .help-modal {
             display: none;
             position: fixed;
@@ -792,6 +859,20 @@
         }
         .fog-overlay.active { opacity: 1; }
 
+        /* ===== ИНДИКАТОР ДОЛГОГО НАЖАТИЯ ===== */
+        .long-press-ring {
+            position: fixed;
+            border-radius: 50%;
+            border: 2px solid rgba(255,215,0,0.5);
+            pointer-events: none;
+            z-index: 1001;
+            animation: ringPulse 0.8s ease-out forwards;
+        }
+        @keyframes ringPulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
         @media (max-width: 400px) {
             .day { font-size: 12px; min-height: 34px; border-radius: 12px; }
             .calendar { padding: 12px; }
@@ -814,8 +895,10 @@
     <div class="calendar-wrapper">
         <div class="calendar">
             <div class="header">
-                <span class="header-title">Мой дневник</span>
+                <span class="header-title">✨ Дневник</span>
                 <div class="header-actions">
+                    <button class="stats-btn" id="statsBtn">📊</button>
+                    <button class="export-btn" id="exportBtn">💾</button>
                     <button class="help-btn" id="helpBtn">?</button>
                 </div>
             </div>
@@ -825,6 +908,7 @@
                 <span class="month-year" id="monthYear">Январь 2026</span>
                 <span class="month-avg" id="monthAvg"></span>
                 <button id="nextMonth">›</button>
+                <button class="today-btn" id="todayBtn">Сегодня</button>
             </div>
             <div class="weekdays">
                 <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
@@ -876,19 +960,6 @@
         <div class="wave-date" id="waveDate">12 января</div>
         <canvas id="waveCanvas"></canvas>
 
-        <!-- ПОДПИСИ СОСТОЯНИЙ НА ХОЛСТЕ (полупрозрачные) -->
-        <div id="stateLabels" style="position:fixed; top:0; left:0; right:0; bottom:0; z-index:999; pointer-events:none; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0.08; color:white; font-size:14px; font-weight:300; letter-spacing:2px; text-shadow:0 0 20px rgba(255,255,255,0.1); user-select:none; -webkit-user-select:none;">
-            <div style="display:flex; flex-wrap:wrap; gap:12px; max-width:80%; text-align:center;">
-                <span>🌊 Поток</span>
-                <span>☀️ Свет</span>
-                <span>🏠 Уют</span>
-                <span>🌙 Тень</span>
-                <span>⚡ Искра</span>
-                <span>🌿 Тишина</span>
-                <span>🌫️ Туман</span>
-            </div>
-        </div>
-
         <div id="moodSelector">
             <div class="mood-select-label">Оцените ваш сегодняшний день по шкале от 1 до 5</div>
             <div class="mood-select-buttons">
@@ -923,6 +994,14 @@
             </div>
             <textarea class="note-editor-textarea" id="noteEditorTextarea" placeholder="Напиши что-нибудь..."></textarea>
             <button class="note-editor-save" id="noteEditorSave">Сохранить</button>
+        </div>
+    </div>
+
+    <div class="stats-modal" id="statsModal">
+        <div class="stats-content">
+            <h3>📊 Статистика</h3>
+            <div id="statsBody"></div>
+            <button class="stats-close" id="statsClose">Закрыть</button>
         </div>
     </div>
 
@@ -983,29 +1062,35 @@
         const MAX_STARS = 7;
         let isResetInProgress = false;
         let waveStates = {};
+        let lastFrameTime = 0;
+        let isFirstOpen = true;
 
         // =================================================================
-        // 2. ЗВУКИ
+        // 2. ЗВУКИ (улучшенные)
         // =================================================================
         let audioCtx = null;
 
         function initAudio() {
-            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            if (!audioCtx) {
+                try { audioCtx = new(window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+            }
         }
 
-        function playTone(freq, duration, type = 'sine', volume = 0.04) {
+        function playTone(freq, duration, type = 'sine', volume = 0.04, delay = 0) {
             try {
                 initAudio();
+                if (!audioCtx) return;
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = type;
                 osc.frequency.value = freq;
-                gain.gain.setValueAtTime(volume * 0.5, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                const startTime = audioCtx.currentTime + delay;
+                gain.gain.setValueAtTime(volume * 0.5, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
+                osc.start(startTime);
+                osc.stop(startTime + duration);
             } catch (e) {}
         }
 
@@ -1016,21 +1101,19 @@
             setTimeout(() => playTone(1000, 0.06, 'sine', 0.03), 100);
         }
 
-        // Стеклянный перелив для добавления звезды
         function soundStarAdd() {
             playTone(1200, 0.1, 'sine', 0.05);
             setTimeout(() => playTone(1500, 0.08, 'sine', 0.04), 120);
             setTimeout(() => playTone(1800, 0.06, 'sine', 0.03), 240);
         }
 
-        // Хрустальный звон для удаления звезды
         function soundStarDelete() {
             playTone(2000, 0.08, 'sine', 0.06);
             setTimeout(() => playTone(1600, 0.06, 'sine', 0.05), 80);
             setTimeout(() => playTone(1200, 0.05, 'sine', 0.04), 160);
             setTimeout(() => playTone(800, 0.04, 'sine', 0.03), 240);
-            // Добавляем шумовой компонент (белый шум через осциллятор)
             try {
+                if (!audioCtx) return;
                 const bufferSize = audioCtx.sampleRate * 0.1;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
@@ -1051,12 +1134,25 @@
 
         function soundReset() { playTone(300, 0.4, 'sawtooth', 0.03); }
 
+        function soundOpenDay() {
+            playTone(500, 0.1, 'sine', 0.02);
+            setTimeout(() => playTone(700, 0.08, 'sine', 0.02), 100);
+        }
+
         // =================================================================
         // 3. РАБОТА С ДАННЫМИ
         // =================================================================
         function loadData() {
             try { const raw = localStorage.getItem('mood_diary_data');
                 if (raw) moodData = JSON.parse(raw); } catch (e) { moodData = {}; }
+            // Гарантируем поля
+            for (const key in moodData) {
+                if (!moodData[key].stateNotes) moodData[key].stateNotes = {};
+                if (!moodData[key].stars) moodData[key].stars = [];
+                if (!moodData[key].states) moodData[key].states = [];
+                if (moodData[key].mood === undefined) moodData[key].mood = 0;
+                if (moodData[key].note === undefined) moodData[key].note = '';
+            }
         }
 
         function saveData() {
@@ -1064,7 +1160,14 @@
         }
 
         function getDayData(dateStr) {
-            if (!moodData[dateStr]) moodData[dateStr] = { mood: 0, states: [], stars: [], note: '', stateNotes: {} };
+            if (!moodData[dateStr]) {
+                moodData[dateStr] = { mood: 0, states: [], stars: [], note: '', stateNotes: {} };
+            }
+            if (!moodData[dateStr].stateNotes) moodData[dateStr].stateNotes = {};
+            if (!moodData[dateStr].stars) moodData[dateStr].stars = [];
+            if (!moodData[dateStr].states) moodData[dateStr].states = [];
+            if (moodData[dateStr].mood === undefined) moodData[dateStr].mood = 0;
+            if (moodData[dateStr].note === undefined) moodData[dateStr].note = '';
             return moodData[dateStr];
         }
 
@@ -1093,6 +1196,35 @@
                     count++; }
             }
             return count > 0 ? (total / count).toFixed(1) : null;
+        }
+
+        function getStats() {
+            let totalMood = 0,
+                countMood = 0,
+                totalStars = 0,
+                stateCount = {};
+            const today = new Date();
+            const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+            const currentMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            for (let d = new Date(currentMonthStart); d <= currentMonthEnd; d.setDate(d.getDate() + 1)) {
+                const ds = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate())
+                    .padStart(2, '0');
+                const data = getDayData(ds);
+                if (data.mood > 0) { totalMood += data.mood;
+                    countMood++; }
+                totalStars += data.stars ? data.stars.length : 0;
+                if (data.states) {
+                    data.states.forEach(st => { stateCount[st] = (stateCount[st] || 0) + 1; });
+                }
+            }
+            const avgMood = countMood > 0 ? (totalMood / countMood).toFixed(1) : '—';
+            // Топ состояний
+            let topStates = Object.entries(stateCount).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            topStates = topStates.map(([id, count]) => {
+                const st = STATES.find(s => s.id === id);
+                return st ? `${st.label} (${count})` : id;
+            });
+            return { avgMood, totalStars, countDays: countMood, topStates: topStates.length ? topStates.join(', ') : 'нет' };
         }
 
         // =================================================================
@@ -1166,7 +1298,8 @@
                 dayEl.addEventListener('click', (function(ds) {
                     return function() {
                         if (!isFuture(ds)) { soundClick();
-                            openDay(ds); } else alert('Этот день ещё не наступил 😊');
+                            openDay(ds); } else { soundClick();
+                            alert('Этот день ещё не наступил 😊'); }
                     };
                 })(dateStr));
                 grid.appendChild(dayEl);
@@ -1197,6 +1330,7 @@
         // 6. ОТКРЫТЬ ДЕНЬ
         // =================================================================
         function openDay(dateStr) {
+            soundOpenDay();
             currentDateStr = dateStr;
             const data = getDayData(dateStr);
             selectedStates = data.states ? [...data.states] : [];
@@ -1243,6 +1377,8 @@
                 container.style.background = '#0a0a12';
                 container.style.boxShadow = 'none';
                 updateFlares(0);
+                // Сброс целевых амплитуд
+                STATES.forEach(st => setWaveTarget(st.id, false));
             }
 
             canvas = document.getElementById('waveCanvas');
@@ -1318,6 +1454,13 @@
 
         function goBackToMood() {
             soundClick();
+            // Сохраняем текущую заметку, если она есть
+            const note = document.getElementById('noteInput').value;
+            if (currentDateStr) {
+                const data = getDayData(currentDateStr);
+                data.note = note;
+                saveData();
+            }
             document.getElementById('bottomPanel').classList.remove('active');
             document.getElementById('backBtn').classList.remove('visible');
             document.getElementById('moodSelector').classList.add('active');
@@ -1392,10 +1535,16 @@
         }
 
         // =================================================================
-        // 10. АНИМАЦИЯ ВОЛН
+        // 10. АНИМАЦИЯ ВОЛН (оптимизирована)
         // =================================================================
-        function animateWaves() {
+        function animateWaves(timestamp) {
             if (!canvas || !ctx) return;
+            // Ограничение FPS
+            if (timestamp - lastFrameTime < 16) {
+                animationId = requestAnimationFrame(animateWaves);
+                return;
+            }
+            lastFrameTime = timestamp;
             const w = canvas.width,
                 h = canvas.height,
                 time = Date.now() / 1000;
@@ -1555,8 +1704,16 @@
         }
 
         // =================================================================
-        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ
+        // 11. ЗВЁЗДЫ — ДОБАВЛЕНИЕ (с проверкой на расстояние)
         // =================================================================
+        function isStarTooClose(x, y, minDist = 100) {
+            for (const star of stars) {
+                const dist = Math.sqrt((star.x - x) ** 2 + (star.y - y) ** 2);
+                if (dist < minDist) return true;
+            }
+            return false;
+        }
+
         function updateStarCounter() {
             document.getElementById('starCounter').textContent = `⭐ ${stars.length}`;
         }
@@ -1572,10 +1729,16 @@
             soundStarAdd();
             const data = getDayData(currentDateStr);
             if (!data.stars) data.stars = [];
+
+            let x, y, attempts = 0;
             const centerX = canvas.width / 2,
                 centerY = canvas.height * 0.2;
-            const x = centerX + (Math.random() - 0.5) * canvas.width * 0.6;
-            const y = centerY + (Math.random() - 0.5) * canvas.height * 0.15;
+            do {
+                x = centerX + (Math.random() - 0.5) * canvas.width * 0.6;
+                y = centerY + (Math.random() - 0.5) * canvas.height * 0.15;
+                attempts++;
+            } while (isStarTooClose(x, y, 80) && attempts < 50);
+
             const newStar = { x, y, note, date: currentDateStr };
             data.stars.push(newStar);
             stars = data.stars;
@@ -1589,7 +1752,6 @@
         });
 
         function createMagicAppearance(x, y) {
-            // Вспышка
             const flash = document.createElement('div');
             flash.style.cssText = `
                 position: fixed; left: ${x-60}px; top: ${y-60}px;
@@ -1602,7 +1764,6 @@
             document.body.appendChild(flash);
             setTimeout(() => flash.remove(), 900);
 
-            // Искры
             for (let i = 0; i < 30; i++) {
                 const spark = document.createElement('div');
                 const angle = Math.random() * Math.PI * 2;
@@ -1642,7 +1803,7 @@
         document.head.appendChild(styleFlash);
 
         // =================================================================
-        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ (ХРУСТАЛЬНЫЙ ВЗРЫВ)
+        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ (с визуальным фидбеком)
         // =================================================================
         function deleteStar(star) {
             soundStarDelete();
@@ -1675,7 +1836,6 @@
                 setTimeout(() => particle.remove(), 900);
             }
 
-            // Удаляем звезду из данных
             const data = getDayData(currentDateStr);
             data.stars = data.stars.filter(s => s.x !== star.x || s.y !== star.y);
             stars = data.stars;
@@ -1683,13 +1843,26 @@
             updateStarCounter();
             renderCalendar();
             longPressTarget = null;
+            // Удаляем кольцо
+            document.querySelectorAll('.long-press-ring').forEach(el => el.remove());
         }
 
         // =================================================================
-        // 13. ДОЛГОЕ НАЖАТИЕ ДЛЯ УДАЛЕНИЯ ЗВЕЗДЫ
+        // 13. ДОЛГОЕ НАЖАТИЕ ДЛЯ УДАЛЕНИЯ ЗВЕЗДЫ (с кольцом)
         // =================================================================
         let longPressTimer = null,
             longPressTarget = null;
+
+        function showLongPressRing(x, y) {
+            const ring = document.createElement('div');
+            ring.className = 'long-press-ring';
+            ring.style.left = (x - 30) + 'px';
+            ring.style.top = (y - 30) + 'px';
+            ring.style.width = '60px';
+            ring.style.height = '60px';
+            document.body.appendChild(ring);
+            setTimeout(() => ring.remove(), 1000);
+        }
 
         document.addEventListener('mousedown', function(e) {
             if (e.target.id !== 'waveCanvas') return;
@@ -1702,6 +1875,7 @@
             }
             if (found) {
                 longPressTarget = found;
+                showLongPressRing(e.clientX, e.clientY);
                 longPressTimer = setTimeout(() => deleteStar(found), 800);
             }
         });
@@ -1709,6 +1883,7 @@
             if (longPressTimer) { clearTimeout(longPressTimer);
                 longPressTimer = null; }
             longPressTarget = null;
+            document.querySelectorAll('.long-press-ring').forEach(el => el.remove());
         });
         document.addEventListener('touchstart', function(e) {
             const touch = e.touches[0];
@@ -1721,6 +1896,7 @@
             }
             if (found) {
                 longPressTarget = found;
+                showLongPressRing(touch.clientX, touch.clientY);
                 longPressTimer = setTimeout(() => deleteStar(found), 800);
             }
         });
@@ -1728,10 +1904,11 @@
             if (longPressTimer) { clearTimeout(longPressTimer);
                 longPressTimer = null; }
             longPressTarget = null;
+            document.querySelectorAll('.long-press-ring').forEach(el => el.remove());
         });
 
         // =================================================================
-        // 14. РЕДАКТОР ЗАМЕТОК (КЛИК ПО ВОЛНЕ)
+        // 14. РЕДАКТОР ЗАМЕТОК
         // =================================================================
         let editingTarget = null,
             editingType = null,
@@ -1790,8 +1967,8 @@
                 const st = STATES.find(s => s.id === stateId);
                 if (st) {
                     title.textContent = `🌊 ${st.label}`;
-                    const data = getDayData(currentDateStr);
-                    textarea.value = data.stateNotes?.[stateId] || '';
+                    const dayData = getDayData(currentDateStr);
+                    textarea.value = dayData.stateNotes?.[stateId] || '';
                     content.style.setProperty('--wave-color', st.color);
                     content.style.setProperty('--wave-glow', `${st.color}33`);
                     content.classList.add('wave-color');
@@ -1920,6 +2097,13 @@
         // 16. ЗАКРЫТИЕ ХОЛСТА, НАВИГАЦИЯ
         // =================================================================
         document.getElementById('closeWaves').addEventListener('click', function() {
+            // Сохраняем заметку
+            if (currentDateStr) {
+                const note = document.getElementById('noteInput').value;
+                const data = getDayData(currentDateStr);
+                data.note = note;
+                saveData();
+            }
             const container = document.getElementById('waveContainer');
             container.classList.remove('active');
             document.getElementById('moodSelector').classList.remove('active');
@@ -1930,20 +2114,65 @@
         });
 
         document.getElementById('prevMonth').addEventListener('click', function() {
+            soundClick();
             currentMonth--;
             if (currentMonth < 0) { currentMonth = 11;
                 currentYear--; }
             renderCalendar();
         });
         document.getElementById('nextMonth').addEventListener('click', function() {
+            soundClick();
             currentMonth++;
             if (currentMonth > 11) { currentMonth = 0;
                 currentYear++; }
             renderCalendar();
         });
+        document.getElementById('todayBtn').addEventListener('click', function() {
+            soundClick();
+            const today = new Date();
+            currentMonth = today.getMonth();
+            currentYear = today.getFullYear();
+            renderCalendar();
+        });
 
         // =================================================================
-        // 17. ИНСТРУКЦИЯ
+        // 17. СТАТИСТИКА
+        // =================================================================
+        document.getElementById('statsBtn').addEventListener('click', function() {
+            const stats = getStats();
+            const body = document.getElementById('statsBody');
+            body.innerHTML = `
+                <div class="stat-item"><span class="stat-label">Средняя оценка за месяц</span><span class="stat-value">${stats.avgMood}</span></div>
+                <div class="stat-item"><span class="stat-label">Всего звёзд</span><span class="stat-value">${stats.totalStars}</span></div>
+                <div class="stat-item"><span class="stat-label">Дней с оценкой</span><span class="stat-value">${stats.countDays}</span></div>
+                <div class="stat-item"><span class="stat-label">Топ состояний</span><span class="stat-value">${stats.topStates}</span></div>
+            `;
+            document.getElementById('statsModal').classList.add('active');
+        });
+        document.getElementById('statsClose').addEventListener('click', function() {
+            document.getElementById('statsModal').classList.remove('active');
+        });
+        document.getElementById('statsModal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('active');
+        });
+
+        // =================================================================
+        // 18. ЭКСПОРТ/ИМПОРТ
+        // =================================================================
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            const dataStr = JSON.stringify(moodData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `дневник_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            soundClick();
+        });
+
+        // =================================================================
+        // 19. ИНСТРУКЦИЯ
         // =================================================================
         document.getElementById('helpBtn').addEventListener('click', function() {
             document.getElementById('helpModal').classList.add('active');
@@ -1956,10 +2185,18 @@
         });
 
         // =================================================================
-        // 18. ИНИЦИАЛИЗАЦИЯ
+        // 20. ИНИЦИАЛИЗАЦИЯ
         // =================================================================
         loadData();
         renderCalendar();
+
+        // Показываем подсказку при первом открытии
+        if (!localStorage.getItem('hasSeenTutorial')) {
+            setTimeout(() => {
+                document.getElementById('helpModal').classList.add('active');
+                localStorage.setItem('hasSeenTutorial', 'true');
+            }, 800);
+        }
 
         window.addEventListener('resize', function() {
             if (canvas) resizeCanvas();
