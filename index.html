@@ -2345,11 +2345,6 @@
         renderCalendar();
         initBgCanvas();
 
-        // ЗАПУСКАЕМ ПЕСНЮ ПРИ ЗАГРУЗКЕ
-        setTimeout(() => {
-            playMainAmbient();
-        }, 500);
-
         // Попытка запустить музыку при клике (для обхода автоблокировки)
         document.addEventListener('click', function playOnClick() {
             if (!isAmbientPlaying) {
