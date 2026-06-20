@@ -6,8 +6,6 @@
     <title>Природный дневник</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* ===== ВСЕ СТИЛИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ ===== */
-        /* (CSS полностью скопирован из предыдущей версии, здесь он не приведён для экономии места) */
         * {
             margin: 0;
             padding: 0;
@@ -936,7 +934,7 @@
         let waveStates = {};
 
         // =================================================================
-        // 2. ЗВУКИ — ПРИРОДНЫЕ, НЕЖНЫЕ
+        // 2. ЗВУКИ — ПОЛНОСТЬЮ ПЕРЕРАБОТАНЫ
         // =================================================================
         let audioCtx = null;
         let ambientNodes = [];
@@ -953,13 +951,13 @@
             ambientNodes = [];
             ambientGainNode = null;
             if (ambientInterval) {
-                clearInterval(ambientInterval);
+                clearTimeout(ambientInterval);
                 ambientInterval = null;
             }
             isAmbientPlaying = false;
         }
 
-        // ===== ОСНОВНОЙ ФОН (ВЕТЕР В ПОЛЕ) =====
+        // ===== ОСНОВНОЙ ФОН ДЛЯ КАЛЕНДАРЯ (ВЕТЕР + КОЛОКОЛЬЧИКИ) =====
         function playMainAmbient() {
             if (isAmbientPlaying) return;
             try {
@@ -967,7 +965,7 @@
                 const now = audioCtx.currentTime;
                 isAmbientPlaying = true;
 
-                // Шум ветра через буфер
+                // Шум ветра (через буфер)
                 const bufferSize = audioCtx.sampleRate * 5;
                 const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
@@ -983,7 +981,7 @@
 
                 ambientGainNode = audioCtx.createGain();
                 ambientGainNode.gain.setValueAtTime(0.04, now);
-                ambientGainNode.gain.exponentialRampToValueAtTime(0.035, now + 2);
+                ambientGainNode.gain.exponentialRampToValueAtTime(0.03, now + 2);
 
                 noise.connect(ambientGainNode);
                 ambientGainNode.connect(audioCtx.destination);
@@ -991,25 +989,25 @@
                 noise.stop(now + 30);
                 ambientNodes.push(noise);
 
-                // Лёгкие переливы (как дальние колокольчики)
-                const notes = [200, 230, 180, 210];
+                // Далекие колокольчики
+                const notes = [200, 230, 180, 210, 190];
                 notes.forEach((freq, i) => {
                     const osc = audioCtx.createOscillator();
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, now + i * 0.8 + 0.5);
-                    osc.frequency.exponentialRampToValueAtTime(freq * 1.01, now + i * 0.8 + 1.5);
+                    osc.frequency.setValueAtTime(freq, now + i * 0.7 + 0.3);
+                    osc.frequency.exponentialRampToValueAtTime(freq * 1.01, now + i * 0.7 + 1.2);
                     const g = audioCtx.createGain();
-                    g.gain.setValueAtTime(0.008, now + i * 0.8 + 0.5);
-                    g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.8 + 1.5);
+                    g.gain.setValueAtTime(0.008, now + i * 0.7 + 0.3);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.7 + 1.2);
                     osc.connect(g);
                     g.connect(audioCtx.destination);
-                    osc.start(now + i * 0.8 + 0.5);
-                    osc.stop(now + i * 0.8 + 1.5);
+                    osc.start(now + i * 0.7 + 0.3);
+                    osc.stop(now + i * 0.7 + 1.2);
                     ambientNodes.push(osc);
                     ambientNodes.push(g);
                 });
 
-                // Повтор
+                // Повтор через 25 секунд
                 ambientInterval = setTimeout(() => {
                     if (isAmbientPlaying) playMainAmbient();
                 }, 25000);
@@ -1031,19 +1029,19 @@
                 switch (type) {
                     case 1:
                         baseAmp = 0.12;
-                        break; // Дождь
+                        break;
                     case 2:
                         baseAmp = 0.06;
-                        break; // Лёгкий дождь
+                        break;
                     case 3:
                         baseAmp = 0.04;
-                        break; // Листва
+                        break;
                     case 4:
                         baseAmp = 0.03;
-                        break; // Птицы
+                        break;
                     case 5:
                         baseAmp = 0.04;
-                        break; // Море
+                        break;
                     default:
                         baseAmp = 0.05;
                 }
@@ -1140,13 +1138,13 @@
             }
         }
 
-        // ===== ЗВУКИ ЗВЁЗД (НЕЖНЫЕ, ПРИРОДНЫЕ) =====
+        // ===== ЗВУКИ ЗВЁЗД =====
         function playStarSound(type) {
             initAudio();
             try {
                 const now = audioCtx.currentTime;
                 if (type === 'add') {
-                    // Капля воды, падающая в воду
+                    // Капля воды
                     const osc = audioCtx.createOscillator();
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(800, now);
@@ -1161,7 +1159,6 @@
                     ambientNodes.push(osc);
                     ambientNodes.push(gain);
 
-                    // Лёгкое эхо
                     setTimeout(() => {
                         const osc2 = audioCtx.createOscillator();
                         osc2.type = 'sine';
@@ -1193,7 +1190,6 @@
                     ambientNodes.push(osc);
                     ambientNodes.push(gain);
 
-                    // Лёгкий шум (исчезновение)
                     const bufferSize = audioCtx.sampleRate * 0.05;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
@@ -2030,7 +2026,6 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
-            // Звёзды
             stars.forEach((star, idx) => {
                 const floatOffset = star.floatPhase || 0;
                 const floatY = Math.sin(time * 0.4 + floatOffset) * 12;
