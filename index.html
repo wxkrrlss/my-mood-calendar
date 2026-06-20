@@ -268,21 +268,22 @@
             transform: none;
             background: transparent !important;
         }
+        /* ЧЕРНО-БЕЛАЯ ШКАЛА ДЛЯ КАЛЕНДАРЯ */
         .day.mood-1 { background: #0a0a0a;
             color: #e8e8f0;
             border-color: #1a1a1a; }
-        .day.mood-2 { background: #1a2a4a;
-            color: #e0e0f0;
-            border-color: #2a3a5a; }
-        .day.mood-3 { background: #d4c98a;
-            color: #1a1a0a;
-            border-color: #e0d5a0; }
-        .day.mood-4 { background: #2a1520;
-            color: #f0e0e8;
-            border-color: #3a1a2a; }
-        .day.mood-5 { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 25%, #fad0c4 50%, #a18cd1 75%, #fbc2eb 100%);
-            color: #1a1a2a;
-            border-color: #e0e8f0; }
+        .day.mood-2 { background: #2a2a2a;
+            color: #e0e0e0;
+            border-color: #3a3a3a; }
+        .day.mood-3 { background: #5a5a5a;
+            color: #f0f0f0;
+            border-color: #6a6a6a; }
+        .day.mood-4 { background: #9a9a9a;
+            color: #1a1a1a;
+            border-color: #aaaaaa; }
+        .day.mood-5 { background: #d0d0d0;
+            color: #1a1a1a;
+            border-color: #e0e0e0; }
         .day.today {
             border-color: #7a9eff;
             border-width: 2px;
@@ -1073,11 +1074,9 @@
 
     <!-- ===== ХОЛСТ ===== -->
     <div id="waveContainer">
-
-        <!-- ТУМАН ДЛЯ СБРОСА -->
         <div class="fog-overlay" id="fogOverlay"></div>
 
-        <!-- ===== БЛИКИ (БОЛЬШИЕ, ЯРКИЕ) ===== -->
+        <!-- БЛИКИ -->
         <div class="lens-flare" id="flare1" style="top:2%;left:2%;width:600px;height:600px;background:radial-gradient(circle,rgba(100,180,255,0.5),transparent 70%);animation-delay:0s;"></div>
         <div class="lens-flare" id="flare2" style="bottom:5%;right:3%;width:550px;height:550px;background:radial-gradient(circle,rgba(200,150,255,0.4),transparent 70%);animation-delay:3s;"></div>
         <div class="lens-flare" id="flare3" style="top:30%;left:55%;width:500px;height:500px;background:radial-gradient(circle,rgba(255,200,150,0.4),transparent 70%);animation-delay:6s;"></div>
@@ -1087,7 +1086,7 @@
         <div class="lens-flare" id="flare7" style="bottom:20%;left:30%;width:500px;height:500px;background:radial-gradient(circle,rgba(255,220,180,0.3),transparent 70%);animation-delay:2.5s;"></div>
         <div class="lens-flare" id="flare8" style="top:45%;right:25%;width:470px;height:470px;background:radial-gradient(circle,rgba(200,200,255,0.3),transparent 70%);animation-delay:5.5s;"></div>
 
-        <!-- ===== МЕРЦАЮЩИЕ ТОЧКИ (20 ШТУК) ===== -->
+        <!-- МЕРЦАЮЩИЕ ТОЧКИ -->
         <div class="bg-sparkle" id="sparkle1" style="top:5%;left:10%;width:6px;height:6px;background:radial-gradient(circle,rgba(255,255,255,0.8),transparent);animation-delay:0s;"></div>
         <div class="bg-sparkle" id="sparkle2" style="top:8%;right:15%;width:4px;height:4px;background:radial-gradient(circle,rgba(255,255,255,0.6),transparent);animation-delay:0.3s;"></div>
         <div class="bg-sparkle" id="sparkle3" style="top:18%;left:25%;width:5px;height:5px;background:radial-gradient(circle,rgba(255,255,255,0.7),transparent);animation-delay:0.6s;"></div>
@@ -1189,7 +1188,7 @@
             { id: 'комфорт', label: '🌿 Комфорт', color: '#2ed573' }
         ];
 
-        // ЦВЕТА ОЦЕНОК (3 — светло-жёлтый, 5 — радужный)
+        // ЦВЕТА ОЦЕНОК ДЛЯ ХОЛСТА
         const MOOD_COLORS = {
             1: { bg: '#0a0a2a', glow: 'rgba(5,10,50,0.95)' },
             2: { bg: '#1a2a4a', glow: 'rgba(30,60,120,0.8)' },
@@ -1431,7 +1430,7 @@
         }
 
         // ===================================================================
-        // ОТКРЫТЬ ДЕНЬ
+        // ОТКРЫТЬ ДЕНЬ (БЕЗ МЕЛЬКАНИЯ)
         // ===================================================================
 
         function openDay(dateStr) {
@@ -1450,22 +1449,26 @@
             ];
             document.getElementById('waveDate').textContent = `${parts[2]} ${months[parts[1]-1]} ${parts[0]}`;
 
-            document.getElementById('backBtn').classList.remove('visible');
-
-            const selector = document.getElementById('moodSelector');
-            selector.classList.add('active');
-            document.getElementById('bottomPanel').classList.remove('active');
-            document.getElementById('noteInput').value = data.note || '';
-
-            document.querySelectorAll('.mood-select-btn').forEach(btn => {
-                btn.classList.toggle('selected', parseInt(btn.dataset.mood) === selectedMood);
-            });
-            document.getElementById('moodConfirmBtn').disabled = selectedMood === 0;
-
+            // Если есть оценка — сразу показываем дополнения, иначе — выбор оценки
             if (selectedMood > 0) {
+                // Сразу показываем дополнения
                 applyMoodGlow(selectedMood);
-                setTimeout(() => showAdditions(), 400);
+                document.getElementById('moodSelector').classList.remove('active');
+                document.getElementById('backBtn').classList.add('visible');
+                document.getElementById('bottomPanel').classList.add('active');
+                document.getElementById('noteInput').value = data.note || '';
+                buildEmotionPanel();
+                updateStarCounter();
             } else {
+                // Показываем выбор оценки
+                document.getElementById('moodSelector').classList.add('active');
+                document.getElementById('bottomPanel').classList.remove('active');
+                document.getElementById('backBtn').classList.remove('visible');
+                document.getElementById('noteInput').value = data.note || '';
+                document.querySelectorAll('.mood-select-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                document.getElementById('moodConfirmBtn').disabled = true;
                 container.style.background = '#1a1a24';
                 container.style.boxShadow = 'none';
                 updateFlares(0);
@@ -1499,14 +1502,7 @@
             updateFlares(mood);
         }
 
-        // ===================================================================
-        // ПОКАЗ ДОПОЛНЕНИЙ
-        // ===================================================================
-
-        function showAdditions() {
-            document.getElementById('moodSelector').classList.remove('active');
-            document.getElementById('backBtn').classList.add('visible');
-
+        function buildEmotionPanel() {
             const panel = document.getElementById('emotionPanel');
             panel.innerHTML = '';
             EMOTIONS.forEach(em => {
@@ -1519,9 +1515,23 @@
                 btn.addEventListener('click', () => toggleEmotion(em.id, btn));
                 panel.appendChild(btn);
             });
+        }
+
+        // ===================================================================
+        // ПОКАЗ ДОПОЛНЕНИЙ ПОСЛЕ ВЫБОРА ОЦЕНКИ
+        // ===================================================================
+
+        function showAdditions() {
+            document.getElementById('moodSelector').classList.remove('active');
+            document.getElementById('backBtn').classList.add('visible');
+            buildEmotionPanel();
             document.getElementById('bottomPanel').classList.add('active');
             updateStarCounter();
         }
+
+        // ===================================================================
+        // ВОЗВРАТ К ВЫБОРУ ОЦЕНКИ
+        // ===================================================================
 
         function goBackToMood() {
             document.getElementById('bottomPanel').classList.remove('active');
@@ -1551,7 +1561,13 @@
 
         function getWaveState(emotionId) {
             if (!waveStates[emotionId]) {
-                waveStates[emotionId] = { currentAmp: 0, targetAmp: 0, currentAlpha: 0, targetAlpha: 0 };
+                waveStates[emotionId] = {
+                    currentAmp: 0,
+                    targetAmp: 0,
+                    currentAlpha: 0,
+                    targetAlpha: 0,
+                    offset: (Math.random() - 0.5) * 120 // рандомный разброс от -60 до +60
+                };
             }
             return waveStates[emotionId];
         }
@@ -1559,7 +1575,7 @@
         function setWaveTarget(emotionId, active) {
             const state = getWaveState(emotionId);
             if (active) {
-                state.targetAmp = 45 + Math.random() * 10;
+                state.targetAmp = 30 + Math.random() * 8; // уменьшенная амплитуда
                 state.targetAlpha = 0.6 + Math.random() * 0.2;
             } else {
                 state.targetAmp = 0;
@@ -1568,7 +1584,7 @@
         }
 
         // ===================================================================
-        // АНИМАЦИЯ ВОЛН (С РАЗБРОСОМ, ВЫШЕ ЦЕНТРА)
+        // АНИМАЦИЯ ВОЛН (РАНДОМНЫЙ РАЗБРОС, МЕНЬШАЯ АМПЛИТУДА)
         // ===================================================================
 
         function animateWaves() {
@@ -1599,7 +1615,7 @@
                 ctx.fillRect(0, 0, w, h);
             }
 
-            // Волны с разбросом, выше центра
+            // Волны с рандомным разбросом, выше центра
             let hasActiveWaves = false;
             EMOTIONS.forEach((em, index) => {
                 const state = waveStates[em.id];
@@ -1615,78 +1631,77 @@
                 hasActiveWaves = true;
 
                 const color = em.color;
-                // Разброс: одни выше, другие ниже (но не сильно)
-                const offset = (index - (EMOTIONS.length - 1) / 2) * 10;
-                // Смещаем центр волн выше (h * 0.4 вместо h * 0.5)
+                const offset = state.offset || 0; // используем сохранённый рандомный разброс
+                // Смещаем центр волн выше (h * 0.4)
                 const centerY = h * 0.4;
-                const baseAmp = currentAmp + Math.sin(time * 0.3 + index * 1.3) * 12;
-                const freq = 0.02 + index * 0.004;
-                const speed = 1.2 + index * 0.15;
+                // Уменьшенная частота
+                const freq = 0.015 + index * 0.003;
+                const speed = 1.0 + index * 0.1;
 
                 // Слой 1
                 ctx.beginPath();
                 ctx.moveTo(0, centerY + offset);
                 for (let x = 0; x <= w; x += 2) {
                     const y = centerY + offset +
-                        Math.sin(x * freq + time * speed + index * 1.1) * baseAmp +
-                        Math.sin(x * freq * 0.5 + time * 0.8 + index * 2.5) * baseAmp * 0.5 +
-                        Math.sin(x * freq * 2.2 + time * 2.5 + index * 0.5) * baseAmp * 0.3 +
-                        Math.sin(x * freq * 0.3 + time * 0.4 + index * 3.5) * baseAmp * 0.15;
+                        Math.sin(x * freq + time * speed + index * 1.1) * currentAmp +
+                        Math.sin(x * freq * 0.5 + time * 0.8 + index * 2.5) * currentAmp * 0.5 +
+                        Math.sin(x * freq * 2.2 + time * 2.5 + index * 0.5) * currentAmp * 0.3 +
+                        Math.sin(x * freq * 0.3 + time * 0.4 + index * 3.5) * currentAmp * 0.15;
                     ctx.lineTo(x, y);
                 }
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 4.0 + Math.sin(time * 0.3 + index) * 1.0;
+                ctx.lineWidth = 3.0 + Math.sin(time * 0.3 + index) * 0.8;
                 ctx.globalAlpha = currentAlpha * (0.6 + Math.sin(time * 0.4 + index * 1.0) * 0.15);
-                ctx.shadowBlur = 50;
+                ctx.shadowBlur = 40;
                 ctx.shadowColor = color;
                 ctx.stroke();
 
                 // Слой 2
                 ctx.beginPath();
-                ctx.moveTo(0, centerY + offset + 20 + Math.sin(time * 0.2 + index) * 10);
+                ctx.moveTo(0, centerY + offset + 18 + Math.sin(time * 0.2 + index) * 8);
                 for (let x = 0; x <= w; x += 3) {
-                    const y = centerY + offset + 20 + Math.sin(time * 0.2 + index) * 10 +
-                        Math.sin(x * freq * 0.6 + time * 1.0 + index * 1.8) * baseAmp * 0.7 +
-                        Math.sin(x * freq * 0.4 + time * 0.6 + index * 2.8) * baseAmp * 0.4 +
-                        Math.sin(x * freq * 1.5 + time * 1.8 + index * 0.7) * baseAmp * 0.2;
+                    const y = centerY + offset + 18 + Math.sin(time * 0.2 + index) * 8 +
+                        Math.sin(x * freq * 0.6 + time * 1.0 + index * 1.8) * currentAmp * 0.7 +
+                        Math.sin(x * freq * 0.4 + time * 0.6 + index * 2.8) * currentAmp * 0.4 +
+                        Math.sin(x * freq * 1.5 + time * 1.8 + index * 0.7) * currentAmp * 0.2;
                     ctx.lineTo(x, y);
                 }
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 2.5;
+                ctx.lineWidth = 2.0;
                 ctx.globalAlpha = currentAlpha * 0.25;
-                ctx.shadowBlur = 30;
+                ctx.shadowBlur = 25;
                 ctx.shadowColor = color;
                 ctx.stroke();
 
                 // Слой 3
                 ctx.beginPath();
-                ctx.moveTo(0, centerY + offset - 15 + Math.sin(time * 0.2 + index * 0.6) * 8);
+                ctx.moveTo(0, centerY + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6);
                 for (let x = 0; x <= w; x += 4) {
-                    const y = centerY + offset - 15 + Math.sin(time * 0.2 + index * 0.6) * 8 +
-                        Math.sin(x * freq * 0.4 + time * 0.6 + index * 1.5) * baseAmp * 0.4 +
-                        Math.sin(x * freq * 0.2 + time * 0.3 + index * 2.5) * baseAmp * 0.15;
+                    const y = centerY + offset - 12 + Math.sin(time * 0.2 + index * 0.6) * 6 +
+                        Math.sin(x * freq * 0.4 + time * 0.6 + index * 1.5) * currentAmp * 0.4 +
+                        Math.sin(x * freq * 0.2 + time * 0.3 + index * 2.5) * currentAmp * 0.15;
                     ctx.lineTo(x, y);
                 }
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 1.5;
+                ctx.lineWidth = 1.2;
                 ctx.globalAlpha = currentAlpha * 0.12;
-                ctx.shadowBlur = 20;
+                ctx.shadowBlur = 15;
                 ctx.shadowColor = color;
                 ctx.stroke();
 
                 // Слой 4
                 ctx.beginPath();
-                ctx.moveTo(0, centerY + offset + 35 + Math.sin(time * 0.15 + index * 0.5) * 12);
+                ctx.moveTo(0, centerY + offset + 30 + Math.sin(time * 0.15 + index * 0.5) * 10);
                 for (let x = 0; x <= w; x += 4) {
-                    const y = centerY + offset + 35 + Math.sin(time * 0.15 + index * 0.5) * 12 +
-                        Math.sin(x * freq * 0.5 + time * 0.7 + index * 1.2) * baseAmp * 0.3 +
-                        Math.sin(x * freq * 0.3 + time * 0.4 + index * 2.2) * baseAmp * 0.1;
+                    const y = centerY + offset + 30 + Math.sin(time * 0.15 + index * 0.5) * 10 +
+                        Math.sin(x * freq * 0.5 + time * 0.7 + index * 1.2) * currentAmp * 0.3 +
+                        Math.sin(x * freq * 0.3 + time * 0.4 + index * 2.2) * currentAmp * 0.1;
                     ctx.lineTo(x, y);
                 }
                 ctx.strokeStyle = color;
-                ctx.lineWidth = 1.0;
+                ctx.lineWidth = 0.8;
                 ctx.globalAlpha = currentAlpha * 0.06;
-                ctx.shadowBlur = 15;
+                ctx.shadowBlur = 10;
                 ctx.shadowColor = color;
                 ctx.stroke();
             });
@@ -1796,7 +1811,7 @@
                 saveData();
                 applyMoodGlow(selectedMood);
                 renderCalendar();
-                setTimeout(() => showAdditions(), 400);
+                showAdditions();
             }
         });
 
