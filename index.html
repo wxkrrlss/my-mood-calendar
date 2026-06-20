@@ -951,12 +951,11 @@
         }
 
 // =================================================================
-        // ЗВУКИ — ПОЛНАЯ ПЕРЕРАБОТКА
+        // 2. ЗВУКИ — ПОЛНАЯ ВЕРСИЯ
         // =================================================================
-        
+
         // ===== ОСНОВНОЙ ФОН (МЕЛАНХОЛИЧНАЯ МЕЛОДИЯ) =====
         function playMainAmbient() {
-            console.log('🎵 НОВАЯ МЕЛОДИЯ ЗАПУЩЕНА!');
             if (isAmbientPlaying) return;
             try {
                 initAudio();
@@ -984,27 +983,27 @@
                 ambientNodes.push(noise);
                 ambientNodes.push(gainNoise);
 
-                // Меланхоличная мелодия (по нотам)
+                // Меланхоличная мелодия
                 const melody = [
-                    { note: 261, duration: 0.8, delay: 0.0 },
-                    { note: 329, duration: 0.8, delay: 0.8 },
-                    { note: 392, duration: 0.8, delay: 1.6 },
-                    { note: 440, duration: 1.2, delay: 2.4 },
-                    { note: 392, duration: 0.8, delay: 3.6 },
-                    { note: 329, duration: 1.0, delay: 4.4 },
-                    { note: 261, duration: 1.5, delay: 5.4 },
-                    { note: 392, duration: 0.8, delay: 7.0 },
-                    { note: 493, duration: 0.8, delay: 7.8 },
-                    { note: 440, duration: 0.8, delay: 8.6 },
-                    { note: 329, duration: 1.2, delay: 9.4 },
-                    { note: 261, duration: 1.5, delay: 10.6 },
-                    { note: 493, duration: 0.8, delay: 12.2 },
-                    { note: 587, duration: 0.8, delay: 13.0 },
-                    { note: 493, duration: 0.8, delay: 13.8 },
-                    { note: 440, duration: 1.2, delay: 14.6 },
-                    { note: 392, duration: 1.0, delay: 15.8 },
-                    { note: 329, duration: 1.5, delay: 16.8 },
-                    { note: 261, duration: 2.0, delay: 18.3 },
+                    { note: 261.63, duration: 0.8, delay: 0.0 },
+                    { note: 329.63, duration: 0.8, delay: 0.8 },
+                    { note: 392.00, duration: 0.8, delay: 1.6 },
+                    { note: 440.00, duration: 1.2, delay: 2.4 },
+                    { note: 392.00, duration: 0.8, delay: 3.6 },
+                    { note: 329.63, duration: 1.0, delay: 4.4 },
+                    { note: 261.63, duration: 1.5, delay: 5.4 },
+                    { note: 392.00, duration: 0.8, delay: 7.0 },
+                    { note: 493.88, duration: 0.8, delay: 7.8 },
+                    { note: 440.00, duration: 0.8, delay: 8.6 },
+                    { note: 329.63, duration: 1.2, delay: 9.4 },
+                    { note: 261.63, duration: 1.5, delay: 10.6 },
+                    { note: 493.88, duration: 0.8, delay: 12.2 },
+                    { note: 587.33, duration: 0.8, delay: 13.0 },
+                    { note: 493.88, duration: 0.8, delay: 13.8 },
+                    { note: 440.00, duration: 1.2, delay: 14.6 },
+                    { note: 392.00, duration: 1.0, delay: 15.8 },
+                    { note: 329.63, duration: 1.5, delay: 16.8 },
+                    { note: 261.63, duration: 2.0, delay: 18.3 },
                 ];
 
                 melody.forEach((noteData) => {
@@ -1017,8 +1016,8 @@
                     );
                     const gain = audioCtx.createGain();
                     gain.gain.setValueAtTime(0.001, now + noteData.delay);
-                    gain.gain.exponentialRampToValueAtTime(0.025, now + noteData.delay + 0.1);
-                    gain.gain.exponentialRampToValueAtTime(0.025, now + noteData.delay + noteData.duration * 0.7);
+                    gain.gain.exponentialRampToValueAtTime(0.02, now + noteData.delay + 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.02, now + noteData.delay + noteData.duration * 0.7);
                     gain.gain.exponentialRampToValueAtTime(0.001, now + noteData.delay + noteData.duration);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
@@ -1027,18 +1026,17 @@
                     ambientNodes.push(osc);
                     ambientNodes.push(gain);
 
-                    // Лёгкое эхо
                     if (Math.random() > 0.6) {
                         const oscEcho = audioCtx.createOscillator();
                         oscEcho.type = 'sine';
-                        oscEcho.frequency.setValueAtTime(noteData.note * 2, now + noteData.delay + 0.05);
+                        oscEcho.frequency.setValueAtTime(noteData.note * 1.5, now + noteData.delay + 0.05);
                         oscEcho.frequency.exponentialRampToValueAtTime(
-                            noteData.note * 2 * (1 + Math.random() * 0.005),
+                            noteData.note * 1.5 * (1 + Math.random() * 0.005),
                             now + noteData.delay + 0.05 + noteData.duration * 0.1
                         );
                         const gainEcho = audioCtx.createGain();
                         gainEcho.gain.setValueAtTime(0.001, now + noteData.delay + 0.05);
-                        gainEcho.gain.exponentialRampToValueAtTime(0.008, now + noteData.delay + 0.15);
+                        gainEcho.gain.exponentialRampToValueAtTime(0.006, now + noteData.delay + 0.15);
                         gainEcho.gain.exponentialRampToValueAtTime(0.001, now + noteData.delay + 0.05 + noteData.duration);
                         oscEcho.connect(gainEcho);
                         gainEcho.connect(audioCtx.destination);
@@ -1056,76 +1054,55 @@
             } catch (e) {}
         }
 
-        // ===== ФОНОВЫЕ ЗВУКИ ДЛЯ ОЦЕНОК (РЕАЛИСТИЧНЫЕ) =====
+        // ===== ФОНОВЫЕ ЗВУКИ ДЛЯ ОЦЕНОК =====
         function createMoodSound(type) {
-            console.log('🔊 НОВЫЙ ЗВУК ФОНА ЗАПУЩЕН!', type);
             stopAllSounds();
             initAudio();
             try {
                 const now = audioCtx.currentTime;
 
-                // 1. ДОЖДЬ
                 if (type === 1) {
                     const bufferSize = audioCtx.sampleRate * 5;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
                         const t = i / audioCtx.sampleRate;
-                        let val = (Math.random() * 2 - 1) * 0.12 * (0.8 + 0.2 * Math.sin(t * 0.3));
-                        if (Math.random() < 0.002) val += (Math.random() * 2 - 1) * 0.15;
-                        val += Math.sin(t * 0.05) * 0.01;
+                        let val = (Math.random() * 2 - 1) * 0.10 * (0.7 + 0.3 * Math.sin(t * 0.5));
+                        if (Math.random() < 0.001) val += (Math.random() * 2 - 1) * 0.12;
                         data[i] = val;
                     }
                     const noise = audioCtx.createBufferSource();
                     noise.buffer = buffer;
                     noise.loop = true;
                     const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.08, now);
-                    gain.gain.exponentialRampToValueAtTime(0.06, now + 1);
+                    gain.gain.setValueAtTime(0.06, now);
+                    gain.gain.exponentialRampToValueAtTime(0.04, now + 1);
                     noise.connect(gain);
                     gain.connect(audioCtx.destination);
                     noise.start(now);
                     noise.stop(now + 25);
                     ambientNodes.push(noise);
                     ambientNodes.push(gain);
-
-                    // Гром
-                    for (let i = 0; i < 3; i++) {
-                        const osc = audioCtx.createOscillator();
-                        osc.type = 'sawtooth';
-                        osc.frequency.setValueAtTime(50 + i * 15, now + i * 2.5 + 1);
-                        osc.frequency.exponentialRampToValueAtTime(30 + i * 10, now + i * 2.5 + 2.5);
-                        const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.03, now + i * 2.5 + 1);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 2.5 + 2.5);
-                        osc.connect(g);
-                        g.connect(audioCtx.destination);
-                        osc.start(now + i * 2.5 + 1);
-                        osc.stop(now + i * 2.5 + 2.5);
-                        ambientNodes.push(osc);
-                        ambientNodes.push(g);
-                    }
                 }
 
-                // 2. ВЕТЕР С ЛИСТВОЙ
                 else if (type === 2) {
                     const bufferSize = audioCtx.sampleRate * 5;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
                         const t = i / audioCtx.sampleRate;
-                        let val = (Math.random() * 2 - 1) * 0.07 * (0.5 + 0.5 * Math.sin(t * 0.1));
-                        val += Math.sin(t * 3.5 + 0.3) * 0.015;
-                        val += Math.sin(t * 4.2 + 0.7) * 0.010;
-                        val += Math.sin(t * 0.15 + 0.5) * 0.02;
+                        let val = (Math.random() * 2 - 1) * 0.05 * (0.5 + 0.5 * Math.sin(t * 0.08));
+                        val += Math.sin(t * 3.0 + 0.3) * 0.01;
+                        val += Math.sin(t * 4.5 + 0.7) * 0.007;
+                        val += Math.sin(t * 0.12 + 0.5) * 0.015;
                         data[i] = val;
                     }
                     const noise = audioCtx.createBufferSource();
                     noise.buffer = buffer;
                     noise.loop = true;
                     const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.05, now);
-                    gain.gain.exponentialRampToValueAtTime(0.035, now + 1);
+                    gain.gain.setValueAtTime(0.04, now);
+                    gain.gain.exponentialRampToValueAtTime(0.03, now + 1);
                     noise.connect(gain);
                     gain.connect(audioCtx.destination);
                     noise.start(now);
@@ -1134,16 +1111,15 @@
                     ambientNodes.push(gain);
                 }
 
-                // 3. КОСМОС
                 else if (type === 3) {
                     const bufferSize = audioCtx.sampleRate * 5;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
                         const t = i / audioCtx.sampleRate;
-                        let val = Math.sin(t * 0.4) * 0.025;
-                        val += Math.sin(t * 0.7 + 0.3) * 0.015;
-                        val += Math.sin(t * 1.1 + 0.8) * 0.010;
+                        let val = Math.sin(t * 0.35) * 0.025;
+                        val += Math.sin(t * 0.65 + 0.3) * 0.015;
+                        val += Math.sin(t * 1.0 + 0.8) * 0.010;
                         val += (Math.random() * 2 - 1) * 0.005;
                         data[i] = val;
                     }
@@ -1151,8 +1127,8 @@
                     noise.buffer = buffer;
                     noise.loop = true;
                     const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.035, now);
-                    gain.gain.exponentialRampToValueAtTime(0.025, now + 1);
+                    gain.gain.setValueAtTime(0.03, now);
+                    gain.gain.exponentialRampToValueAtTime(0.02, now + 1);
                     noise.connect(gain);
                     gain.connect(audioCtx.destination);
                     noise.start(now);
@@ -1177,25 +1153,24 @@
                     }
                 }
 
-                // 4. ВОДА
                 else if (type === 4) {
                     const bufferSize = audioCtx.sampleRate * 5;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
                         const t = i / audioCtx.sampleRate;
-                        let val = (Math.random() * 2 - 1) * 0.05 * (0.6 + 0.4 * Math.sin(t * 0.2));
-                        val += Math.sin(t * 0.8 + 0.5) * 0.015;
-                        val += Math.sin(t * 1.2 + 0.9) * 0.010;
-                        if (Math.random() < 0.001) val += (Math.random() * 2 - 1) * 0.08;
+                        let val = (Math.random() * 2 - 1) * 0.045 * (0.6 + 0.4 * Math.sin(t * 0.2));
+                        val += Math.sin(t * 0.8 + 0.5) * 0.012;
+                        val += Math.sin(t * 1.2 + 0.9) * 0.008;
+                        if (Math.random() < 0.001) val += (Math.random() * 2 - 1) * 0.07;
                         data[i] = val;
                     }
                     const noise = audioCtx.createBufferSource();
                     noise.buffer = buffer;
                     noise.loop = true;
                     const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.04, now);
-                    gain.gain.exponentialRampToValueAtTime(0.03, now + 1);
+                    gain.gain.setValueAtTime(0.035, now);
+                    gain.gain.exponentialRampToValueAtTime(0.025, now + 1);
                     noise.connect(gain);
                     gain.connect(audioCtx.destination);
                     noise.start(now);
@@ -1209,7 +1184,7 @@
                         osc.frequency.setValueAtTime(150 + i * 25 + Math.random() * 10, now + i * 0.4 + 0.2);
                         osc.frequency.exponentialRampToValueAtTime(130 + i * 20 + Math.random() * 8, now + i * 0.4 + 0.8);
                         const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.015, now + i * 0.4 + 0.2);
+                        g.gain.setValueAtTime(0.012, now + i * 0.4 + 0.2);
                         g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.4 + 0.8);
                         osc.connect(g);
                         g.connect(audioCtx.destination);
@@ -1220,16 +1195,15 @@
                     }
                 }
 
-                // 5. КОЛОКОЛЬЧИКИ
                 else if (type === 5) {
                     const bufferSize = audioCtx.sampleRate * 5;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
                         const t = i / audioCtx.sampleRate;
-                        let val = Math.sin(t * 2.5) * 0.02;
-                        val += Math.sin(t * 3.2 + 0.4) * 0.015;
-                        val += Math.sin(t * 4.0 + 0.8) * 0.010;
+                        let val = Math.sin(t * 2.5) * 0.018;
+                        val += Math.sin(t * 3.2 + 0.4) * 0.012;
+                        val += Math.sin(t * 4.0 + 0.8) * 0.008;
                         val += (Math.random() * 2 - 1) * 0.003;
                         data[i] = val;
                     }
@@ -1237,8 +1211,8 @@
                     noise.buffer = buffer;
                     noise.loop = true;
                     const gain = audioCtx.createGain();
-                    gain.gain.setValueAtTime(0.025, now);
-                    gain.gain.exponentialRampToValueAtTime(0.018, now + 1);
+                    gain.gain.setValueAtTime(0.02, now);
+                    gain.gain.exponentialRampToValueAtTime(0.015, now + 1);
                     noise.connect(gain);
                     gain.connect(audioCtx.destination);
                     noise.start(now);
@@ -1250,14 +1224,14 @@
                         const osc = audioCtx.createOscillator();
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(400 + i * 70 + Math.random() * 30, now + i * 0.10);
-                        osc.frequency.exponentialRampToValueAtTime(500 + i * 60 + Math.random() * 20, now + i * 0.10 + 1.2);
+                        osc.frequency.exponentialRampToValueAtTime(500 + i * 60 + Math.random() * 20, now + i * 0.10 + 1.0);
                         const g = audioCtx.createGain();
-                        g.gain.setValueAtTime(0.012, now + i * 0.10);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.10 + 1.2);
+                        g.gain.setValueAtTime(0.01, now + i * 0.10);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.10 + 1.0);
                         osc.connect(g);
                         g.connect(audioCtx.destination);
                         osc.start(now + i * 0.10);
-                        osc.stop(now + i * 0.10 + 1.2);
+                        osc.stop(now + i * 0.10 + 1.0);
                         ambientNodes.push(osc);
                         ambientNodes.push(g);
                     }
@@ -1275,7 +1249,6 @@
 
         // ===== ЗВУКИ ЗВЁЗД =====
         function playStarSound(type) {
-            console.log('⭐ НОВЫЙ ЗВУК ЗВЕЗДЫ!', type);
             initAudio();
             try {
                 const now = audioCtx.currentTime;
@@ -1284,44 +1257,30 @@
                     const osc = audioCtx.createOscillator();
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(1200, now);
-                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.25);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.2);
                     const gain = audioCtx.createGain();
                     gain.gain.setValueAtTime(0.04, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     osc.start(now);
-                    osc.stop(now + 0.3);
+                    osc.stop(now + 0.25);
                     ambientNodes.push(osc);
                     ambientNodes.push(gain);
 
                     const osc2 = audioCtx.createOscillator();
                     osc2.type = 'sine';
                     osc2.frequency.setValueAtTime(1800, now + 0.02);
-                    osc2.frequency.exponentialRampToValueAtTime(1400, now + 0.2);
+                    osc2.frequency.exponentialRampToValueAtTime(1400, now + 0.15);
                     const gain2 = audioCtx.createGain();
                     gain2.gain.setValueAtTime(0.02, now + 0.02);
-                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
                     osc2.connect(gain2);
                     gain2.connect(audioCtx.destination);
                     osc2.start(now + 0.02);
-                    osc2.stop(now + 0.22);
+                    osc2.stop(now + 0.18);
                     ambientNodes.push(osc2);
                     ambientNodes.push(gain2);
-
-                    const osc3 = audioCtx.createOscillator();
-                    osc3.type = 'sine';
-                    osc3.frequency.setValueAtTime(1000, now + 0.08);
-                    osc3.frequency.exponentialRampToValueAtTime(700, now + 0.15);
-                    const gain3 = audioCtx.createGain();
-                    gain3.gain.setValueAtTime(0.015, now + 0.08);
-                    gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-                    osc3.connect(gain3);
-                    gain3.connect(audioCtx.destination);
-                    osc3.start(now + 0.08);
-                    osc3.stop(now + 0.18);
-                    ambientNodes.push(osc3);
-                    ambientNodes.push(gain3);
 
                     const bufferSize = audioCtx.sampleRate * 0.03;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -1346,30 +1305,16 @@
                     const osc = audioCtx.createOscillator();
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(900, now);
-                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.4);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.35);
                     const gain = audioCtx.createGain();
                     gain.gain.setValueAtTime(0.035, now);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     osc.start(now);
-                    osc.stop(now + 0.45);
+                    osc.stop(now + 0.4);
                     ambientNodes.push(osc);
                     ambientNodes.push(gain);
-
-                    const osc2 = audioCtx.createOscillator();
-                    osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(1400, now + 0.03);
-                    osc2.frequency.exponentialRampToValueAtTime(600, now + 0.25);
-                    const gain2 = audioCtx.createGain();
-                    gain2.gain.setValueAtTime(0.02, now + 0.03);
-                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
-                    osc2.connect(gain2);
-                    gain2.connect(audioCtx.destination);
-                    osc2.start(now + 0.03);
-                    osc2.stop(now + 0.28);
-                    ambientNodes.push(osc2);
-                    ambientNodes.push(gain2);
 
                     for (let i = 0; i < 5; i++) {
                         const osc3 = audioCtx.createOscillator();
@@ -1387,7 +1332,7 @@
                         ambientNodes.push(gain3);
                     }
 
-                    const bufferSize = audioCtx.sampleRate * 0.05;
+                    const bufferSize = audioCtx.sampleRate * 0.04;
                     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                     const data = buffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) {
@@ -1396,12 +1341,12 @@
                     const noise = audioCtx.createBufferSource();
                     noise.buffer = buffer;
                     const gainNoise = audioCtx.createGain();
-                    gainNoise.gain.setValueAtTime(0.025, now);
-                    gainNoise.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    gainNoise.gain.setValueAtTime(0.02, now);
+                    gainNoise.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
                     noise.connect(gainNoise);
                     gainNoise.connect(audioCtx.destination);
                     noise.start(now);
-                    noise.stop(now + 0.05);
+                    noise.stop(now + 0.04);
                     ambientNodes.push(noise);
                     ambientNodes.push(gainNoise);
                 }
