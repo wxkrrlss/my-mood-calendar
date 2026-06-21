@@ -945,12 +945,14 @@
         let waveStates = {};
 
 // =================================================================
-        // 2. ЗВУКИ — ТОЛЬКО ПЕСНЯ (ПРИВЯЗАНА К САЙТУ)
+        // 2. ЗВУКИ — ПЕСНЯ + ДОЖДЬ ДЛЯ 1 И 2 ФОНА
         // =================================================================
         let audioContext = null;
         let audioElement = null;
         let isMusicPlaying = false;
         let musicStarted = false;
+        let rainNodes1 = [];
+        let rainNodes2 = [];
 
         // Инициализация аудио
         function initAudio() {
@@ -964,6 +966,103 @@
                                 audioElement.loop = true;
                         }
                 }
+        }
+
+        // ===== ЗВУК ДОЖДЯ ДЛЯ ОЦЕНКИ 1 =====
+        function createRainSound1() {
+                try {
+                        initAudio();
+                        const now = audioContext.currentTime;
+                        const bufferSize = audioContext.sampleRate * 4;
+                        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+                        const data = buffer.getChannelData(0);
+                        for (let i = 0; i < bufferSize; i++) {
+                                const t = i / audioContext.sampleRate;
+                                let val = (Math.random() * 2 - 1) * 0.12 * (0.8 + 0.2 * Math.sin(t * 0.3));
+                                if (Math.random() < 0.002) {
+                                        val += (Math.random() * 2 - 1) * 0.15;
+                                }
+                                val += Math.sin(t * 0.05) * 0.01;
+                                data[i] = val;
+                        }
+                        const noise = audioContext.createBufferSource();
+                        noise.buffer = buffer;
+                        noise.loop = true;
+                        const gain = audioContext.createGain();
+                        gain.gain.setValueAtTime(0.08, now);
+                        gain.gain.exponentialRampToValueAtTime(0.06, now + 1);
+                        noise.connect(gain);
+                        gain.connect(audioContext.destination);
+                        noise.start(now);
+                        noise.stop(now + 20);
+                        rainNodes1.push(noise);
+                        rainNodes1.push(gain);
+
+                        // Гром (для атмосферы)
+                        for (let i = 0; i < 3; i++) {
+                                const osc = audioContext.createOscillator();
+                                osc.type = 'sawtooth';
+                                osc.frequency.setValueAtTime(50 + i * 15, now + i * 2.5 + 1);
+                                osc.frequency.exponentialRampToValueAtTime(30 + i * 10, now + i * 2.5 + 2.5);
+                                const g = audioContext.createGain();
+                                g.gain.setValueAtTime(0.03, now + i * 2.5 + 1);
+                                g.gain.exponentialRampToValueAtTime(0.001, now + i * 2.5 + 2.5);
+                                osc.connect(g);
+                                g.connect(audioContext.destination);
+                                osc.start(now + i * 2.5 + 1);
+                                osc.stop(now + i * 2.5 + 2.5);
+                                rainNodes1.push(osc);
+                                rainNodes1.push(g);
+                        }
+                } catch (e) {}
+        }
+
+        // ===== ЗВУК ДОЖДЯ ДЛЯ ОЦЕНКИ 2 =====
+        function createRainSound2() {
+                try {
+                        initAudio();
+                        const now = audioContext.currentTime;
+                        const bufferSize = audioContext.sampleRate * 4;
+                        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+                        const data = buffer.getChannelData(0);
+                        for (let i = 0; i < bufferSize; i++) {
+                                const t = i / audioContext.sampleRate;
+                                let val = (Math.random() * 2 - 1) * 0.06 * (0.6 + 0.4 * Math.sin(t * 0.2));
+                                val += Math.sin(t * 0.5) * 0.01;
+                                if (Math.random() < 0.001) {
+                                        val += (Math.random() * 2 - 1) * 0.06;
+                                }
+                                data[i] = val;
+                        }
+                        const noise = audioContext.createBufferSource();
+                        noise.buffer = buffer;
+                        noise.loop = true;
+                        const gain = audioContext.createGain();
+                        gain.gain.setValueAtTime(0.05, now);
+                        gain.gain.exponentialRampToValueAtTime(0.035, now + 1);
+                        noise.connect(gain);
+                        gain.connect(audioContext.destination);
+                        noise.start(now);
+                        noise.stop(now + 20);
+                        rainNodes2.push(noise);
+                        rainNodes2.push(gain);
+                } catch (e) {}
+        }
+
+        // ===== ФУНКЦИЯ ДЛЯ ЗАПУСКА ДОЖДЯ ПРИ ОЦЕНКЕ =====
+        function createMoodSound(type) {
+                // Останавливаем старые звуки дождя
+                rainNodes1.forEach(node => { try { node.stop(); } catch (e) {} });
+                rainNodes1 = [];
+                rainNodes2.forEach(node => { try { node.stop(); } catch (e) {} });
+                rainNodes2 = [];
+
+                if (type === 1) {
+                        createRainSound1();
+                } else if (type === 2) {
+                        createRainSound2();
+                }
+                // Для 3,4,5 — нет дополнительных звуков, только песня
         }
 
         // Запуск музыки (привязка к сайту)
@@ -1011,7 +1110,12 @@
                 }
                 isMusicPlaying = false;
                 musicStarted = false;
-                console.log('⏹️ Музыка остановлена');
+                // Останавливаем дождь
+                rainNodes1.forEach(node => { try { node.stop(); } catch (e) {} });
+                rainNodes1 = [];
+                rainNodes2.forEach(node => { try { node.stop(); } catch (e) {} });
+                rainNodes2 = [];
+                console.log('⏹️ Музыка и дождь остановлены');
         }
 
         // Переключение play/pause
@@ -1029,6 +1133,7 @@
 
         console.log('🎵 Нажмите на страницу, чтобы включить музыку');
         console.log('🎵 Музыка привязана к сайту и будет играть бесконечно');
+        console.log('🌧️ Для оценок 1 и 2 будет звук дождя');
         
         // =================================================================
         // 3. ДАННЫЕ
@@ -1460,7 +1565,8 @@
             flowers = [];
             flareParticles = [];
             lightningFlash = 0;
-
+            // ЗАПУСКАЕМ ЗВУКИ ДОЖДЯ
+            createMoodSound(mood);
 
             switch (mood) {
                 case 1:
