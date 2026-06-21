@@ -978,7 +978,6 @@
                         return;
                 }
                 
-                // Включаем звук
                 audioElement.play()
                         .then(() => {
                                 isMusicPlaying = true;
@@ -987,9 +986,9 @@
                         })
                         .catch((err) => {
                                 console.log('❌ Ошибка запуска:', err);
-                                // Пробуем через AudioContext
                                 tryPlayViaContext();
                         });
+        }
 
         // Запасной вариант через AudioContext
         function tryPlayViaContext() {
@@ -998,14 +997,13 @@
                         if (audioContext.state === 'suspended') {
                                 audioContext.resume();
                         }
-                        // Пробуем ещё раз
                         if (audioElement) {
                                 audioElement.play().catch(() => {});
                         }
                 } catch (e) {}
         }
 
-        // Остановка музыки (если нужно)
+        // Остановка музыки
         function stopMusic() {
                 if (audioElement) {
                         audioElement.pause();
@@ -1031,6 +1029,7 @@
 
         console.log('🎵 Нажмите на страницу, чтобы включить музыку');
         console.log('🎵 Музыка привязана к сайту и будет играть бесконечно');
+        
         // =================================================================
         // 3. ДАННЫЕ
         // =================================================================
