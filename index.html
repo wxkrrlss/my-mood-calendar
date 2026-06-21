@@ -2345,14 +2345,7 @@
         renderCalendar();
         initBgCanvas();
 
-        // Попытка запустить музыку при клике (для обхода автоблокировки)
-        document.addEventListener('click', function playOnClick() {
-            if (!isAmbientPlaying) {
-                playMainAmbient();
-            }
-            document.removeEventListener('click', playOnClick);
-        });
-
+    
         window.addEventListener('resize', function() {
             if (canvas) resizeCanvas();
             resizeBgCanvas();
@@ -2366,7 +2359,6 @@
         } catch (e) {}
 
         console.log('📅 Календарь настроения загружен!');
-        console.log('🎵 Фоновая музыка: watching the sky - foreveralone');
         console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
     </script>
 </body>
