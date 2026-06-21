@@ -998,22 +998,7 @@
                         rainNodes1.push(noise);
                         rainNodes1.push(gain);
 
-                        // Гром (для атмосферы)
-                        for (let i = 0; i < 3; i++) {
-                                const osc = audioContext.createOscillator();
-                                osc.type = 'sawtooth';
-                                osc.frequency.setValueAtTime(50 + i * 15, now + i * 2.5 + 1);
-                                osc.frequency.exponentialRampToValueAtTime(30 + i * 10, now + i * 2.5 + 2.5);
-                                const g = audioContext.createGain();
-                                g.gain.setValueAtTime(0.03, now + i * 2.5 + 1);
-                                g.gain.exponentialRampToValueAtTime(0.001, now + i * 2.5 + 2.5);
-                                osc.connect(g);
-                                g.connect(audioContext.destination);
-                                osc.start(now + i * 2.5 + 1);
-                                osc.stop(now + i * 2.5 + 2.5);
-                                rainNodes1.push(osc);
-                                rainNodes1.push(g);
-                        }
+                        
                 } catch (e) {}
         }
 
@@ -2018,61 +2003,80 @@
             data.note = '';
             saveData();
         });
-
         function createCrystalAppearance(x, y) {
-            const ripple = document.createElement('div');
-            ripple.style.cssText = `
-                position: fixed; left: ${x-80}px; top: ${y-80}px;
-                width: 160px; height: 160px;
-                border: 1px solid rgba(200,230,255,0.10);
+            // Плавная световая вспышка
+            const glow = document.createElement('div');
+            glow.style.cssText = `
+                position: fixed; left: ${x-120}px; top: ${y-120}px;
+                width: 240px; height: 240px;
                 border-radius: 50%;
+                background: radial-gradient(circle, rgba(200,230,255,0.12) 0%, rgba(200,230,255,0.04) 40%, transparent 70%);
                 pointer-events: none; z-index: 2000;
-                transform: scale(0);
-                animation: rippleCrystal 1s ease-out forwards;
+                opacity: 0;
+                transform: scale(0.5);
+                transition: all 1.2s cubic-bezier(0.2, 0.9, 0.4, 1);
             `;
-            document.body.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 1100);
+            document.body.appendChild(glow);
+            requestAnimationFrame(() => {
+                glow.style.opacity = '1';
+                glow.style.transform = 'scale(1.5)';
+            });
+            setTimeout(() => {
+                glow.style.opacity = '0';
+                glow.style.transform = 'scale(2.5)';
+            }, 800);
+            setTimeout(() => glow.remove(), 2000);
 
-            const flash = document.createElement('div');
-            flash.style.cssText = `
-                position: fixed; left: ${x-50}px; top: ${y-50}px;
-                width: 100px; height: 100px;
-                border-radius: 50%;
-                background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(200,230,255,0.05) 40%, transparent 70%);
-                pointer-events: none; z-index: 2000;
-                transform: scale(0);
-                animation: flashCrystal 0.8s ease-out forwards;
-            `;
-            document.body.appendChild(flash);
-            setTimeout(() => flash.remove(), 900);
-
-            for (let i = 0; i < 15; i++) {
+            // Мягкие искры, разлетающиеся плавно
+            for (let i = 0; i < 20; i++) {
                 const spark = document.createElement('div');
                 const angle = Math.random() * Math.PI * 2;
-                const dist = 40 + Math.random() * 80;
+                const dist = 30 + Math.random() * 70;
                 const dx = Math.cos(angle) * dist;
-                const dy = Math.sin(angle) * dist;
+                const dy = Math.sin(angle) * dist - 20;
                 const size = 2 + Math.random() * 4;
-                const hue = 200 + Math.random() * 40;
-                const color = `hsl(${hue}, 70%, ${70 + Math.random() * 30}%)`;
+                const delay = Math.random() * 0.3;
+                const colors = ['#c8e6ff', '#b0d4ff', '#ffffff', '#e0f0ff', '#d0e8ff'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
                 spark.style.cssText = `
                     position: fixed; left: ${x}px; top: ${y}px;
                     width: ${size}px; height: ${size}px;
                     border-radius: 50%;
                     background: ${color};
-                    box-shadow: 0 0 10px ${color};
+                    box-shadow: 0 0 15px ${color};
                     pointer-events: none; z-index: 2000;
-                    transition: all 0.8s ease-out;
-                    opacity: 0.6;
+                    opacity: 0;
+                    transform: scale(0);
+                    transition: all 1.5s cubic-bezier(0.2, 0.9, 0.4, 1);
+                    transition-delay: ${delay}s;
                 `;
                 document.body.appendChild(spark);
                 requestAnimationFrame(() => {
-                    spark.style.transform = `translate(${dx}px, ${dy}px) scale(0)`;
-                    spark.style.opacity = '0';
+                    spark.style.opacity = '0.7';
+                    spark.style.transform = `translate(${dx}px, ${dy}px) scale(1)`;
                 });
-                setTimeout(() => spark.remove(), 900);
+                setTimeout(() => {
+                    spark.style.opacity = '0';
+                    spark.style.transform = `translate(${dx * 1.5}px, ${dy * 1.5}px) scale(0)`;
+                }, 1200 + delay * 1000);
+                setTimeout(() => spark.remove(), 2500 + delay * 1000);
             }
 
+            // Добавляем стили для плавного появления
+            if (!document.getElementById('crystalStyles')) {
+                const style = document.createElement('style');
+                style.id = 'crystalStyles';
+                style.textContent = `
+                    @keyframes appearSoft {
+                        0% { transform: scale(0.3); opacity: 0; }
+                        40% { transform: scale(1.2); opacity: 0.8; }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
             if (!document.getElementById('crystalStyles')) {
                 const style = document.createElement('style');
                 style.id = 'crystalStyles';
@@ -2096,45 +2100,55 @@
         // 12. ЗВЁЗДЫ — УДАЛЕНИЕ
         // =================================================================
         function deleteStar(star) {
-            const mist = document.createElement('div');
-            mist.style.cssText = `
-                position: fixed; left: ${star.x-100}px; top: ${star.y-100}px;
-                width: 200px; height: 200px;
+            // Плавное затухание с увеличением
+            const dissolve = document.createElement('div');
+            dissolve.style.cssText = `
+                position: fixed; left: ${star.x-120}px; top: ${star.y-120}px;
+                width: 240px; height: 240px;
                 border-radius: 50%;
-                background: radial-gradient(circle, rgba(200,230,255,0.08) 0%, rgba(150,200,255,0.04) 30%, transparent 70%);
+                background: radial-gradient(circle, rgba(200,230,255,0.06) 0%, rgba(200,230,255,0.03) 40%, transparent 70%);
                 pointer-events: none; z-index: 2000;
-                transform: scale(0.5);
-                opacity: 0;
-                animation: mistCrystal 1s ease-out forwards;
+                opacity: 0.4;
+                transform: scale(0.6);
+                transition: all 2s cubic-bezier(0.3, 0.8, 0.4, 1);
             `;
-            document.body.appendChild(mist);
-            setTimeout(() => mist.remove(), 1100);
+            document.body.appendChild(dissolve);
+            requestAnimationFrame(() => {
+                dissolve.style.opacity = '0';
+                dissolve.style.transform = 'scale(2.5)';
+            });
+            setTimeout(() => dissolve.remove(), 2200);
 
+            // Медленные частицы, плавно рассеивающиеся
             for (let i = 0; i < 25; i++) {
                 const particle = document.createElement('div');
-                const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.0;
-                const speed = 60 + Math.random() * 120;
-                const dx = Math.cos(angle) * speed;
-                const dy = Math.sin(angle) * speed - 60;
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 40 + Math.random() * 100;
+                const dx = Math.cos(angle) * dist;
+                const dy = Math.sin(angle) * dist - 30;
                 const size = 2 + Math.random() * 4;
-                const hue = 190 + Math.random() * 40;
-                const color = `hsl(${hue}, 60%, ${70 + Math.random() * 30}%)`;
+                const delay = Math.random() * 0.4;
+                const duration = 1.8 + Math.random() * 0.6;
+                const colors = ['#c8e6ff', '#b0d4ff', '#ffffff', '#e0f0ff', '#d0e8ff'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
                 particle.style.cssText = `
                     position: fixed; left: ${star.x}px; top: ${star.y}px;
                     width: ${size}px; height: ${size}px;
                     border-radius: 50%;
                     background: ${color};
-                    box-shadow: 0 0 15px ${color};
+                    box-shadow: 0 0 20px ${color};
                     pointer-events: none; z-index: 2000;
-                    transition: all 1s cubic-bezier(0.2, 0.9, 0.4, 1);
                     opacity: 0.6;
+                    transform: scale(1);
+                    transition: all ${duration}s cubic-bezier(0.3, 0.8, 0.4, 1);
+                    transition-delay: ${delay}s;
                 `;
                 document.body.appendChild(particle);
                 requestAnimationFrame(() => {
-                    particle.style.transform = `translate(${dx}px, ${dy}px) scale(0)`;
+                    particle.style.transform = `translate(${dx}px, ${dy}px) scale(0.1)`;
                     particle.style.opacity = '0';
                 });
-                setTimeout(() => particle.remove(), 1200);
+                setTimeout(() => particle.remove(), (duration + delay) * 1000 + 300);
             }
 
             const data = getDayData(currentDateStr);
@@ -2144,19 +2158,6 @@
             updateStarCounter();
             renderCalendar();
             longPressTarget = null;
-
-            if (!document.getElementById('mistCrystalStyles')) {
-                const style = document.createElement('style');
-                style.id = 'mistCrystalStyles';
-                style.textContent = `
-                    @keyframes mistCrystal {
-                        0% { transform: scale(0.5); opacity: 0; }
-                        30% { transform: scale(1.2); opacity: 0.5; }
-                        100% { transform: scale(2.2); opacity: 0; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
         }
 
         // =================================================================
@@ -2398,6 +2399,12 @@
             if (animationId) cancelAnimationFrame(animationId);
             setMoodEffect(0);
             renderCalendar();
+            
+            // Останавливаем только дождь (музыка остаётся)
+            rainNodes1.forEach(node => { try { node.stop(); } catch (e) {} });
+            rainNodes1 = [];
+            rainNodes2.forEach(node => { try { node.stop(); } catch (e) {} });
+            rainNodes2 = [];
         });
 
         document.getElementById('prevMonth').addEventListener('click', function() {
