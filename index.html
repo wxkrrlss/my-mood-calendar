@@ -2431,6 +2431,50 @@
 
         console.log('📅 Календарь настроения загружен!');
         console.log('💡 Для сброса дня зажми дату в центре вверху на 2 секунды.');
+        // =================================================================
+        // 19. ОТПРАВКА ДАННЫХ В ТЕЛЕГРАМ-БОТА
+        // =================================================================
+        function sendToBot(data) {
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.sendData(JSON.stringify(data));
+                console.log('📤 Данные отправлены в бота:', data);
+            } else {
+                console.log('⚠️ Telegram WebApp не найден, данные сохранены локально');
+            }
+        }
+
+        // Отправляем данные при сохранении дня (после нажатия "Подтвердить")
+        function saveDayToBot() {
+            if (!currentDateStr) return;
+            
+            const data = {
+                date: currentDateStr,
+                mood: selectedMood || 0,
+                emotions: selectedStates || [],
+                stars: stars.map(s => s.note || ''),
+                note: document.getElementById('noteInput').value || ''
+            };
+            sendToBot(data);
+        }
+
+        // Перехватываем сохранение дня (добавляем отправку в бота)
+        const originalConfirm = document.getElementById('moodConfirmBtn').click;
+        document.getElementById('moodConfirmBtn').addEventListener('click', function() {
+            // Даём время на сохранение в localStorage
+            setTimeout(() => {
+                saveDayToBot();
+            }, 300);
+        });
+
+        // Также отправляем при добавлении звезды
+        const originalStarBtn = document.getElementById('starBtn').click;
+        document.getElementById('starBtn').addEventListener('click', function() {
+            setTimeout(() => {
+                saveDayToBot();
+            }, 300);
+        });
+
+        console.log('📤 Отправка данных в бота настроена');
     </script>
 </body>
 </html>
