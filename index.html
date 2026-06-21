@@ -990,11 +990,6 @@
                                 // Пробуем через AudioContext
                                 tryPlayViaContext();
                         });
-                
-                // Удаляем обработчики после запуска
-                document.removeEventListener('click', startMusic);
-                document.removeEventListener('touchstart', startMusic);
-        }
 
         // Запасной вариант через AudioContext
         function tryPlayViaContext() {
