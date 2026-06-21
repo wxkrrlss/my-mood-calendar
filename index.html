@@ -997,8 +997,6 @@
                         noise.stop(now + 20);
                         rainNodes1.push(noise);
                         rainNodes1.push(gain);
-
-                        
                 } catch (e) {}
         }
 
@@ -1863,7 +1861,7 @@
                 ctx.fillText('Нажми на кнопки внизу', w / 2, h * 0.4 + 24);
             }
 
-            // ===== ЗВЁЗДЫ (БЕЗ ИЗМЕНЕНИЙ) =====
+            // ===== ЗВЁЗДЫ =====
             stars.forEach((star, idx) => {
                 const floatOffset = star.floatPhase || 0;
                 const crystalOffset = star.crystalPhase || 0;
@@ -2003,6 +2001,8 @@
             data.note = '';
             saveData();
         });
+
+        // ===== ПОЯВЛЕНИЕ ЗВЕЗДЫ (ПЛАВНОЕ) =====
         function createCrystalAppearance(x, y) {
             // Плавная световая вспышка
             const glow = document.createElement('div');
@@ -2061,43 +2061,10 @@
                 }, 1200 + delay * 1000);
                 setTimeout(() => spark.remove(), 2500 + delay * 1000);
             }
-
-            // Добавляем стили для плавного появления
-            if (!document.getElementById('crystalStyles')) {
-                const style = document.createElement('style');
-                style.id = 'crystalStyles';
-                style.textContent = `
-                    @keyframes appearSoft {
-                        0% { transform: scale(0.3); opacity: 0; }
-                        40% { transform: scale(1.2); opacity: 0.8; }
-                        100% { transform: scale(1); opacity: 1; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }
-        
-            if (!document.getElementById('crystalStyles')) {
-                const style = document.createElement('style');
-                style.id = 'crystalStyles';
-                style.textContent = `
-                    @keyframes rippleCrystal {
-                        0% { transform: scale(0); opacity: 1; }
-                        60% { transform: scale(1.4); opacity: 0.5; }
-                        100% { transform: scale(2); opacity: 0; }
-                    }
-                    @keyframes flashCrystal {
-                        0% { transform: scale(0); opacity: 1; }
-                        50% { transform: scale(1.8); opacity: 0.6; }
-                        100% { transform: scale(3); opacity: 0; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
         }
 
         // =================================================================
-        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ
+        // 12. ЗВЁЗДЫ — УДАЛЕНИЕ (ПЛАВНОЕ)
         // =================================================================
         function deleteStar(star) {
             // Плавное затухание с увеличением
